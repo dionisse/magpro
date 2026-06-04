@@ -13,6 +13,7 @@ interface AuthContextValue {
   signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   canAccess: (module: AdminModule) => boolean;
+  reloadProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -48,33 +49,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function loadProfile(userId: string) {
-    const { data } = await supabase
+    // Step 1: Always fetch the base profile first (simple query, no joins)
+    const { data: baseProfile } = await supabase
       .from('profiles')
-      .select('*, sections(id, name, color, section_permissions(module))')
+      .select('*')
       .eq('id', userId)
       .maybeSingle();
 
-    type ProfileWithSection = Profile & {
-      sections?: { section_permissions: { module: string }[] } | null;
-    };
-    const prof = data as ProfileWithSection | null;
+    const prof = baseProfile as Profile | null;
     setProfile(prof);
 
     if (!prof) {
       setAllowedModules([]);
-    } else if (prof.role === 'admin') {
-      setAllowedModules(null); // null = unrestricted
-    } else if (prof.section_id && prof.sections?.section_permissions) {
-      setAllowedModules(prof.sections.section_permissions.map((p) => p.module as AdminModule));
+      setLoading(false);
+      return;
+    }
+
+    // Admins always have full access — no need to load section permissions
+    if (prof.role === 'admin') {
+      setAllowedModules(null);
+      setLoading(false);
+      return;
+    }
+
+    // Step 2: For non-admins with a section, load permissions separately
+    if (prof.section_id) {
+      const { data: permsData } = await supabase
+        .from('section_permissions')
+        .select('module')
+        .eq('section_id', prof.section_id);
+
+      if (permsData && permsData.length > 0) {
+        setAllowedModules(permsData.map((p) => p.module as AdminModule));
+      } else {
+        setAllowedModules([]);
+      }
     } else {
+      // Staff without a section: no module access by default
       setAllowedModules([]);
     }
 
     setLoading(false);
   }
 
+  async function reloadProfile() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) await loadProfile(session.user.id);
+  }
+
   function canAccess(module: AdminModule): boolean {
-    if (allowedModules === null) return true;
+    if (allowedModules === null) return true; // admin
     return allowedModules.includes(module);
   }
 
@@ -99,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, allowedModules, loading, signIn, signUp, signOut, canAccess }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, allowedModules, loading, signIn, signUp, signOut, canAccess, reloadProfile }}>
       {children}
     </AuthContext.Provider>
   );

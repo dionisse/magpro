@@ -13,7 +13,7 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const isStaff = profile?.role === 'admin' || profile?.role === 'cashier';
+  const isStaff = profile?.role === 'admin' || profile?.role === 'cashier' || profile?.role === 'employee';
 
   if (isStaff) {
     setView({ kind: 'admin-dashboard' });
