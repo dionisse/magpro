@@ -78,9 +78,34 @@ export interface Category {
   created_at: string;
 }
 
+export interface Brand {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface ProductOptionGroup {
+  id: string;
+  product_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+  product_options?: ProductOption[];
+}
+
+export interface ProductOption {
+  id: string;
+  group_id: string;
+  label: string;
+  price_modifier: number;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Product {
   id: string;
   category_id: string | null;
+  brand_id: string | null;
   name: string;
   description: string;
   price: number;
