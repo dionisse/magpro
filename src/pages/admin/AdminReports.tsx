@@ -275,7 +275,7 @@ export function AdminReports() {
               <h2 className="font-semibold mb-3">Modes de paiement</h2>
               <div className="space-y-2">
                 {Object.entries(paymentBreakdown).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
-                  const labels: Record<string, string> = { cash: 'Espèces', mobile_money_mtn: 'MTN MoMo', mobile_money_moov: 'MOOV Money', mobile_money_celtis: 'CELTIS Pay', bank_transfer: 'Virement', cash_on_delivery: 'Livraison', chariow_online: 'En ligne' };
+                  const labels: Record<string, string> = { cash: 'Espèces', mobile_money_mtn: 'MTN MoMo', mobile_money_moov: 'MOOV Money', mobile_money_celtis: 'CELTIS Pay', bank_transfer: 'Virement', cash_on_delivery: 'Livraison', fedapay_online: 'FedaPay', chariow_online: 'Chariow' };
                   return (
                     <div key={method}>
                       <div className="flex justify-between text-sm mb-1">

@@ -15,6 +15,7 @@ const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   mobile_money_celtis: 'CELTIS Pay',
   bank_transfer: 'Virement',
   cash_on_delivery: 'À la livraison',
+  fedapay_online: 'FedaPay',
   chariow_online: 'En ligne',
 };
 

@@ -22,13 +22,14 @@ interface PaymentOption {
 }
 
 const PAYMENT_OPTIONS: PaymentOption[] = [
-  { method: 'cash',               label: 'Espèces',           sublabel: 'Paiement en main propre',         icon: <Banknote className="w-5 h-5" />,    group: 'manual', color: 'odoo-success' },
-  { method: 'mobile_money_mtn',   label: 'MTN Mobile Money',  sublabel: 'MTN MoMo',                        icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-warning' },
-  { method: 'mobile_money_moov',  label: 'MOOV Money',        sublabel: 'Moov Africa',                     icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-info' },
-  { method: 'mobile_money_celtis',label: 'CELTIS Pay',        sublabel: 'Celtis Mobile',                   icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-primary' },
-  { method: 'bank_transfer',      label: 'Virement bancaire', sublabel: 'Virement sur compte',             icon: <Building2 className="w-5 h-5" />,   group: 'manual', color: 'odoo-secondary' },
-  { method: 'cash_on_delivery',   label: 'Paiement à la livraison', sublabel: 'Règlement à réception',    icon: <Truck className="w-5 h-5" />,       group: 'manual', color: 'odoo-muted' },
-  { method: 'chariow_online',     label: 'Paiement en ligne', sublabel: 'Chariow — carte / wave / etc.',  icon: <CreditCard className="w-5 h-5" />,  group: 'online', color: 'odoo-primary' },
+  { method: 'cash',               label: 'Espèces',                sublabel: 'Paiement en main propre',         icon: <Banknote className="w-5 h-5" />,    group: 'manual', color: 'odoo-success' },
+  { method: 'mobile_money_mtn',   label: 'MTN Mobile Money',       sublabel: 'MTN MoMo',                        icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-warning' },
+  { method: 'mobile_money_moov',  label: 'MOOV Money',             sublabel: 'Moov Africa',                     icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-info' },
+  { method: 'mobile_money_celtis',label: 'CELTIS Pay',             sublabel: 'Celtis Mobile',                   icon: <Smartphone className="w-5 h-5" />,  group: 'manual', color: 'odoo-primary' },
+  { method: 'bank_transfer',      label: 'Virement bancaire',      sublabel: 'Virement sur compte',             icon: <Building2 className="w-5 h-5" />,   group: 'manual', color: 'odoo-secondary' },
+  { method: 'cash_on_delivery',   label: 'Paiement à la livraison',sublabel: 'Règlement à réception',           icon: <Truck className="w-5 h-5" />,       group: 'manual', color: 'odoo-muted' },
+  { method: 'fedapay_online',     label: 'FedaPay',                sublabel: 'MoMo · Carte · Wave · etc.',      icon: <CreditCard className="w-5 h-5" />,  group: 'online', color: 'odoo-success' },
+  { method: 'chariow_online',     label: 'Chariow',                sublabel: 'Paiement via Chariow',            icon: <CreditCard className="w-5 h-5" />,  group: 'online', color: 'odoo-primary' },
 ];
 
 const METHOD_LABELS: Record<PaymentMethod, string> = {
@@ -38,7 +39,8 @@ const METHOD_LABELS: Record<PaymentMethod, string> = {
   mobile_money_celtis: 'CELTIS Pay',
   bank_transfer: 'Virement bancaire',
   cash_on_delivery: 'Paiement à la livraison',
-  chariow_online: 'Paiement en ligne (Chariow)',
+  fedapay_online: 'FedaPay (en ligne)',
+  chariow_online: 'Chariow (en ligne)',
 };
 
 export { METHOD_LABELS };
@@ -156,7 +158,68 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
     };
     await supabase.from('payments').insert(paymentEntry);
 
-    // 4. For Chariow online: call edge function to initiate checkout
+    // 4a. FedaPay online checkout
+    if (payment === 'fedapay_online') {
+      try {
+        const nameParts = name.trim().split(' ');
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/fedapay-checkout/initiate`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: subtotal,
+            description: `Commande ${(order as { order_number: string }).order_number}`,
+            callback_url: `${window.location.origin}?order=${(order as { order_number: string }).order_number}`,
+            customer: {
+              email: user.email,
+              firstname: nameParts[0] ?? name,
+              lastname: nameParts.slice(1).join(' ') || nameParts[0],
+              phone_number: {
+                number: phone.replace(/\D/g, '') || '0',
+                country: 'BJ',
+              },
+            },
+            custom_metadata: {
+              order_number: (order as { order_number: string }).order_number,
+              order_id: (order as { id: string }).id,
+            },
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(`FedaPay : ${data?.error ?? data?.message ?? `Erreur ${res.status}`}`);
+          setSubmitting(false);
+          return;
+        }
+
+        const paymentUrl: string | undefined = data?.url;
+
+        if (paymentUrl) {
+          await supabase.from('payments').update({
+            transaction_id: String(data.transaction_id ?? ''),
+          }).eq('order_id', (order as { id: string }).id);
+
+          clearCart();
+          setSubmitting(false);
+          window.location.href = paymentUrl;
+          return;
+        }
+
+        setError('FedaPay : URL de paiement non reçue. Réessayez.');
+        setSubmitting(false);
+        return;
+      } catch {
+        setError('Impossible de contacter FedaPay. Vérifiez votre connexion.');
+        setSubmitting(false);
+        return;
+      }
+    }
+
+    // 4b. For Chariow online: call edge function to initiate checkout
     if (payment === 'chariow_online') {
       try {
         const nameParts = name.trim().split(' ');
@@ -324,6 +387,13 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
               ))}
             </div>
 
+            {/* FedaPay info */}
+            {payment === 'fedapay_online' && (
+              <div className="mt-3 p-3 bg-odoo-success/5 border border-odoo-success/20 rounded-lg text-xs text-odoo-success">
+                Vous serez automatiquement redirigé vers FedaPay pour payer par Mobile Money (MTN, Moov), carte bancaire ou Wave.
+              </div>
+            )}
+
             {/* Chariow info */}
             {payment === 'chariow_online' && (
               <div className="mt-3 p-3 bg-odoo-info/5 border border-odoo-info/20 rounded-lg text-xs text-odoo-info">
@@ -380,7 +450,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             {error && <div className="bg-odoo-danger/10 text-odoo-danger text-sm p-2 rounded mb-3">{error}</div>}
             <button type="submit" disabled={submitting} className="btn-primary w-full">
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> :
-                payment === 'chariow_online' ? 'Commander & Payer en ligne' : 'Confirmer la commande'}
+                (payment === 'fedapay_online' || payment === 'chariow_online') ? 'Commander & Payer en ligne' : 'Confirmer la commande'}
             </button>
           </div>
         </div>

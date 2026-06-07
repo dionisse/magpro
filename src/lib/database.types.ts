@@ -37,6 +37,7 @@ export type PaymentMethod =
   | 'mobile_money_celtis'
   | 'bank_transfer'
   | 'cash_on_delivery'
+  | 'fedapay_online'
   | 'chariow_online';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded' | 'partial';

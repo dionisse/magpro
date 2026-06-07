@@ -33,12 +33,14 @@ const METHOD_ICONS: Record<PaymentMethod, React.ReactNode> = {
   mobile_money_celtis: <Smartphone className="w-4 h-4" />,
   bank_transfer:       <Building2 className="w-4 h-4" />,
   cash_on_delivery:    <Truck className="w-4 h-4" />,
+  fedapay_online:      <CreditCard className="w-4 h-4" />,
   chariow_online:      <CreditCard className="w-4 h-4" />,
 };
 
 const METHOD_GROUPS: { label: string; methods: PaymentMethod[] }[] = [
   { label: 'Mobile Money', methods: ['mobile_money_mtn', 'mobile_money_moov', 'mobile_money_celtis'] },
-  { label: 'Autres', methods: ['cash', 'bank_transfer', 'cash_on_delivery', 'chariow_online'] },
+  { label: 'En ligne', methods: ['fedapay_online', 'chariow_online'] },
+  { label: 'Autres', methods: ['cash', 'bank_transfer', 'cash_on_delivery'] },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -75,7 +77,7 @@ export function AdminPayments() {
   const totalPaid    = payments.filter((p) => p.status === 'paid').reduce((a, p) => a + Number(p.amount), 0);
   const totalPending = payments.filter((p) => p.status === 'pending').reduce((a, p) => a + Number(p.amount), 0);
   const totalFailed  = payments.filter((p) => p.status === 'failed').reduce((a, p) => a + Number(p.amount), 0);
-  const onlinePaid   = payments.filter((p) => p.status === 'paid' && p.method === 'chariow_online').reduce((a, p) => a + Number(p.amount), 0);
+  const onlinePaid   = payments.filter((p) => p.status === 'paid' && (p.method === 'fedapay_online' || p.method === 'chariow_online')).reduce((a, p) => a + Number(p.amount), 0);
 
   const byMethod = payments
     .filter((p) => p.status === 'paid')
@@ -164,11 +166,11 @@ export function AdminPayments() {
         </div>
         <div className="card p-4 border-l-4 border-l-odoo-primary">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs text-odoo-muted uppercase font-medium">En ligne (Chariow)</p>
+            <p className="text-xs text-odoo-muted uppercase font-medium">En ligne (FedaPay / Chariow)</p>
             <div className="bg-odoo-primary/10 text-odoo-primary rounded-md p-1.5"><TrendingUp className="w-4 h-4" /></div>
           </div>
           <p className="text-xl font-bold text-odoo-primary">{formatPrice(onlinePaid)}</p>
-          <p className="text-xs text-odoo-muted mt-1">{payments.filter((p) => p.method === 'chariow_online' && p.status === 'paid').length} paiements</p>
+          <p className="text-xs text-odoo-muted mt-1">{payments.filter((p) => (p.method === 'fedapay_online' || p.method === 'chariow_online') && p.status === 'paid').length} paiements</p>
         </div>
         <div className="card p-4 border-l-4 border-l-odoo-danger">
           <div className="flex items-center justify-between mb-2">
