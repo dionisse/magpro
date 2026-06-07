@@ -60,13 +60,20 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      // Handle both flat { id } and nested { v1: { transaction: { id } } } responses
-      const transactionId: number | undefined =
-        txData?.v1?.transaction?.id ?? txData?.id;
+      // FedaPay REST API wraps responses in several possible ways depending on version:
+      //   { v1: { transaction: { id, ... } } }
+      //   { transaction: { id, ... } }
+      //   { id, ... }  (flat, as per OpenAPI spec)
+      const txObj =
+        txData?.v1?.transaction ??
+        txData?.transaction ??
+        txData;
+
+      const transactionId: number | undefined = txObj?.id;
 
       if (!transactionId) {
         return new Response(
-          JSON.stringify({ error: "ID de transaction absent", details: txData }),
+          JSON.stringify({ error: "ID de transaction absent", raw: txData }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
