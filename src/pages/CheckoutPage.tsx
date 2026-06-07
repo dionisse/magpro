@@ -167,57 +167,59 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: subtotal,
-            currency: 'XOF',
+            // product_id is injected server-side from CHARIOW_PRODUCT_ID secret
             email: user.email,
             first_name: nameParts[0] ?? name,
             last_name: nameParts.slice(1).join(' ') || nameParts[0],
-            phone: { number: phone.replace(/\D/g, ''), country_code: 'BJ' },
+            phone: { number: phone.replace(/\D/g, '') || '00000000', country_code: 'BJ' },
             redirect_url: `${window.location.origin}?order=${(order as { order_number: string }).order_number}`,
-            description: `Commande ${(order as { order_number: string }).order_number}`,
             custom_metadata: {
               order_number: (order as { order_number: string }).order_number,
               order_id: (order as { id: string }).id,
+              order_amount: String(subtotal),
+              customer_name: name,
             },
           }),
         });
 
         const data = await res.json();
-        // Try multiple common response shapes from Chariow
-        const checkoutUrl =
-          data?.data?.payment?.checkout_url ??
-          data?.data?.checkout_url ??
-          data?.checkout_url ??
-          data?.payment_url ??
-          data?.url ?? null;
 
-        if (checkoutUrl) {
+        if (!res.ok) {
+          setError(`Paiement Chariow indisponible : ${data?.error ?? data?.message ?? res.status}. Choisissez un autre mode ou contactez l'administrateur.`);
+          setSubmitting(false);
+          return;
+        }
+
+        const step = data?.data?.step;
+        const checkoutUrl = data?.data?.payment?.checkout_url ?? null;
+
+        if (step === 'payment' && checkoutUrl) {
           // Persist Chariow references then redirect immediately
           await Promise.all([
             supabase.from('orders').update({
-              chariow_sale_id: data?.data?.purchase?.id ?? data?.data?.id ?? '',
+              chariow_sale_id: data?.data?.purchase?.id ?? '',
             }).eq('id', (order as { id: string }).id),
             supabase.from('payments').update({
-              transaction_id: data?.data?.purchase?.id ?? data?.data?.id ?? '',
+              transaction_id: data?.data?.purchase?.id ?? '',
               chariow_checkout_url: checkoutUrl,
             }).eq('order_id', (order as { id: string }).id),
           ]);
 
           clearCart();
           setSubmitting(false);
-          // Redirect user to Chariow payment page
           window.location.href = checkoutUrl;
           return;
         }
 
-        // Chariow call succeeded but no URL found — fall through to normal success screen
-        if (!res.ok) {
-          setError(`Paiement en ligne indisponible (${data?.error ?? res.status}). Choisissez un autre mode ou réessayez.`);
+        if (step === 'already_purchased') {
+          setError('Ce produit Chariow a déjà été acheté par ce compte. Contactez l\'administrateur.');
           setSubmitting(false);
           return;
         }
-      } catch (err) {
-        setError('Impossible de contacter le service de paiement. Veuillez réessayer ou choisir un autre mode.');
+
+        // step === 'completed' (free product) or unknown — fall through to success screen
+      } catch {
+        setError('Impossible de contacter Chariow. Vérifiez votre connexion ou choisissez un autre mode de paiement.');
         setSubmitting(false);
         return;
       }

@@ -23,9 +23,6 @@ Deno.serve(async (req: Request) => {
     }
 
     const url = new URL(req.url);
-    // /chariow-checkout/initiate  → POST /checkout
-    // /chariow-checkout/sales     → GET /sales
-    // /chariow-checkout/sale/:id  → GET /sales/:id
     const path = url.pathname.replace(/^\/chariow-checkout\/?/, "");
 
     const chariowHeaders = {
@@ -36,25 +33,49 @@ Deno.serve(async (req: Request) => {
     let chariowRes: Response;
 
     if (path === "initiate" && req.method === "POST") {
+      // CHARIOW_PRODUCT_ID must be set to a published product ID/slug from the Chariow dashboard
+      const productId = Deno.env.get("CHARIOW_PRODUCT_ID");
+      if (!productId) {
+        return new Response(
+          JSON.stringify({
+            error: "CHARIOW_PRODUCT_ID not configured. Please add it in Edge Function secrets.",
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       const body = await req.json();
+
+      // Build a clean Chariow-compatible payload — only fields the API accepts
+      const chariowPayload: Record<string, unknown> = {
+        product_id: productId,
+        email: body.email,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        phone: body.phone,
+      };
+
+      if (body.redirect_url) chariowPayload.redirect_url = body.redirect_url;
+      if (body.custom_metadata) chariowPayload.custom_metadata = body.custom_metadata;
+      if (body.discount_code) chariowPayload.discount_code = body.discount_code;
+      if (body.campaign_id) chariowPayload.campaign_id = body.campaign_id;
+
       chariowRes = await fetch(`${CHARIOW_BASE}/checkout`, {
         method: "POST",
         headers: chariowHeaders,
-        body: JSON.stringify(body),
+        body: JSON.stringify(chariowPayload),
       });
+
     } else if (path === "sales" && req.method === "GET") {
-      chariowRes = await fetch(`${CHARIOW_BASE}/sales`, {
-        headers: chariowHeaders,
-      });
+      chariowRes = await fetch(`${CHARIOW_BASE}/sales`, { headers: chariowHeaders });
+
     } else if (path.startsWith("sales/") && req.method === "GET") {
       const saleId = path.replace("sales/", "");
-      chariowRes = await fetch(`${CHARIOW_BASE}/sales/${saleId}`, {
-        headers: chariowHeaders,
-      });
+      chariowRes = await fetch(`${CHARIOW_BASE}/sales/${saleId}`, { headers: chariowHeaders });
+
     } else if (path === "store" && req.method === "GET") {
-      chariowRes = await fetch(`${CHARIOW_BASE}/store`, {
-        headers: chariowHeaders,
-      });
+      chariowRes = await fetch(`${CHARIOW_BASE}/store`, { headers: chariowHeaders });
+
     } else {
       return new Response(
         JSON.stringify({ error: "Unknown route: " + path }),
