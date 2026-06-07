@@ -6,21 +6,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
+async function safeJson(res: Response): Promise<{ ok: boolean; status: number; data: unknown; raw: string }> {
+  const raw = await res.text();
+  try {
+    return { ok: res.ok, status: res.status, data: JSON.parse(raw), raw };
+  } catch {
+    return { ok: res.ok, status: res.status, data: null, raw: raw.slice(0, 800) };
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
   try {
     const secretKey = Deno.env.get("FEDAPAY_SECRET_KEY");
     if (!secretKey) {
-      return new Response(
-        JSON.stringify({ error: "FEDAPAY_SECRET_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json({ error: "FEDAPAY_SECRET_KEY non configuré" }, 500);
     }
 
-    const environment = Deno.env.get("FEDAPAY_ENVIRONMENT") ?? "live";
+    const environment = (Deno.env.get("FEDAPAY_ENVIRONMENT") ?? "live").trim();
     const BASE = environment === "sandbox"
       ? "https://sandbox-api.fedapay.com/v1"
       : "https://api.fedapay.com/v1";
@@ -30,99 +42,94 @@ Deno.serve(async (req: Request) => {
       "Content-Type": "application/json",
     };
 
-    const url = new URL(req.url);
-    const path = url.pathname.replace(/^\/fedapay-checkout\/?/, "");
+    const reqUrl = new URL(req.url);
+    const path = reqUrl.pathname.replace(/^\/fedapay-checkout\/?/, "");
 
-    // ── POST /initiate — create transaction + return payment URL ──────────────
+    // ── POST /initiate ────────────────────────────────────────────────────────
     if (path === "initiate" && req.method === "POST") {
-      const body = await req.json();
+      let body: Record<string, unknown>;
+      try {
+        body = await req.json();
+      } catch {
+        return json({ error: "Corps de requête JSON invalide" }, 400);
+      }
 
-      // 1. Create the transaction
-      const txRes = await fetch(`${BASE}/transactions`, {
+      // Normalize customer phone: country lowercase, digits only
+      const cust = (body.customer ?? {}) as Record<string, unknown>;
+      const ph = (cust.phone_number ?? {}) as Record<string, unknown>;
+      const customer = {
+        ...cust,
+        phone_number: ph.number
+          ? { number: String(ph.number).replace(/\D/g, ""), country: String(ph.country ?? "bj").toLowerCase() }
+          : undefined,
+      };
+
+      // 1. Create transaction
+      const txFetch = await fetch(`${BASE}/transactions`, {
         method: "POST",
         headers: apiHeaders,
         body: JSON.stringify({
           description: body.description ?? "Commande en ligne",
-          amount: body.amount,
+          amount: Number(body.amount),
           currency: { iso: "XOF" },
           callback_url: body.callback_url,
           custom_metadata: body.custom_metadata ?? {},
-          customer: body.customer,
+          customer,
         }),
       });
 
-      const txData = await txRes.json();
+      const tx = await safeJson(txFetch);
 
-      if (!txRes.ok) {
-        return new Response(
-          JSON.stringify({ error: "Création de transaction échouée", details: txData }),
-          { status: txRes.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (!tx.ok) {
+        return json({ error: "FedaPay: création de transaction échouée", details: tx.data, raw: tx.raw }, tx.status >= 400 ? tx.status : 502);
       }
 
-      // FedaPay REST API wraps responses in several possible ways depending on version:
-      //   { v1: { transaction: { id, ... } } }
-      //   { transaction: { id, ... } }
-      //   { id, ... }  (flat, as per OpenAPI spec)
-      const txObj =
-        txData?.v1?.transaction ??
-        txData?.transaction ??
-        txData;
+      // Resolve transaction id from all known envelope shapes
+      const d = tx.data as Record<string, unknown>;
+      const txId: number | undefined =
+        ((d?.["v1"] as Record<string, unknown>)?.["transaction"] as Record<string, unknown>)?.["id"] as number ??
+        (d?.["transaction"] as Record<string, unknown>)?.["id"] as number ??
+        d?.["id"] as number;
 
-      const transactionId: number | undefined = txObj?.id;
-
-      if (!transactionId) {
-        return new Response(
-          JSON.stringify({ error: "ID de transaction absent", raw: txData }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (!txId) {
+        return json({ error: "FedaPay: ID introuvable", raw: tx.data }, 500);
       }
 
-      // 2. Generate the payment URL/token
-      const tokenRes = await fetch(`${BASE}/transactions/${transactionId}/token`, {
+      // 2. Generate payment token/URL
+      const tokenFetch = await fetch(`${BASE}/transactions/${txId}/token`, {
         method: "POST",
         headers: apiHeaders,
       });
 
-      const tokenData = await tokenRes.json();
+      const tok = await safeJson(tokenFetch);
 
-      if (!tokenRes.ok) {
-        return new Response(
-          JSON.stringify({ error: "Génération du lien de paiement échouée", details: tokenData }),
-          { status: tokenRes.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (!tok.ok) {
+        return json({ error: "FedaPay: génération du lien échouée", details: tok.data, raw: tok.raw }, tok.status >= 400 ? tok.status : 502);
       }
 
-      return new Response(
-        JSON.stringify({
-          transaction_id: transactionId,
-          token: tokenData?.token,
-          url: tokenData?.url,
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      const td = tok.data as Record<string, unknown>;
+      const paymentUrl: string | undefined =
+        td?.["url"] as string ??
+        ((td?.["v1"] as Record<string, unknown>)?.["token"] as Record<string, unknown>)?.["url"] as string;
 
-    // ── GET /transactions/:id — check transaction status ─────────────────────
+      return json({ transaction_id: txId, token: td?.["token"], url: paymentUrl });
+
+    // ── GET /transactions/:id ─────────────────────────────────────────────────
     } else if (path.startsWith("transactions/") && req.method === "GET") {
       const txId = path.replace("transactions/", "");
-      const txRes = await fetch(`${BASE}/transactions/${txId}`, { headers: apiHeaders });
-      const data = await txRes.json();
-      return new Response(JSON.stringify(data), {
-        status: txRes.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const r = await fetch(`${BASE}/transactions/${txId}`, { headers: apiHeaders });
+      const { data, raw, status } = await safeJson(r);
+      return json(data ?? { raw }, status);
 
     } else {
-      return new Response(
-        JSON.stringify({ error: "Route inconnue: " + path }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return json({ error: "Route inconnue: " + path }, 404);
     }
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: message, stack }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
