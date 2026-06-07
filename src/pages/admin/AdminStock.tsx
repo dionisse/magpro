@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  PackageSearch, Plus, ArrowUpCircle, ArrowDownCircle, AlertTriangle,
-  Loader2, X, RefreshCw, BarChart2, Calendar, ChevronDown, Trash2, ClipboardList,
+  PackageSearch, Plus, ArrowUpCircle, AlertTriangle,
+  Loader2, X, RefreshCw, BarChart2, Calendar, Trash2, ClipboardList, Tag,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatPrice, formatDate } from '../../lib/format';
 import { useAuth } from '../../contexts/AuthContext';
-import type { Product } from '../../lib/database.types';
+import type { Brand, Product } from '../../lib/database.types';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -60,6 +60,7 @@ export function AdminStock() {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>('stock');
   const [products, setProducts] = useState<Product[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [periods, setPeriods] = useState<StockPeriod[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,14 +84,16 @@ export function AdminStock() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [prodRes, movRes, perRes] = await Promise.all([
+    const [prodRes, movRes, perRes, brandRes] = await Promise.all([
       supabase.from('products').select('*').eq('is_active', true).order('name'),
       supabase.from('stock_movements').select('*, products(name, sku)').order('created_at', { ascending: false }).limit(300),
       supabase.from('stock_periods').select('*, products(name, sku)').order('created_at', { ascending: false }),
+      supabase.from('brands').select('*').order('name'),
     ]);
     setProducts((prodRes.data as Product[]) ?? []);
     setMovements((movRes.data as StockMovement[]) ?? []);
     setPeriods((perRes.data as StockPeriod[]) ?? []);
+    setBrands((brandRes.data as Brand[]) ?? []);
     setLoading(false);
   }, []);
 
@@ -258,6 +261,7 @@ export function AdminStock() {
                     <tr>
                       <th className="p-3 text-left">Produit</th>
                       <th className="p-3 text-left hidden sm:table-cell">SKU</th>
+                      <th className="p-3 text-left hidden lg:table-cell">Marque</th>
                       <th className="p-3 text-right">Stock actuel</th>
                       <th className="p-3 text-right hidden md:table-cell">Seuil alerte</th>
                       <th className="p-3 text-center">Statut</th>
@@ -273,6 +277,13 @@ export function AdminStock() {
                         <tr key={p.id} className={`hover:bg-odoo-surface/50 ${isOut ? 'bg-odoo-danger/3' : ''}`}>
                           <td className="p-3 font-medium">{p.name}</td>
                           <td className="p-3 hidden sm:table-cell text-odoo-muted font-mono text-xs">{p.sku || '—'}</td>
+                          <td className="p-3 hidden lg:table-cell">
+                            {brands.find(b => b.id === p.brand_id) ? (
+                              <span className="inline-flex items-center gap-1 text-xs bg-odoo-primary/8 text-odoo-primary px-2 py-0.5 rounded-full">
+                                <Tag className="w-3 h-3" />{brands.find(b => b.id === p.brand_id)!.name}
+                              </span>
+                            ) : <span className="text-odoo-muted text-xs">—</span>}
+                          </td>
                           <td className={`p-3 text-right font-bold text-lg ${isOut ? 'text-odoo-danger' : isLow ? 'text-odoo-warning' : 'text-odoo-dark'}`}>
                             {p.stock}
                           </td>

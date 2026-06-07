@@ -149,6 +149,9 @@ export interface OrderItem {
 export interface CartItem {
   product: Product;
   quantity: number;
+  cartKey?: string;       // unique per product+option combo (for POS)
+  optionLabel?: string;   // e.g., "L / Rouge"
+  priceModifier?: number; // sum of selected option modifiers
 }
 
 export interface Expense {

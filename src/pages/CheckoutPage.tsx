@@ -167,11 +167,14 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            amount: subtotal,
+            currency: 'XOF',
             email: user.email,
             first_name: nameParts[0] ?? name,
             last_name: nameParts.slice(1).join(' ') || nameParts[0],
             phone: { number: phone.replace(/\D/g, ''), country_code: 'BJ' },
-            redirect_url: window.location.origin,
+            redirect_url: `${window.location.origin}?order=${(order as { order_number: string }).order_number}`,
+            description: `Commande ${(order as { order_number: string }).order_number}`,
             custom_metadata: {
               order_number: (order as { order_number: string }).order_number,
               order_id: (order as { id: string }).id,
@@ -179,26 +182,44 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
           }),
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          const checkoutUrl = data?.data?.payment?.checkout_url;
-          if (checkoutUrl) {
-            // Save the Chariow sale ID + checkout URL on the order
-            await supabase.from('orders').update({
-              chariow_sale_id: data?.data?.purchase?.id ?? '',
-            }).eq('id', (order as { id: string }).id);
+        const data = await res.json();
+        // Try multiple common response shapes from Chariow
+        const checkoutUrl =
+          data?.data?.payment?.checkout_url ??
+          data?.data?.checkout_url ??
+          data?.checkout_url ??
+          data?.payment_url ??
+          data?.url ?? null;
 
-            // Update payment record with Chariow data
-            await supabase.from('payments').update({
-              transaction_id: data?.data?.purchase?.id ?? '',
+        if (checkoutUrl) {
+          // Persist Chariow references then redirect immediately
+          await Promise.all([
+            supabase.from('orders').update({
+              chariow_sale_id: data?.data?.purchase?.id ?? data?.data?.id ?? '',
+            }).eq('id', (order as { id: string }).id),
+            supabase.from('payments').update({
+              transaction_id: data?.data?.purchase?.id ?? data?.data?.id ?? '',
               chariow_checkout_url: checkoutUrl,
-            }).eq('order_id', (order as { id: string }).id);
+            }).eq('order_id', (order as { id: string }).id),
+          ]);
 
-            setChariowUrl(checkoutUrl);
-          }
+          clearCart();
+          setSubmitting(false);
+          // Redirect user to Chariow payment page
+          window.location.href = checkoutUrl;
+          return;
         }
-      } catch {
-        // Non-blocking: order is already created, just show it without redirect URL
+
+        // Chariow call succeeded but no URL found — fall through to normal success screen
+        if (!res.ok) {
+          setError(`Paiement en ligne indisponible (${data?.error ?? res.status}). Choisissez un autre mode ou réessayez.`);
+          setSubmitting(false);
+          return;
+        }
+      } catch (err) {
+        setError('Impossible de contacter le service de paiement. Veuillez réessayer ou choisir un autre mode.');
+        setSubmitting(false);
+        return;
       }
     }
 

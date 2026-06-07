@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, Search, Plus, Minus, Trash2, ScanBarcode, CheckCircle2, Package2, Receipt, MessageCircle, Printer, Tag } from 'lucide-react';
+import {
+  Loader2, Search, Plus, Minus, Trash2, ScanBarcode, CheckCircle2,
+  Package2, Receipt, MessageCircle, Printer, Tag, Layers, X, Check,
+} from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatPrice, formatDate } from '../../lib/format';
 import { getEffectivePrice } from '../../contexts/CartContext';
-import type { Product, CartItem, PaymentMethod } from '../../lib/database.types';
+import type { CartItem, Product, PaymentMethod, ProductOptionGroup, ProductOption } from '../../lib/database.types';
 
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   cash: 'Espèces',
@@ -15,8 +18,19 @@ const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   chariow_online: 'En ligne',
 };
 
+interface ReceiptData {
+  orderNumber: string;
+  total: number;
+  items: CartItem[];
+  payment: PaymentMethod;
+  customerName: string;
+  customerPhone: string;
+  date: string;
+}
+
 export function AdminPOS() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [optionsByProduct, setOptionsByProduct] = useState<Record<string, ProductOptionGroup[]>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -27,28 +41,31 @@ export function AdminPOS() {
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  // Option picker
+  const [pickerProduct, setPickerProduct] = useState<Product | null>(null);
+
   const categories = useMemo(() => {
     const catIds = [...new Set(products.map((p) => p.category_id).filter(Boolean))] as string[];
     return catIds;
   }, [products]);
 
-  interface ReceiptData {
-    orderNumber: string;
-    total: number;
-    items: CartItem[];
-    payment: PaymentMethod;
-    customerName: string;
-    customerPhone: string;
-    date: string;
-  }
+  useEffect(() => { loadAll(); }, []);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
+  async function loadAll() {
+    const [prodRes, ogRes] = await Promise.all([
+      supabase.from('products').select('*').eq('is_active', true).order('name'),
+      supabase.from('product_option_groups').select('*, product_options(*)').order('sort_order'),
+    ]);
+    const prods = (prodRes.data as Product[]) ?? [];
+    setProducts(prods);
 
-  async function loadProducts() {
-    const { data } = await supabase.from('products').select('*').eq('is_active', true).order('name');
-    setProducts((data as Product[]) ?? []);
+    // Build map productId → groups[]
+    const map: Record<string, ProductOptionGroup[]> = {};
+    for (const g of (ogRes.data as ProductOptionGroup[]) ?? []) {
+      if (!map[g.product_id]) map[g.product_id] = [];
+      map[g.product_id].push(g);
+    }
+    setOptionsByProduct(map);
     setLoading(false);
   }
 
@@ -62,18 +79,31 @@ export function AdminPOS() {
     return list;
   }, [products, search, activeCategory]);
 
-  function addProduct(p: Product) {
+  function handleProductClick(p: Product) {
     if (p.stock <= 0) return;
+    const groups = optionsByProduct[p.id];
+    if (groups && groups.length > 0) {
+      setPickerProduct(p);
+    } else {
+      addToCart({ product: p, quantity: 1, cartKey: p.id });
+    }
+  }
+
+  function addToCart(item: CartItem) {
+    const key = item.cartKey ?? item.product.id;
     setCart((prev) => {
-      const found = prev.find((it) => it.product.id === p.id);
-      if (found) return found.quantity >= p.stock ? prev : prev.map((it) => it.product.id === p.id ? { ...it, quantity: it.quantity + 1 } : it);
-      return [...prev, { product: p, quantity: 1 }];
+      const found = prev.find((it) => (it.cartKey ?? it.product.id) === key);
+      if (found) {
+        if (found.quantity >= item.product.stock) return prev;
+        return prev.map((it) => (it.cartKey ?? it.product.id) === key ? { ...it, quantity: it.quantity + 1 } : it);
+      }
+      return [...prev, item];
     });
   }
 
-  function updateQty(id: string, delta: number) {
+  function updateQty(key: string, delta: number) {
     setCart((prev) => prev.flatMap((it) => {
-      if (it.product.id !== id) return [it];
+      if ((it.cartKey ?? it.product.id) !== key) return [it];
       const q = it.quantity + delta;
       if (q <= 0) return [];
       if (q > it.product.stock) return [it];
@@ -81,16 +111,16 @@ export function AdminPOS() {
     }));
   }
 
-  function setQty(id: string, qty: number) {
-    const item = cart.find((it) => it.product.id === id);
+  function setQty(key: string, qty: number) {
+    const item = cart.find((it) => (it.cartKey ?? it.product.id) === key);
     if (!item) return;
-    if (qty <= 0) { setCart((prev) => prev.filter((it) => it.product.id !== id)); return; }
-    setCart((prev) => prev.map((it) => it.product.id === id ? { ...it, quantity: Math.min(qty, it.product.stock) } : it));
+    if (qty <= 0) { setCart((prev) => prev.filter((it) => (it.cartKey ?? it.product.id) !== key)); return; }
+    setCart((prev) => prev.map((it) => (it.cartKey ?? it.product.id) === key ? { ...it, quantity: Math.min(qty, it.product.stock) } : it));
   }
 
-  const subtotal = cart.reduce((acc, it) => acc + getEffectivePrice(it.product, it.quantity) * it.quantity, 0);
-  const hasBulkItems = cart.some((it) => it.product.bulk_quantity > 0 && it.quantity >= it.product.bulk_quantity && it.product.bulk_price > 0);
+  const subtotal = cart.reduce((acc, it) => acc + getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0) * it.quantity, 0);
   const originalTotal = cart.reduce((acc, it) => acc + it.product.price * it.quantity, 0);
+  const hasBulkItems = cart.some((it) => it.product.bulk_quantity > 0 && it.quantity >= it.product.bulk_quantity && it.product.bulk_price > 0);
   const discount = originalTotal - subtotal;
 
   async function checkout() {
@@ -109,8 +139,16 @@ export function AdminPOS() {
     if (error || !order) { setSubmitting(false); return; }
 
     const orderItems = cart.map((it) => {
-      const unit = getEffectivePrice(it.product, it.quantity);
-      return { order_id: (order as { id: string }).id, product_id: it.product.id, product_name: it.product.name, quantity: it.quantity, unit_price: unit, subtotal: unit * it.quantity };
+      const unit = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
+      const label = it.optionLabel ? ` (${it.optionLabel})` : '';
+      return {
+        order_id: (order as { id: string }).id,
+        product_id: it.product.id,
+        product_name: it.product.name + label,
+        quantity: it.quantity,
+        unit_price: unit,
+        subtotal: unit * it.quantity,
+      };
     });
     await supabase.from('order_items').insert(orderItems);
 
@@ -132,7 +170,7 @@ export function AdminPOS() {
     setCustomerPhone('');
     setPayment('cash');
     setSubmitting(false);
-    loadProducts();
+    loadAll();
   }
 
   if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>;
@@ -140,12 +178,14 @@ export function AdminPOS() {
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
       <div className="grid lg:grid-cols-5 gap-4" style={{ minHeight: 'calc(100vh - 8rem)' }}>
+
+        {/* ── Product grid ── */}
         <div className="lg:col-span-3 flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <ScanBarcode className="w-5 h-5 text-odoo-primary flex-shrink-0" />
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-odoo-muted" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nom, SKU..." autoFocus className="input pl-9" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nom, SKU…" autoFocus className="input pl-9" />
             </div>
           </div>
 
@@ -169,9 +209,10 @@ export function AdminPOS() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 overflow-auto flex-1">
             {filtered.map((p) => {
-              const inCart = cart.find((it) => it.product.id === p.id)?.quantity ?? 0;
+              const inCart = cart.filter((it) => it.product.id === p.id).reduce((a, it) => a + it.quantity, 0);
+              const hasOptions = (optionsByProduct[p.id]?.length ?? 0) > 0;
               return (
-                <button key={p.id} onClick={() => addProduct(p)} disabled={p.stock === 0}
+                <button key={p.id} onClick={() => handleProductClick(p)} disabled={p.stock === 0}
                   className={`card overflow-hidden text-left hover:border-odoo-primary hover:shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed group relative ${inCart > 0 ? 'ring-2 ring-odoo-primary' : ''}`}>
                   {inCart > 0 && (
                     <div className="absolute top-1 right-1 w-5 h-5 bg-odoo-primary text-white text-xs font-bold rounded-full flex items-center justify-center z-10">
@@ -182,11 +223,12 @@ export function AdminPOS() {
                     {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-8 h-8 text-odoo-muted" /></div>}
                     {p.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-xs font-semibold text-odoo-danger">Rupture</span></div>}
                     {p.bulk_quantity > 0 && <div className="absolute top-1 left-1"><Tag className="w-3.5 h-3.5 text-odoo-success" /></div>}
+                    {hasOptions && <div className="absolute bottom-1 right-1 bg-odoo-info text-white rounded-full p-0.5"><Layers className="w-3 h-3" /></div>}
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-medium line-clamp-1">{p.name}</p>
                     <p className="text-sm font-bold text-odoo-primary">{formatPrice(p.price)}</p>
-                    <p className="text-xs text-odoo-muted">Stock: {p.stock}</p>
+                    <p className="text-xs text-odoo-muted">Stock: {p.stock}{hasOptions && ' · options'}</p>
                   </div>
                 </button>
               );
@@ -195,6 +237,7 @@ export function AdminPOS() {
           </div>
         </div>
 
+        {/* ── Cart panel ── */}
         <div className="lg:col-span-2 card flex flex-col">
           <div className="p-4 bg-odoo-primary/5 border-b border-odoo-border flex items-center justify-between">
             <h2 className="font-semibold flex items-center gap-2 text-odoo-dark">
@@ -214,29 +257,38 @@ export function AdminPOS() {
             ) : (
               <div className="divide-y divide-odoo-border">
                 {cart.map((it) => {
-                  const price = getEffectivePrice(it.product, it.quantity);
+                  const key = it.cartKey ?? it.product.id;
+                  const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
                   const isBulk = it.product.bulk_quantity > 0 && it.quantity >= it.product.bulk_quantity && it.product.bulk_price > 0;
                   return (
-                    <div key={it.product.id} className="p-3">
+                    <div key={key} className="p-3">
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{it.product.name}</p>
-                          {isBulk && <span className="badge bg-odoo-success/10 text-odoo-success text-xs"><Tag className="w-2.5 h-2.5 mr-0.5" />Lot</span>}
+                          {it.optionLabel && (
+                            <span className="inline-flex items-center gap-1 text-xs text-odoo-info bg-odoo-info/8 px-1.5 py-0.5 rounded">
+                              <Layers className="w-2.5 h-2.5" />{it.optionLabel}
+                            </span>
+                          )}
+                          {isBulk && <span className="badge bg-odoo-success/10 text-odoo-success text-xs ml-1"><Tag className="w-2.5 h-2.5 mr-0.5" />Lot</span>}
                         </div>
-                        <button onClick={() => setCart((prev) => prev.filter((i) => i.product.id !== it.product.id))} className="text-odoo-muted hover:text-odoo-danger transition flex-shrink-0 ml-2">
+                        <button onClick={() => setCart((prev) => prev.filter((i) => (i.cartKey ?? i.product.id) !== key))}
+                          className="text-odoo-muted hover:text-odoo-danger transition flex-shrink-0 ml-2">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center border border-odoo-border rounded overflow-hidden">
-                          <button onClick={() => updateQty(it.product.id, -1)} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted"><Minus className="w-3 h-3" /></button>
-                          <input type="number" value={it.quantity} onChange={(e) => setQty(it.product.id, parseInt(e.target.value) || 0)}
+                          <button onClick={() => updateQty(key, -1)} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted"><Minus className="w-3 h-3" /></button>
+                          <input type="number" value={it.quantity} onChange={(e) => setQty(key, parseInt(e.target.value) || 0)}
                             className="w-10 text-center text-sm font-medium border-x border-odoo-border py-1 focus:outline-none" />
-                          <button onClick={() => updateQty(it.product.id, 1)} disabled={it.quantity >= it.product.stock} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted disabled:opacity-40"><Plus className="w-3 h-3" /></button>
+                          <button onClick={() => updateQty(key, 1)} disabled={it.quantity >= it.product.stock} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted disabled:opacity-40"><Plus className="w-3 h-3" /></button>
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-odoo-primary text-sm">{formatPrice(price * it.quantity)}</p>
-                          {isBulk && <p className="text-xs text-odoo-muted line-through">{formatPrice(it.product.price * it.quantity)}</p>}
+                          {(isBulk || (it.priceModifier ?? 0) !== 0) && (
+                            <p className="text-xs text-odoo-muted line-through">{formatPrice(it.product.price * it.quantity)}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -249,7 +301,7 @@ export function AdminPOS() {
           <div className="border-t border-odoo-border p-4 space-y-3 bg-white">
             <div className="grid grid-cols-2 gap-2">
               <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Nom client" className="input text-sm" />
-              <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Téléphone (WhatsApp)" className="input text-sm" type="tel" />
+              <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Téléphone" className="input text-sm" type="tel" />
             </div>
 
             <div className="grid grid-cols-2 gap-1.5">
@@ -281,24 +333,117 @@ export function AdminPOS() {
       </div>
 
       {receipt && <ReceiptModal receipt={receipt} onClose={() => setReceipt(null)} />}
+
+      {pickerProduct && (
+        <OptionPickerModal
+          product={pickerProduct}
+          groups={optionsByProduct[pickerProduct.id] ?? []}
+          onConfirm={(item) => { addToCart(item); setPickerProduct(null); }}
+          onClose={() => setPickerProduct(null)}
+        />
+      )}
     </div>
   );
 }
 
-interface ReceiptData {
-  orderNumber: string;
-  total: number;
-  items: CartItem[];
-  payment: PaymentMethod;
-  customerName: string;
-  customerPhone: string;
-  date: string;
+// ── OptionPickerModal ─────────────────────────────────────────────────────────
+
+function OptionPickerModal({ product, groups, onConfirm, onClose }: {
+  product: Product;
+  groups: ProductOptionGroup[];
+  onConfirm: (item: CartItem) => void;
+  onClose: () => void;
+}) {
+  const [selected, setSelected] = useState<Record<string, ProductOption>>({});
+
+  const allGroupsSelected = groups.every((g) => selected[g.id]);
+  const totalModifier = Object.values(selected).reduce((a, o) => a + o.price_modifier, 0);
+  const finalPrice = Math.max(0, product.price + totalModifier);
+  const optionLabel = groups
+    .filter((g) => selected[g.id])
+    .map((g) => selected[g.id].label)
+    .join(' / ');
+
+  function confirm() {
+    if (!allGroupsSelected) return;
+    const cartKey = `${product.id}__${optionLabel}`;
+    onConfirm({ product, quantity: 1, cartKey, optionLabel, priceModifier: totalModifier });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-white w-full sm:max-w-md sm:rounded-xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-start justify-between p-4 border-b border-odoo-border">
+          <div className="flex-1 min-w-0 mr-3">
+            <p className="text-xs text-odoo-muted uppercase tracking-wide font-medium mb-0.5">Choisir les options</p>
+            <p className="font-semibold truncate">{product.name}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-odoo-surface rounded-lg flex-shrink-0"><X className="w-4 h-4" /></button>
+        </div>
+
+        {/* Option groups */}
+        <div className="flex-1 overflow-auto p-4 space-y-5">
+          {groups.map((group) => (
+            <div key={group.id}>
+              <p className="text-sm font-semibold mb-2 text-odoo-dark">{group.name}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {((group.product_options as ProductOption[]) ?? []).map((opt) => {
+                  const isSelected = selected[group.id]?.id === opt.id;
+                  const adjusted = product.price + opt.price_modifier;
+                  return (
+                    <button key={opt.id} onClick={() => setSelected((prev) => ({ ...prev, [group.id]: opt }))}
+                      className={`border rounded-xl p-2.5 text-left transition-all ${isSelected ? 'border-odoo-primary bg-odoo-primary/5 ring-1 ring-odoo-primary' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-sm font-medium">{opt.label}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-odoo-primary flex-shrink-0" />}
+                      </div>
+                      <p className={`text-xs font-semibold ${isSelected ? 'text-odoo-primary' : 'text-odoo-muted'}`}>
+                        {formatPrice(Math.max(0, adjusted))}
+                      </p>
+                      {opt.price_modifier !== 0 && (
+                        <p className="text-xs text-odoo-muted">
+                          {opt.price_modifier > 0 ? '+' : ''}{formatPrice(opt.price_modifier)}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-odoo-border bg-odoo-surface/50">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-odoo-muted">Prix total</span>
+            <span className="text-xl font-bold text-odoo-primary">{formatPrice(finalPrice)}</span>
+          </div>
+          {!allGroupsSelected && (
+            <p className="text-xs text-odoo-warning mb-2">Veuillez sélectionner une option pour chaque groupe.</p>
+          )}
+          <button onClick={confirm} disabled={!allGroupsSelected}
+            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed">
+            <Plus className="w-4 h-4" />Ajouter au ticket
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+// ── ReceiptModal ──────────────────────────────────────────────────────────────
 
 function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () => void }) {
   const whatsappMsg = encodeURIComponent(
     `Bonjour ${receipt.customerName},\nVotre reçu - Commande ${receipt.orderNumber}\n` +
-    receipt.items.map((it) => `• ${it.quantity}x ${it.product.name}: ${formatPrice(getEffectivePrice(it.product, it.quantity) * it.quantity)}`).join('\n') +
+    receipt.items.map((it) => {
+      const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
+      const optLabel = it.optionLabel ? ` (${it.optionLabel})` : '';
+      return `• ${it.quantity}x ${it.product.name}${optLabel}: ${formatPrice(price * it.quantity)}`;
+    }).join('\n') +
     `\nTOTAL: ${formatPrice(receipt.total)}\nPaiement: ${PAYMENT_LABELS[receipt.payment]}\nMerci pour votre achat !`
   );
 
@@ -311,14 +456,16 @@ function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () 
       h2{text-align:center;font-size:14px;margin:0 0 4px}
       .center{text-align:center}.divider{border-top:1px dashed #000;margin:8px 0}
       .row{display:flex;justify-content:space-between}.total{font-size:16px;font-weight:bold}
+      .option{font-size:10px;color:#666;margin-left:8px}
       </style></head>
       <body>
         <h2>MagasinPro</h2>
         <p class="center" style="font-size:10px;margin:0">${formatDate(receipt.date)}</p>
         <div class="divider"></div>
         ${receipt.items.map((it) => {
-          const price = getEffectivePrice(it.product, it.quantity);
-          return `<div class="row"><span>${it.quantity}x ${it.product.name}</span><span>${formatPrice(price * it.quantity)}</span></div>`;
+          const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
+          const optLabel = it.optionLabel ? `<span class="option">${it.optionLabel}</span>` : '';
+          return `<div class="row"><span>${it.quantity}x ${it.product.name}${optLabel}</span><span>${formatPrice(price * it.quantity)}</span></div>`;
         }).join('')}
         <div class="divider"></div>
         <div class="row total"><span>TOTAL</span><span>${formatPrice(receipt.total)}</span></div>
@@ -345,15 +492,17 @@ function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () 
         </div>
         <div className="p-4 max-h-52 overflow-auto text-sm">
           {receipt.items.map((it) => {
-            const price = getEffectivePrice(it.product, it.quantity);
+            const key = it.cartKey ?? it.product.id;
+            const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
             const isBulk = it.product.bulk_quantity > 0 && it.quantity >= it.product.bulk_quantity && it.product.bulk_price > 0;
             return (
-              <div key={it.product.id} className="flex justify-between py-1.5 border-b border-odoo-border last:border-0">
-                <div>
+              <div key={key} className="flex justify-between py-1.5 border-b border-odoo-border last:border-0 gap-2">
+                <div className="min-w-0">
                   <span className="font-medium">{it.quantity}× {it.product.name}</span>
+                  {it.optionLabel && <p className="text-xs text-odoo-muted">{it.optionLabel}</p>}
                   {isBulk && <span className="ml-1 text-xs text-odoo-success">(-{Math.round((1 - it.product.bulk_price / it.product.price) * 100)}%)</span>}
                 </div>
-                <span className="font-semibold">{formatPrice(price * it.quantity)}</span>
+                <span className="font-semibold flex-shrink-0">{formatPrice(price * it.quantity)}</span>
               </div>
             );
           })}

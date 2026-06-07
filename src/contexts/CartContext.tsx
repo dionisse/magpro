@@ -14,11 +14,11 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 const STORAGE_KEY = 'magasinpro_cart_v1';
 
-export function getEffectivePrice(product: Product, quantity: number) {
-  if (product.bulk_quantity > 0 && quantity >= product.bulk_quantity && product.bulk_price > 0) {
-    return product.bulk_price;
-  }
-  return product.price;
+export function getEffectivePrice(product: Product, quantity: number, priceModifier = 0): number {
+  const base = (product.bulk_quantity > 0 && quantity >= product.bulk_quantity && product.bulk_price > 0)
+    ? product.bulk_price
+    : product.price;
+  return Math.max(0, base + priceModifier);
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
