@@ -111,14 +111,17 @@ Deno.serve(async (req: Request) => {
       }
 
       const td = tok.data as Record<string, unknown>;
-      const tokObj =
-        (td?.["v1/token"] as Record<string, unknown>) ??
-        ((td?.["v1"] as Record<string, unknown>)?.["token"] as Record<string, unknown>) ??
-        (td?.["token"] as Record<string, unknown>) ??
-        td;
-      const paymentUrl = tokObj?.["url"] as string | undefined;
+      const tokNested = td?.["v1/token"] as Record<string, unknown> | undefined;
+      const tokenVal = (tokNested?.["token"] ?? td?.["token"]) as string | undefined;
+      const paymentUrl = (tokNested?.["url"] ?? td?.["url"]) as string | undefined;
 
-      return json({ transaction_id: txId, token: tokObj?.["token"], url: paymentUrl, _tok_debug: tok.data });
+      if (!paymentUrl && !tokenVal) {
+        return json({ error: `FedaPay: token absent. Réponse: ${JSON.stringify(td).slice(0, 400)}` }, 500);
+      }
+
+      const finalUrl = paymentUrl ?? `https://checkout.fedapay.com/payment?token=${tokenVal}`;
+
+      return json({ transaction_id: txId, token: tokenVal, url: finalUrl });
 
     // ── GET /transactions/:id ─────────────────────────────────────────────────
     } else if (path.startsWith("transactions/") && req.method === "GET") {
