@@ -205,7 +205,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
 
           clearCart();
           setSubmitting(false);
-          window.location.href = paymentUrl;
+          window.open(paymentUrl, '_blank');
           return;
         }
 
@@ -270,7 +270,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
 
           clearCart();
           setSubmitting(false);
-          window.location.href = checkoutUrl;
+          window.open(checkoutUrl, '_blank');
           return;
         }
 
