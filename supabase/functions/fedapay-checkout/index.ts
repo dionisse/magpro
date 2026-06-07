@@ -84,16 +84,18 @@ Deno.serve(async (req: Request) => {
         return json({ error: "FedaPay: création de transaction échouée", details: tx.data, raw: tx.raw }, tx.status >= 400 ? tx.status : 502);
       }
 
-      // Resolve transaction id from all known envelope shapes
+      // FedaPay REST API returns { "v1/transaction": { id, ... } }
       const d = tx.data as Record<string, unknown>;
-      const txId: number | undefined =
-        ((d?.["v1"] as Record<string, unknown>)?.["transaction"] as Record<string, unknown>)?.["id"] as number ??
-        (d?.["transaction"] as Record<string, unknown>)?.["id"] as number ??
-        d?.["id"] as number;
+      const txObj =
+        (d?.["v1/transaction"] as Record<string, unknown>) ??
+        ((d?.["v1"] as Record<string, unknown>)?.["transaction"] as Record<string, unknown>) ??
+        (d?.["transaction"] as Record<string, unknown>) ??
+        d;
+      const txId = txObj?.["id"] as number | undefined;
 
       if (!txId) {
         const dump = JSON.stringify(tx.data ?? tx.raw).slice(0, 600);
-        return json({ error: `FedaPay: structure inattendue: ${dump}` }, 500);
+        return json({ error: `FedaPay: ID introuvable. Structure: ${dump}` }, 500);
       }
 
       // 2. Generate payment token/URL
@@ -109,11 +111,14 @@ Deno.serve(async (req: Request) => {
       }
 
       const td = tok.data as Record<string, unknown>;
-      const paymentUrl: string | undefined =
-        td?.["url"] as string ??
-        ((td?.["v1"] as Record<string, unknown>)?.["token"] as Record<string, unknown>)?.["url"] as string;
+      const tokObj =
+        (td?.["v1/token"] as Record<string, unknown>) ??
+        ((td?.["v1"] as Record<string, unknown>)?.["token"] as Record<string, unknown>) ??
+        (td?.["token"] as Record<string, unknown>) ??
+        td;
+      const paymentUrl = tokObj?.["url"] as string | undefined;
 
-      return json({ transaction_id: txId, token: td?.["token"], url: paymentUrl });
+      return json({ transaction_id: txId, token: tokObj?.["token"], url: paymentUrl });
 
     // ── GET /transactions/:id ─────────────────────────────────────────────────
     } else if (path.startsWith("transactions/") && req.method === "GET") {
