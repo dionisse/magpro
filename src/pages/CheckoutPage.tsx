@@ -209,7 +209,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
           return;
         }
 
-        setError('FedaPay : URL de paiement non reçue. Réessayez.');
+        setError(`FedaPay : URL absente. Données: ${JSON.stringify(data).slice(0, 500)}`);
         setSubmitting(false);
         return;
       } catch {

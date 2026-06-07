@@ -118,7 +118,7 @@ Deno.serve(async (req: Request) => {
         td;
       const paymentUrl = tokObj?.["url"] as string | undefined;
 
-      return json({ transaction_id: txId, token: tokObj?.["token"], url: paymentUrl });
+      return json({ transaction_id: txId, token: tokObj?.["token"], url: paymentUrl, _tok_debug: tok.data });
 
     // ── GET /transactions/:id ─────────────────────────────────────────────────
     } else if (path.startsWith("transactions/") && req.method === "GET") {
