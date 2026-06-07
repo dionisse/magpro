@@ -92,7 +92,8 @@ Deno.serve(async (req: Request) => {
         d?.["id"] as number;
 
       if (!txId) {
-        return json({ error: "FedaPay: ID introuvable", raw: tx.data }, 500);
+        const dump = JSON.stringify(tx.data ?? tx.raw).slice(0, 600);
+        return json({ error: `FedaPay: structure inattendue: ${dump}` }, 500);
       }
 
       // 2. Generate payment token/URL
