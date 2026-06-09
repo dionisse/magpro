@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, Loader2, CheckCircle2, MessageCircle,
-  Banknote, Smartphone, Building2, Truck, CreditCard, ExternalLink,
+  Banknote, Smartphone, Building2, Truck, CreditCard, ExternalLink, UserPlus, Copy, Check,
 } from 'lucide-react';
 import { useCart, getEffectivePrice } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -48,6 +48,11 @@ export { METHOD_LABELS };
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
+function generatePassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
+  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
@@ -55,6 +60,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
   const { user, profile } = useAuth();
   const [name, setName] = useState(profile?.full_name ?? '');
   const [phone, setPhone] = useState(profile?.phone ?? '');
+  const [guestEmail, setGuestEmail] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
   const [payment, setPayment] = useState<PaymentMethod>('cash');
@@ -62,13 +68,8 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
   const [error, setError] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [chariowUrl, setChariowUrl] = useState<string | null>(null);
-
-  if (!user) return (
-    <div className="max-w-md mx-auto px-4 py-16 text-center">
-      <h1 className="text-xl font-semibold mb-2">Connexion requise</h1>
-      <button onClick={() => setView({ kind: 'auth' })} className="btn-primary mt-4">Se connecter</button>
-    </div>
-  );
+  const [autoCredentials, setAutoCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [passwordCopied, setPasswordCopied] = useState(false);
 
   if (items.length === 0 && !orderNumber) { setView({ kind: 'shop' }); return null; }
 
@@ -86,6 +87,47 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
           Mode de paiement : <span className="font-medium">{METHOD_LABELS[payment]}</span>
         </p>
 
+        {/* Auto-created credentials */}
+        {autoCredentials && (
+          <div className="bg-odoo-success/5 border border-odoo-success/20 rounded-xl p-5 mb-6 text-left">
+            <p className="font-semibold text-odoo-success mb-3 flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />Votre compte a été créé !
+            </p>
+            <p className="text-sm text-odoo-muted mb-3">
+              Notez ces identifiants pour suivre vos commandes :
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium w-28 flex-shrink-0 text-odoo-dark">Email :</span>
+                <code className="bg-white border border-odoo-border rounded-md px-2 py-1 text-xs flex-1 truncate">
+                  {autoCredentials.email}
+                </code>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium w-28 flex-shrink-0 text-odoo-dark">Mot de passe :</span>
+                <code className="bg-white border border-odoo-border rounded-md px-2 py-1 text-xs flex-1 font-mono tracking-widest">
+                  {autoCredentials.password}
+                </code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(autoCredentials.password);
+                    setPasswordCopied(true);
+                    setTimeout(() => setPasswordCopied(false), 2000);
+                  }}
+                  className="p-1.5 rounded hover:bg-odoo-success/10 text-odoo-success transition flex-shrink-0"
+                  title="Copier le mot de passe"
+                >
+                  {passwordCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-odoo-muted mt-3">
+              Vous pouvez modifier ce mot de passe depuis votre profil après connexion.
+            </p>
+          </div>
+        )}
+
+        {/* Chariow payment link */}
         {chariowUrl && (
           <div className="bg-odoo-primary/5 border border-odoo-primary/20 rounded-xl p-5 mb-6 text-left">
             <p className="font-semibold text-odoo-primary mb-2 flex items-center gap-2">
@@ -100,7 +142,11 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
         )}
 
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
-          <button onClick={() => setView({ kind: 'orders' })} className="btn-primary">Voir mes commandes</button>
+          {user ? (
+            <button onClick={() => setView({ kind: 'orders' })} className="btn-primary">Voir mes commandes</button>
+          ) : (
+            <button onClick={() => setView({ kind: 'auth' })} className="btn-primary">Se connecter</button>
+          )}
           <a href={`https://wa.me/?text=${msg}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">
             <MessageCircle className="w-4 h-4" />Confirmer sur WhatsApp
           </a>
@@ -111,13 +157,50 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!user) return;
     setSubmitting(true);
     setError(null);
 
-    // 1. Create order
+    // ── Step 0: resolve user identity ────────────────────────────────────────
+    let resolvedId: string;
+    let resolvedEmail: string;
+    let newCredentials: { email: string; password: string } | null = null;
+
+    if (user) {
+      resolvedId = user.id;
+      resolvedEmail = user.email ?? guestEmail;
+    } else {
+      const password = generatePassword();
+      const { data: sd, error: se } = await supabase.auth.signUp({
+        email: guestEmail,
+        password,
+      });
+
+      if (se || !sd.user) {
+        const msg = se?.message ?? '';
+        if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already been registered')) {
+          setError('Cet email est déjà enregistré. Connectez-vous avant de commander.');
+        } else {
+          setError(msg || 'Erreur lors de la création du compte. Réessayez.');
+        }
+        setSubmitting(false);
+        return;
+      }
+
+      resolvedId = sd.user.id;
+      resolvedEmail = guestEmail;
+      newCredentials = { email: guestEmail, password };
+
+      await supabase.from('profiles').insert({
+        id: resolvedId,
+        full_name: name,
+        phone,
+        role: 'customer',
+      });
+    }
+
+    // ── Step 1: Create order ──────────────────────────────────────────────────
     const { data: order, error: orderErr } = await supabase.from('orders').insert({
-      customer_id: user.id,
+      customer_id: resolvedId,
       customer_name: name,
       customer_phone: phone,
       delivery_address: address,
@@ -126,12 +209,16 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
       source: 'online',
       total: subtotal,
       status: 'pending',
-      payment_status: payment === 'chariow_online' ? 'pending' : 'pending',
+      payment_status: 'pending',
     }).select().single();
 
-    if (orderErr || !order) { setError(orderErr?.message ?? 'Erreur'); setSubmitting(false); return; }
+    if (orderErr || !order) {
+      setError(orderErr?.message ?? 'Erreur lors de la création de la commande');
+      setSubmitting(false);
+      return;
+    }
 
-    // 2. Insert order items
+    // ── Step 2: Order items ───────────────────────────────────────────────────
     const orderItems = items.map((it) => {
       const unit = getEffectivePrice(it.product, it.quantity);
       return {
@@ -146,19 +233,18 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
     const { error: itemsErr } = await supabase.from('order_items').insert(orderItems);
     if (itemsErr) { setError(itemsErr.message); setSubmitting(false); return; }
 
-    // 3. Record payment entry
-    const paymentEntry = {
+    // ── Step 3: Payment entry ─────────────────────────────────────────────────
+    await supabase.from('payments').insert({
       order_id: (order as { id: string }).id,
       order_number: (order as { order_number: string }).order_number,
       method: payment,
       amount: subtotal,
-      status: payment === 'chariow_online' ? 'pending' : 'pending',
+      status: 'pending',
       payer_name: name,
       payer_phone: phone,
-    };
-    await supabase.from('payments').insert(paymentEntry);
+    });
 
-    // 4a. FedaPay online checkout
+    // ── Step 4a: FedaPay online ───────────────────────────────────────────────
     if (payment === 'fedapay_online') {
       try {
         const nameParts = name.trim().split(' ');
@@ -173,12 +259,12 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             description: `Commande ${(order as { order_number: string }).order_number}`,
             callback_url: `${window.location.origin}?order=${(order as { order_number: string }).order_number}`,
             customer: {
-              email: user.email,
+              email: resolvedEmail,
               firstname: nameParts[0] ?? name,
               lastname: nameParts.slice(1).join(' ') || nameParts[0],
               phone_number: {
                 number: phone.replace(/\D/g, '') || '0',
-                country: 'BJ',
+                country: 'bj',
               },
             },
             custom_metadata: {
@@ -203,9 +289,11 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             transaction_id: String(data.transaction_id ?? ''),
           }).eq('order_id', (order as { id: string }).id);
 
+          if (newCredentials) setAutoCredentials(newCredentials);
           clearCart();
           setSubmitting(false);
           window.open(paymentUrl, '_blank');
+          setOrderNumber((order as { order_number: string }).order_number);
           return;
         }
 
@@ -219,7 +307,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
       }
     }
 
-    // 4b. For Chariow online: call edge function to initiate checkout
+    // ── Step 4b: Chariow online ───────────────────────────────────────────────
     if (payment === 'chariow_online') {
       try {
         const nameParts = name.trim().split(' ');
@@ -230,8 +318,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            // product_id is injected server-side from CHARIOW_PRODUCT_ID secret
-            email: user.email,
+            email: resolvedEmail,
             first_name: nameParts[0] ?? name,
             last_name: nameParts.slice(1).join(' ') || nameParts[0],
             phone: { number: phone.replace(/\D/g, '') || '00000000', country_code: 'BJ' },
@@ -257,7 +344,6 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
         const checkoutUrl = data?.data?.payment?.checkout_url ?? null;
 
         if (step === 'payment' && checkoutUrl) {
-          // Persist Chariow references then redirect immediately
           await Promise.all([
             supabase.from('orders').update({
               chariow_sale_id: data?.data?.purchase?.id ?? '',
@@ -268,9 +354,12 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             }).eq('order_id', (order as { id: string }).id),
           ]);
 
+          setChariowUrl(checkoutUrl);
+          if (newCredentials) setAutoCredentials(newCredentials);
           clearCart();
           setSubmitting(false);
           window.open(checkoutUrl, '_blank');
+          setOrderNumber((order as { order_number: string }).order_number);
           return;
         }
 
@@ -279,8 +368,6 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
           setSubmitting(false);
           return;
         }
-
-        // step === 'completed' (free product) or unknown — fall through to success screen
       } catch {
         setError('Impossible de contacter Chariow. Vérifiez votre connexion ou choisissez un autre mode de paiement.');
         setSubmitting(false);
@@ -288,6 +375,8 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
       }
     }
 
+    // ── Success ───────────────────────────────────────────────────────────────
+    if (newCredentials) setAutoCredentials(newCredentials);
     setOrderNumber((order as { order_number: string }).order_number);
     clearCart();
     setSubmitting(false);
@@ -317,6 +406,26 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
                 <label className="block text-sm font-medium mb-1">Téléphone</label>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="input" placeholder="Ex: 97000000" />
               </div>
+              {!user && (
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium mb-1">
+                    Email <span className="text-odoo-muted font-normal">(pour recevoir vos commandes)</span>
+                  </label>
+                  <input
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    required
+                    type="email"
+                    className="input"
+                    placeholder="votre@email.com"
+                    autoComplete="email"
+                  />
+                  <p className="text-xs text-odoo-muted mt-1 flex items-center gap-1">
+                    <UserPlus className="w-3 h-3" />
+                    Un compte sera créé automatiquement pour suivre vos commandes.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -330,7 +439,6 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
           <div className="card p-5">
             <h2 className="font-semibold mb-4">Mode de paiement</h2>
 
-            {/* Manual methods */}
             <p className="text-xs font-semibold text-odoo-muted uppercase tracking-wide mb-2">Paiement manuel</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
               {manualOptions.map((opt) => (
@@ -358,7 +466,6 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
               ))}
             </div>
 
-            {/* Online payment */}
             <p className="text-xs font-semibold text-odoo-muted uppercase tracking-wide mb-2">Paiement en ligne</p>
             <div className="grid grid-cols-1 gap-2">
               {onlineOptions.map((opt) => (
@@ -387,27 +494,21 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
               ))}
             </div>
 
-            {/* FedaPay info */}
             {payment === 'fedapay_online' && (
               <div className="mt-3 p-3 bg-odoo-success/5 border border-odoo-success/20 rounded-lg text-xs text-odoo-success">
                 Vous serez automatiquement redirigé vers FedaPay pour payer par Mobile Money (MTN, Moov), carte bancaire ou Wave.
               </div>
             )}
-
-            {/* Chariow info */}
             {payment === 'chariow_online' && (
               <div className="mt-3 p-3 bg-odoo-info/5 border border-odoo-info/20 rounded-lg text-xs text-odoo-info">
                 Vous serez redirigé vers la page de paiement sécurisée Chariow après validation de votre commande.
               </div>
             )}
-
-            {/* Mobile money instruction */}
             {(payment === 'mobile_money_mtn' || payment === 'mobile_money_moov' || payment === 'mobile_money_celtis') && (
               <div className="mt-3 p-3 bg-odoo-warning/5 border border-odoo-warning/20 rounded-lg text-xs text-odoo-warning">
                 Après validation, vous recevrez les instructions de paiement par SMS ou WhatsApp.
               </div>
             )}
-
             {payment === 'bank_transfer' && (
               <div className="mt-3 p-3 bg-odoo-surface border border-odoo-border rounded-lg text-xs text-odoo-muted">
                 Les coordonnées bancaires vous seront communiquées après validation de la commande.
@@ -452,6 +553,14 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> :
                 (payment === 'fedapay_online' || payment === 'chariow_online') ? 'Commander & Payer en ligne' : 'Confirmer la commande'}
             </button>
+            {!user && (
+              <p className="text-center text-xs text-odoo-muted mt-3">
+                Déjà client ?{' '}
+                <button type="button" onClick={() => setView({ kind: 'auth' })} className="text-odoo-primary hover:underline">
+                  Se connecter
+                </button>
+              </p>
+            )}
           </div>
         </div>
       </form>

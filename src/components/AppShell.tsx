@@ -89,12 +89,12 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-md transition">
                   <Store className="w-3.5 h-3.5" />Boutique
                 </button>
-              ) : (
-                <button onClick={() => setView({ kind: isStaff ? 'admin-dashboard' : 'admin-setup' })}
+              ) : isStaff ? (
+                <button onClick={() => setView({ kind: 'admin-dashboard' })}
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-md transition">
                   <Settings className="w-3.5 h-3.5" />Admin
                 </button>
-              )}
+              ) : null}
 
               {user ? (
                 <div className="relative">
@@ -119,10 +119,12 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
                           className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2">
                           <Package className="w-4 h-4 text-odoo-muted" />Mes commandes
                         </button>
-                        <button onClick={() => { setView({ kind: isStaff ? 'admin-dashboard' : 'admin-setup' }); setUserMenuOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2">
-                          <Settings className="w-4 h-4 text-odoo-muted" />Espace administrateur
-                        </button>
+                        {isStaff && (
+                          <button onClick={() => { setView({ kind: 'admin-dashboard' }); setUserMenuOpen(false); }}
+                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-odoo-muted" />Espace administrateur
+                          </button>
+                        )}
                         <button onClick={() => { signOut(); setUserMenuOpen(false); }}
                           className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2 text-odoo-danger border-t border-odoo-border">
                           <LogOut className="w-4 h-4" />Déconnexion
@@ -183,10 +185,12 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
                     <span className="text-odoo-muted"><Package className="w-4 h-4" /></span>Mes commandes
                   </button>}
                   <div className="my-2 border-t border-odoo-border" />
-                  <button onClick={() => { setView({ kind: isStaff ? 'admin-dashboard' : 'admin-setup' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                    <span className="text-odoo-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
-                  </button>
+                  {isStaff && (
+                    <button onClick={() => { setView({ kind: 'admin-dashboard' }); setMobileOpen(false); }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
+                      <span className="text-odoo-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
+                    </button>
+                  )}
                 </>
               )}
             </nav>
@@ -208,10 +212,14 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 text-sm flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2"><Store className="w-4 h-4" /><span className="font-medium text-white">MagasinPro</span></div>
           <div className="flex items-center gap-4 text-xs">
-            <button onClick={() => setView({ kind: isStaff ? 'admin-dashboard' : 'admin-setup' })} className="hover:text-white transition flex items-center gap-1">
-              <Settings className="w-3.5 h-3.5" />Administration
-            </button>
-            <span className="text-white/40">|</span>
+            {isStaff && (
+              <>
+                <button onClick={() => setView({ kind: 'admin-dashboard' })} className="hover:text-white transition flex items-center gap-1">
+                  <Settings className="w-3.5 h-3.5" />Administration
+                </button>
+                <span className="text-white/40">|</span>
+              </>
+            )}
             <span className="text-white/50">PWA — Fonctionne hors-ligne</span>
           </div>
         </div>
