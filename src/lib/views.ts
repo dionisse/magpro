@@ -6,6 +6,8 @@ export type View =
   | { kind: 'orders' }
   | { kind: 'order'; id: string }
   | { kind: 'auth' }
+  | { kind: 'legal' }
+  | { kind: 'terms' }
   | { kind: 'admin-setup' }
   | { kind: 'admin-dashboard' }
   | { kind: 'admin-products' }
@@ -16,7 +18,8 @@ export type View =
   | { kind: 'admin-stock' }
   | { kind: 'admin-purchases' }
   | { kind: 'admin-payments' }
-  | { kind: 'admin-sections' };
+  | { kind: 'admin-sections' }
+  | { kind: 'admin-settings' };
 
 // Re-export for convenience
 export type { AdminModule } from './database.types';

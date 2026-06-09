@@ -10,7 +10,25 @@ export type AdminModule =
   | 'admin-pos'
   | 'admin-stock'
   | 'admin-purchases'
-  | 'admin-sections';
+  | 'admin-sections'
+  | 'admin-settings';
+
+export interface StoreSettings {
+  id: number;
+  store_name: string;
+  logo_url: string | null;
+  company_name: string | null;
+  rccm: string | null;
+  ifu: string | null;
+  whatsapp_number: string | null;
+  phone_number: string | null;
+  facebook_url: string | null;
+  tiktok_url: string | null;
+  whatsapp_url: string | null;
+  legal_mentions: string | null;
+  terms_of_use: string | null;
+  updated_at: string;
+}
 
 export interface Section {
   id: string;

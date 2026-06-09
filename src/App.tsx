@@ -6,6 +6,7 @@ import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrdersPage, OrderDetailPage } from './pages/OrdersPage';
 import { AuthPage } from './pages/AuthPage';
+import { LegalPage } from './pages/LegalPage';
 import { AdminSetupPage } from './pages/AdminSetupPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
@@ -17,6 +18,7 @@ import { AdminStock } from './pages/admin/AdminStock';
 import { AdminPurchases } from './pages/admin/AdminPurchases';
 import { AdminPayments } from './pages/admin/AdminPayments';
 import { AdminSections } from './pages/admin/AdminSections';
+import { AdminSettings } from './pages/admin/AdminSettings';
 import { useAuth } from './contexts/AuthContext';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import type { AdminModule, View } from './lib/views';
@@ -51,7 +53,6 @@ function App() {
     );
   }
 
-  // For staff with restricted sections: block access to forbidden modules
   if (isStrictAdminView && isStaff && view.kind !== 'admin-dashboard') {
     const module = view.kind as AdminModule;
     if (!canAccess(module)) {
@@ -79,6 +80,8 @@ function App() {
       {view.kind === 'orders' && <OrdersPage setView={setView} />}
       {view.kind === 'order' && <OrderDetailPage id={view.id} setView={setView} />}
       {view.kind === 'auth' && <AuthPage setView={setView} />}
+      {view.kind === 'legal' && <LegalPage kind="legal" setView={setView} />}
+      {view.kind === 'terms' && <LegalPage kind="terms" setView={setView} />}
       {view.kind === 'admin-setup' && <AdminSetupPage setView={setView} />}
       {view.kind === 'admin-dashboard' && <AdminDashboard setView={setView} />}
       {view.kind === 'admin-products' && <AdminProducts />}
@@ -90,9 +93,9 @@ function App() {
       {view.kind === 'admin-purchases' && <AdminPurchases />}
       {view.kind === 'admin-payments' && <AdminPayments />}
       {view.kind === 'admin-sections' && <AdminSections />}
+      {view.kind === 'admin-settings' && <AdminSettings />}
     </AppShell>
   );
 }
 
 export default App;
-
