@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Tag, Package2, Plus, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { formatPrice } from '../lib/format';
+import { formatPrice, parseImages } from '../lib/format';
 import type { Category, Product } from '../lib/database.types';
 import { useCart } from '../contexts/CartContext';
 import { LazyImage, SkeletonCard, StaggerItem, useRipple, useToast } from '../components/ui';
@@ -151,6 +151,7 @@ export function ProductCard({ product, onView, onAdd }: { product: Product; onVi
   const [justAdded, setJustAdded] = useState(false);
   const { toast } = useToast();
   const ripple = useRipple();
+  const firstImage = parseImages(product.image_url)[0] ?? null;
 
   function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
     if (isOutOfStock) return;
@@ -165,8 +166,8 @@ export function ProductCard({ product, onView, onAdd }: { product: Product; onVi
     <div className="product-card h-full will-transform">
       <button onClick={onView}
         className="block aspect-square w-full bg-odoo-surface overflow-hidden relative group/img focus:outline-none">
-        {product.image_url ? (
-          <LazyImage src={product.image_url} alt={product.name}
+        {firstImage ? (
+          <LazyImage src={firstImage} alt={product.name}
             className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
             fallback={<div className="w-full h-full flex items-center justify-center bg-odoo-surface"><Package2 className="w-12 h-12 text-odoo-muted" /></div>} />
         ) : (

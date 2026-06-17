@@ -15,3 +15,10 @@ export function formatDate(iso: string) {
     minute: '2-digit',
   }).format(new Date(iso));
 }
+
+/** Split a comma-separated image_url field into an array of trimmed URLs. */
+export function parseImages(imageUrl: string | null | undefined): string[] {
+  if (!imageUrl?.trim()) return [];
+  return imageUrl.split(',').map((u) => u.trim()).filter(Boolean);
+}
+

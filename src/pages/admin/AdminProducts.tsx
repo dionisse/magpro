@@ -471,11 +471,36 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
               </div>
             </div>
 
-            {/* Image */}
+            {/* Images */}
             <div>
-              <label className="block text-sm font-medium mb-1">URL de l'image</label>
-              <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" className="input" />
-              {imageUrl && <img src={imageUrl} alt="" className="mt-2 w-20 h-20 object-cover rounded-lg border border-odoo-border" />}
+              <label className="block text-sm font-medium mb-1">
+                Photos du produit
+                <span className="text-xs text-odoo-muted font-normal ml-1">— séparez plusieurs URLs par <code className="bg-odoo-surface px-1 rounded">, </code></span>
+              </label>
+              <textarea
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg"
+                rows={2}
+                className="input resize-none text-sm"
+              />
+              {imageUrl.trim() && (
+                <div className="mt-2 flex gap-2 flex-wrap">
+                  {imageUrl.split(',').map((u) => u.trim()).filter(Boolean).map((src, i) => (
+                    <div key={i} className="relative group">
+                      <img
+                        src={src}
+                        alt={`Photo ${i + 1}`}
+                        className="w-16 h-16 object-cover rounded-lg border border-odoo-border"
+                        onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+                      />
+                      {i === 0 && (
+                        <span className="absolute -top-1 -left-1 bg-odoo-primary text-white text-[9px] font-bold px-1 py-0.5 rounded-full leading-none">1</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Description */}
