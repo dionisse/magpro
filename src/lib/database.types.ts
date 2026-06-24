@@ -11,7 +11,35 @@ export type AdminModule =
   | 'admin-stock'
   | 'admin-purchases'
   | 'admin-sections'
-  | 'admin-settings';
+  | 'admin-settings'
+  | 'admin-banners';
+
+export interface Banner {
+  id: string;
+  title: string | null;
+  subtitle: string | null;
+  image_url: string;
+  cta_text: string | null;
+  cta_action: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  badge_text: string | null;
+  badge_color: string;
+  image_url: string | null;
+  cta_text: string | null;
+  cta_action: string | null;
+  sort_order: number;
+  is_active: boolean;
+  ends_at: string | null;
+  created_at: string;
+}
 
 export interface StoreSettings {
   id: number;

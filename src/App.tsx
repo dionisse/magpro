@@ -19,6 +19,7 @@ import { AdminPurchases } from './pages/admin/AdminPurchases';
 import { AdminPayments } from './pages/admin/AdminPayments';
 import { AdminSections } from './pages/admin/AdminSections';
 import { AdminSettings } from './pages/admin/AdminSettings';
+import { AdminBanners } from './pages/admin/AdminBanners';
 import { useAuth } from './contexts/AuthContext';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import type { AdminModule, View } from './lib/views';
@@ -94,6 +95,7 @@ function App() {
       {view.kind === 'admin-payments' && <AdminPayments />}
       {view.kind === 'admin-sections' && <AdminSections />}
       {view.kind === 'admin-settings' && <AdminSettings />}
+      {view.kind === 'admin-banners' && <AdminBanners />}
     </AppShell>
   );
 }

@@ -19,7 +19,8 @@ export type View =
   | { kind: 'admin-purchases' }
   | { kind: 'admin-payments' }
   | { kind: 'admin-sections' }
-  | { kind: 'admin-settings' };
+  | { kind: 'admin-settings' }
+  | { kind: 'admin-banners' };
 
 // Re-export for convenience
 export type { AdminModule } from './database.types';
