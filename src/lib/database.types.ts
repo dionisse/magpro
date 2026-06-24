@@ -117,6 +117,8 @@ export interface ProductOption {
   group_id: string;
   label: string;
   price_modifier: number;
+  stock: number;
+  image_url: string | null;
   sort_order: number;
   created_at: string;
 }
@@ -168,9 +170,10 @@ export interface OrderItem {
 export interface CartItem {
   product: Product;
   quantity: number;
-  cartKey?: string;       // unique per product+option combo (for POS)
+  cartKey?: string;       // unique per product+option combo
   optionLabel?: string;   // e.g., "L / Rouge"
   priceModifier?: number; // sum of selected option modifiers
+  optionStock?: number;   // stock of the selected option (if applicable)
 }
 
 export interface Expense {

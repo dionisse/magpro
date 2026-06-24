@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Loader2, Package2, Tag, Plus, Minus, ShoppingCart, MessageCircle, AlertCircle, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  ArrowLeft, Loader2, Package2, Tag, Plus, Minus, ShoppingCart,
+  MessageCircle, AlertCircle, CheckCircle2, ChevronLeft, ChevronRight,
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatPrice, parseImages } from '../lib/format';
-import type { Product } from '../lib/database.types';
+import type { Product, ProductOptionGroup, ProductOption } from '../lib/database.types';
 import { useCart, getEffectivePrice } from '../contexts/CartContext';
 import { LazyImage, useRipple, useToast } from '../components/ui';
 import type { View } from '../lib/views';
@@ -11,6 +14,9 @@ import type { View } from '../lib/views';
 
 function ImageGallery({ images, name }: { images: string[]; name: string }) {
   const [active, setActive] = useState(0);
+
+  // Reset to first image when the list changes
+  useEffect(() => { setActive(0); }, [images.join(',')]);
 
   function prev() { setActive((i) => (i === 0 ? images.length - 1 : i - 1)); }
   function next() { setActive((i) => (i === images.length - 1 ? 0 : i + 1)); }
@@ -35,57 +41,40 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
           alt={`${name} — photo ${active + 1}`}
           className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ease-out"
         />
-
-        {/* Arrows (only when multiple images) */}
         {images.length > 1 && (
           <>
-            <button
-              onClick={prev}
+            <button onClick={prev}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
-              aria-label="Photo précédente"
-            >
+              aria-label="Photo précédente">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button
-              onClick={next}
+            <button onClick={next}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
-              aria-label="Photo suivante"
-            >
+              aria-label="Photo suivante">
               <ChevronRight className="w-4 h-4" />
             </button>
-            {/* Dots */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
               {images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActive(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${i === active ? 'bg-white w-5' : 'bg-white/50 hover:bg-white/75'}`}
-                />
+                <button key={i} onClick={() => setActive(i)}
+                  className={`h-2 rounded-full transition-all ${i === active ? 'bg-white w-5' : 'bg-white/50 w-2 hover:bg-white/75'}`} />
               ))}
             </div>
           </>
         )}
       </div>
 
-      {/* Thumbnails strip */}
+      {/* Thumbnails */}
       {images.length > 1 && (
         <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide bg-white border-t border-odoo-border">
           {images.map((src, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
+            <button key={i} onClick={() => setActive(i)}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                 i === active
                   ? 'border-odoo-primary shadow-md shadow-odoo-primary/25 scale-105'
                   : 'border-odoo-border hover:border-odoo-primary/50 opacity-70 hover:opacity-100'
-              }`}
-            >
-              <img
-                src={src}
-                alt={`Miniature ${i + 1}`}
-                className="w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
-              />
+              }`}>
+              <img src={src} alt={`Miniature ${i + 1}`} className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
             </button>
           ))}
         </div>
@@ -94,12 +83,95 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
   );
 }
 
+// ─── Option selector ──────────────────────────────────────────────────────────
+
+interface SelectedOptions {
+  [groupId: string]: ProductOption;
+}
+
+function OptionSelector({
+  groups,
+  selected,
+  onSelect,
+}: {
+  groups: ProductOptionGroup[];
+  selected: SelectedOptions;
+  onSelect: (groupId: string, option: ProductOption) => void;
+}) {
+  if (groups.length === 0) return null;
+
+  return (
+    <div className="space-y-4 mb-5">
+      {groups.map((group) => (
+        <div key={group.id}>
+          <p className="text-sm font-semibold mb-2">{group.name}</p>
+          <div className="flex flex-wrap gap-2">
+            {(group.product_options ?? []).map((opt) => {
+              const isSelected = selected[group.id]?.id === opt.id;
+              const isOutOfStock = opt.stock === 0;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  disabled={isOutOfStock}
+                  onClick={() => onSelect(group.id, opt)}
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
+                    isOutOfStock
+                      ? 'border-odoo-border bg-odoo-surface text-odoo-muted cursor-not-allowed opacity-60'
+                      : isSelected
+                        ? 'border-odoo-primary bg-odoo-primary text-white shadow-md shadow-odoo-primary/25'
+                        : 'border-odoo-border hover:border-odoo-primary/60 hover:shadow-sm'
+                  }`}
+                >
+                  {/* Option image thumbnail */}
+                  {opt.image_url && (
+                    <img
+                      src={opt.image_url}
+                      alt={opt.label}
+                      className={`w-7 h-7 rounded-lg object-cover flex-shrink-0 ${isSelected ? 'ring-2 ring-white/60' : 'ring-1 ring-odoo-border'}`}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  )}
+
+                  <span>{opt.label}</span>
+
+                  {opt.price_modifier !== 0 && (
+                    <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-odoo-muted'}`}>
+                      {opt.price_modifier > 0 ? '+' : ''}{formatPrice(opt.price_modifier)}
+                    </span>
+                  )}
+
+                  {/* Out of stock overlay */}
+                  {isOutOfStock && (
+                    <span className="absolute -top-1.5 -right-1.5 text-[9px] bg-odoo-danger text-white px-1 py-0.5 rounded-full font-bold leading-none">
+                      Rupture
+                    </span>
+                  )}
+
+                  {/* Low stock indicator */}
+                  {!isOutOfStock && opt.stock <= 5 && (
+                    <span className={`text-[9px] ${isSelected ? 'text-white/70' : 'text-odoo-warning'} font-medium`}>
+                      ({opt.stock})
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function ProductPage({ id, setView }: { id: string; setView: (v: View) => void }) {
   const [product, setProduct] = useState<Product | null>(null);
+  const [optionGroups, setOptionGroups] = useState<ProductOptionGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selected, setSelected] = useState<SelectedOptions>({});
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const { toast } = useToast();
@@ -107,9 +179,24 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
   useEffect(() => {
     let mounted = true;
-    supabase.from('products').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+    Promise.all([
+      supabase.from('products').select('*').eq('id', id).maybeSingle(),
+      supabase
+        .from('product_option_groups')
+        .select('*, product_options(*)')
+        .eq('product_id', id)
+        .order('sort_order'),
+    ]).then(([prod, opts]) => {
       if (!mounted) return;
-      setProduct(data as Product | null);
+      setProduct(prod.data as Product | null);
+      const groups = (opts.data ?? []) as ProductOptionGroup[];
+      // Sort options within each group by sort_order
+      groups.forEach((g) => {
+        if (g.product_options) {
+          g.product_options.sort((a, b) => (a as ProductOption).sort_order - (b as ProductOption).sort_order);
+        }
+      });
+      setOptionGroups(groups);
       setLoading(false);
     });
     return () => { mounted = false; };
@@ -129,20 +216,60 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
     </div>
   );
 
-  const images = parseImages(product.image_url);
+  // Build displayed images: if a selected option has an image, prepend it
+  const productImages = parseImages(product.image_url);
+  const selectedOptionImages = Object.values(selected)
+    .map((o) => o.image_url)
+    .filter((u): u is string => !!u);
+  const displayImages = selectedOptionImages.length > 0
+    ? [...selectedOptionImages, ...productImages]
+    : productImages;
+
+  // Calculate price modifier from selected options
+  const totalPriceModifier = Object.values(selected).reduce((acc, o) => acc + o.price_modifier, 0);
+
+  // Determine effective stock: minimum of product stock and all selected option stocks
+  const selectedOptionStocks = Object.values(selected).map((o) => o.stock);
+  const effectiveStock = selectedOptionStocks.length > 0
+    ? Math.min(product.stock, ...selectedOptionStocks)
+    : product.stock;
+
   const hasBulk = product.bulk_quantity > 0 && product.bulk_price > 0;
-  const isOutOfStock = product.stock === 0;
-  const effectivePrice = getEffectivePrice(product, quantity);
+  const isOutOfStock = effectiveStock === 0;
+  const effectivePrice = getEffectivePrice(product, quantity, totalPriceModifier);
   const total = effectivePrice * quantity;
   const savings = hasBulk && quantity >= product.bulk_quantity ? (product.price - product.bulk_price) * quantity : 0;
-  const whatsappMsg = encodeURIComponent(`Bonjour, je suis intéressé(e) par: ${product.name} (SKU: ${product.sku})`);
+
+  // Check if all groups have a selection (required before adding to cart)
+  const allGroupsSelected = optionGroups.length === 0 || optionGroups.every((g) => selected[g.id]);
+  const missingSelection = optionGroups.length > 0 && !allGroupsSelected;
+
+  function handleSelectOption(groupId: string, option: ProductOption) {
+    setSelected((prev) => ({ ...prev, [groupId]: option }));
+    setQuantity(1);
+  }
+
+  const optionLabel = optionGroups.length > 0
+    ? optionGroups
+        .map((g) => selected[g.id]?.label)
+        .filter(Boolean)
+        .join(' / ')
+    : undefined;
+
+  const whatsappMsg = encodeURIComponent(
+    `Bonjour, je suis intéressé(e) par: ${product.name}${optionLabel ? ` (${optionLabel})` : ''}${product.sku ? ` — SKU: ${product.sku}` : ''}`,
+  );
 
   function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
-    if (isOutOfStock) return;
+    if (isOutOfStock || missingSelection) return;
     ripple(e);
-    addToCart(product, quantity);
+    addToCart(product, quantity, {
+      optionLabel,
+      priceModifier: totalPriceModifier || undefined,
+      optionStock: selectedOptionStocks.length > 0 ? Math.min(...selectedOptionStocks) : undefined,
+    });
     setAdded(true);
-    toast(`${product.name} × ${quantity} ajouté au panier`, 'success');
+    toast(`${product.name}${optionLabel ? ` (${optionLabel})` : ''} × ${quantity} ajouté au panier`, 'success');
     setTimeout(() => setAdded(false), 2200);
   }
 
@@ -154,7 +281,7 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Image gallery */}
-        <ImageGallery images={images} name={product.name} />
+        <ImageGallery images={displayImages} name={product.name} />
 
         {/* Details panel */}
         <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
@@ -175,7 +302,7 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
           {/* Bulk pricing badge */}
           {hasBulk && (
-            <div className="bg-odoo-success/8 border border-odoo-success/25 rounded-xl p-3.5 mb-4 flex items-start gap-2.5 animate-fade-in-up">
+            <div className="bg-odoo-success/8 border border-odoo-success/25 rounded-xl p-3.5 mb-4 flex items-start gap-2.5">
               <Tag className="w-4 h-4 text-odoo-success mt-0.5 flex-shrink-0" />
               <div className="text-sm">
                 <p className="font-semibold text-odoo-success">Prix de gros disponible</p>
@@ -195,18 +322,29 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
             </div>
           )}
 
+          {/* Option selector */}
+          <OptionSelector groups={optionGroups} selected={selected} onSelect={handleSelectOption} />
+
+          {/* Selection required hint */}
+          {missingSelection && (
+            <p className="text-xs text-odoo-warning mb-3 flex items-center gap-1">
+              <AlertCircle className="w-3.5 h-3.5" />
+              Veuillez sélectionner une option dans chaque groupe
+            </p>
+          )}
+
           {/* Stock status */}
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm font-semibold">Stock :</span>
             {isOutOfStock ? (
               <span className="badge bg-odoo-danger/15 text-odoo-danger">Rupture de stock</span>
-            ) : product.stock <= product.low_stock_threshold ? (
+            ) : effectiveStock <= product.low_stock_threshold ? (
               <span className="badge bg-odoo-warning/15 text-odoo-warning flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-odoo-warning animate-pulse" />
-                Faible ({product.stock})
+                Faible ({effectiveStock})
               </span>
             ) : (
-              <span className="badge bg-odoo-success/15 text-odoo-success">En stock ({product.stock})</span>
+              <span className="badge bg-odoo-success/15 text-odoo-success">En stock ({effectiveStock})</span>
             )}
           </div>
 
@@ -221,9 +359,9 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
                     <Minus className="w-4 h-4" />
                   </button>
                   <input type="number" value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
+                    onChange={(e) => setQuantity(Math.max(1, Math.min(effectiveStock, parseInt(e.target.value) || 1)))}
                     className="w-16 text-center font-bold border-x border-odoo-border py-2 focus:outline-none bg-white" />
-                  <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                  <button onClick={() => setQuantity(Math.min(effectiveStock, quantity + 1))}
                     className="p-2.5 hover:bg-odoo-surface active:bg-odoo-border transition-colors duration-100">
                     <Plus className="w-4 h-4" />
                   </button>
@@ -249,8 +387,12 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-2">
-            <button onClick={handleAdd} disabled={isOutOfStock}
-              className={`btn-primary flex-1 transition-all duration-200 ${added ? 'bg-odoo-success hover:bg-odoo-success' : ''}`}>
+            <button
+              onClick={handleAdd}
+              disabled={isOutOfStock || missingSelection}
+              title={missingSelection ? 'Sélectionnez toutes les options' : undefined}
+              className={`btn-primary flex-1 transition-all duration-200 ${added ? 'bg-odoo-success hover:bg-odoo-success' : ''}`}
+            >
               {added
                 ? <><CheckCircle2 className="w-4 h-4 animate-success-pop" />Ajouté au panier !</>
                 : isOutOfStock

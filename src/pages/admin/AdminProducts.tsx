@@ -62,6 +62,8 @@ interface LocalOption {
   id?: string;
   label: string;
   price_modifier: number;
+  stock: number;
+  image_url: string;
 }
 
 interface LocalGroup {
@@ -361,6 +363,8 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
               id: o.id,
               label: o.label,
               price_modifier: o.price_modifier,
+              stock: o.stock ?? 0,
+              image_url: o.image_url ?? '',
             })),
           })));
         }
@@ -451,6 +455,8 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
             group_id: (gData as ProductOptionGroup).id,
             label: o.label.trim(),
             price_modifier: o.price_modifier,
+            stock: Number(o.stock),
+            image_url: o.image_url.trim() || null,
             sort_order: oi,
           })).filter((o) => o.label);
           if (optPayload.length > 0) {
@@ -680,7 +686,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
   function addOption(groupKey: string) {
     onChange(groups.map((g) =>
       g._key === groupKey
-        ? { ...g, options: [...g.options, { _key: crypto.randomUUID(), label: '', price_modifier: 0 }] }
+        ? { ...g, options: [...g.options, { _key: crypto.randomUUID(), label: '', price_modifier: 0, stock: 0, image_url: '' }] }
         : g
     ));
   }
@@ -689,7 +695,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
       g._key === groupKey ? { ...g, options: g.options.filter((o) => o._key !== optKey) } : g
     ));
   }
-  function updateOption(groupKey: string, optKey: string, field: 'label' | 'price_modifier', value: string | number) {
+  function updateOption(groupKey: string, optKey: string, field: keyof Omit<LocalOption, '_key' | 'id'>, value: string | number) {
     onChange(groups.map((g) =>
       g._key === groupKey
         ? { ...g, options: g.options.map((o) => o._key === optKey ? { ...o, [field]: value } : o) }
@@ -703,7 +709,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-odoo-muted">
-          Définissez des variantes (taille, couleur…) avec un modificateur de prix par option.
+          Variantes (taille, couleur…) avec prix, stock et image par option.
         </p>
         <button type="button" onClick={addGroup} className="btn-secondary text-sm gap-1.5"><Plus className="w-3.5 h-3.5" />Groupe</button>
       </div>
@@ -731,35 +737,75 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
           </div>
 
           {/* Options */}
-          <div className="p-3 space-y-2">
+          <div className="p-3 space-y-3">
             {g.options.length === 0 && (
               <p className="text-xs text-odoo-muted italic">Aucune option — ajoutez-en ci-dessous</p>
             )}
             {g.options.map((o) => {
               const finalPrice = basePrice + o.price_modifier;
               return (
-                <div key={o._key} className="flex items-center gap-2">
-                  <input
-                    value={o.label}
-                    onChange={(e) => updateOption(g._key, o._key, 'label', e.target.value)}
-                    placeholder="Label (ex: L, Rouge, 500g…)"
-                    className="input text-sm flex-1"
-                  />
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <div className="relative">
+                <div key={o._key} className="border border-odoo-border rounded-lg overflow-hidden">
+                  {/* Row 1: label + price + delete */}
+                  <div className="flex items-center gap-2 p-2 bg-odoo-surface/50">
+                    <input
+                      value={o.label}
+                      onChange={(e) => updateOption(g._key, o._key, 'label', e.target.value)}
+                      placeholder="Label (ex: L, Rouge, 500g…)"
+                      className="input text-sm flex-1 h-8 py-1"
+                    />
+                    <div className="relative flex-shrink-0">
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-odoo-muted">±</span>
                       <input
                         type="number" step={50}
                         value={o.price_modifier}
                         onChange={(e) => updateOption(g._key, o._key, 'price_modifier', Number(e.target.value))}
-                        className="input text-sm w-28 pl-7"
+                        className="input text-sm w-24 pl-6 h-8 py-1"
+                        title="Modificateur de prix"
                       />
                     </div>
-                    <span className="text-xs text-odoo-muted whitespace-nowrap w-24 text-right">
+                    <span className="text-xs text-odoo-muted whitespace-nowrap w-24 text-right flex-shrink-0">
                       = {formatPrice(Math.max(0, finalPrice))}
                     </span>
+                    <button type="button" onClick={() => removeOption(g._key, o._key)} className="p-1 text-odoo-muted hover:text-odoo-danger rounded transition flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
                   </div>
-                  <button type="button" onClick={() => removeOption(g._key, o._key)} className="p-1 text-odoo-muted hover:text-odoo-danger rounded transition flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
+
+                  {/* Row 2: stock + image */}
+                  <div className="flex items-start gap-2 p-2 pt-1.5">
+                    {/* Stock */}
+                    <div className="flex-shrink-0">
+                      <label className="text-[10px] font-medium text-odoo-muted uppercase tracking-wide block mb-1">Stock</label>
+                      <input
+                        type="number" min={0}
+                        value={o.stock}
+                        onChange={(e) => updateOption(g._key, o._key, 'stock', Number(e.target.value))}
+                        className="input text-sm w-20 h-8 py-1"
+                      />
+                    </div>
+
+                    {/* Image URL */}
+                    <div className="flex-1">
+                      <label className="text-[10px] font-medium text-odoo-muted uppercase tracking-wide block mb-1">Photo de l'option (URL)</label>
+                      <input
+                        value={o.image_url}
+                        onChange={(e) => updateOption(g._key, o._key, 'image_url', e.target.value)}
+                        placeholder="https://…"
+                        className="input text-sm h-8 py-1 w-full"
+                        type="url"
+                      />
+                    </div>
+
+                    {/* Image thumbnail */}
+                    {o.image_url && (
+                      <div className="flex-shrink-0 mt-4">
+                        <img
+                          src={o.image_url}
+                          alt={o.label}
+                          className="w-10 h-10 rounded-lg object-cover border border-odoo-border"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
