@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, Tag, Package2, Plus, AlertCircle, CheckCircle2,
   ChevronLeft, ChevronRight, Clock, ArrowRight, Flame, Sparkles,
+  Truck, RotateCcw, ShieldCheck, Headphones, ShoppingCart, SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatPrice, parseImages } from '../lib/format';
@@ -10,7 +12,7 @@ import { useCart } from '../contexts/CartContext';
 import { LazyImage, SkeletonCard, StaggerItem, useRipple, useToast } from '../components/ui';
 import type { View } from '../lib/views';
 
-// ─── Countdown timer ──────────────────────────────────────────────────────────
+// ─── Countdown ────────────────────────────────────────────────────────────────
 
 function Countdown({ endsAt }: { endsAt: string }) {
   const [remaining, setRemaining] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
@@ -31,123 +33,179 @@ function Countdown({ endsAt }: { endsAt: string }) {
     return () => clearInterval(id);
   }, [endsAt]);
 
-  if (!remaining) return <span className="text-xs text-odoo-muted">Expiré</span>;
-
+  if (!remaining) return <span className="text-xs opacity-70">Expiré</span>;
   const pad = (n: number) => String(n).padStart(2, '0');
+
   return (
-    <div className="flex items-center gap-1.5 text-xs font-bold">
-      <Clock className="w-3 h-3 opacity-70 flex-shrink-0" />
-      {remaining.d > 0 && <span className="bg-black/15 px-1.5 py-0.5 rounded">{remaining.d}j</span>}
-      <span className="bg-black/15 px-1.5 py-0.5 rounded">{pad(remaining.h)}h</span>
-      <span className="bg-black/15 px-1.5 py-0.5 rounded">{pad(remaining.m)}m</span>
-      <span className="bg-black/15 px-1.5 py-0.5 rounded">{pad(remaining.s)}s</span>
+    <div className="flex items-center gap-1 text-xs font-bold">
+      <Clock className="w-3 h-3 opacity-60 flex-shrink-0" />
+      {remaining.d > 0 && <span className="bg-white/20 px-1.5 py-0.5 rounded">{remaining.d}j</span>}
+      <span className="bg-white/20 px-1.5 py-0.5 rounded">{pad(remaining.h)}h</span>
+      <span className="bg-white/20 px-1.5 py-0.5 rounded">{pad(remaining.m)}m</span>
+      <span className="bg-white/20 px-1.5 py-0.5 rounded">{pad(remaining.s)}s</span>
     </div>
   );
 }
 
 // ─── Banner carousel ──────────────────────────────────────────────────────────
 
-function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (action: string | null) => void }) {
+function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a: string | null) => void }) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (banners.length <= 1) return;
-    if (paused) return;
-    timerRef.current = setInterval(() => {
-      setActive((i) => (i + 1) % banners.length);
-    }, 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    if (banners.length <= 1 || paused) return;
+    const id = setInterval(() => setActive((i) => (i + 1) % banners.length), 5500);
+    return () => clearInterval(id);
   }, [banners.length, paused]);
 
   if (banners.length === 0) return null;
-
   const b = banners[active];
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-2xl"
-      style={{ height: 'clamp(220px, 45vw, 520px)' }}
+      className="relative w-full overflow-hidden"
+      style={{ height: 'clamp(320px, 62vh, 680px)' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Slides */}
       {banners.map((banner, i) => (
-        <div
-          key={banner.id}
-          className={`absolute inset-0 transition-opacity duration-700 ${i === active ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-        >
-          <img
-            src={banner.image_url}
-            alt={banner.title ?? ''}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading={i === 0 ? 'eager' : 'lazy'}
-          />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div key={banner.id}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === active ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+          <img src={banner.image_url} alt={banner.title ?? ''} loading={i === 0 ? 'eager' : 'lazy'}
+            className="absolute inset-0 w-full h-full object-cover scale-[1.02] transition-transform duration-[8000ms] ease-out"
+            style={{ transform: i === active ? 'scale(1)' : 'scale(1.04)' }} />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>
       ))}
 
-      {/* Content overlay */}
-      <div className="absolute inset-0 z-20 flex items-center px-6 sm:px-10 lg:px-14">
-        <div className="text-white max-w-md lg:max-w-xl">
+      <div className="absolute inset-0 z-20 flex items-center">
+        <div className="max-w-7xl mx-auto w-full px-6 lg:px-12">
           {b.title && (
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-tight mb-2 drop-shadow-md animate-fade-in-up">
+            <p className="text-white/70 text-sm font-medium tracking-widest uppercase mb-3 animate-fade-in-up">
+              Collection
+            </p>
+          )}
+          {b.title && (
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-none mb-4 animate-fade-in-up drop-shadow-lg"
+              style={{ animationDelay: '60ms' }}>
               {b.title}
             </h2>
           )}
           {b.subtitle && (
-            <p className="text-sm sm:text-base text-white/85 mb-5 leading-relaxed drop-shadow animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+            <p className="text-white/80 text-base lg:text-lg max-w-lg leading-relaxed mb-8 animate-fade-in-up"
+              style={{ animationDelay: '120ms' }}>
               {b.subtitle}
             </p>
           )}
           {b.cta_text && (
-            <button
-              onClick={() => onAction(b.cta_action)}
-              className="inline-flex items-center gap-2 bg-white text-odoo-dark font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-odoo-surface active:scale-95 transition-all shadow-lg animate-fade-in-up"
-              style={{ animationDelay: '160ms' }}
-            >
-              {b.cta_text}<ArrowRight className="w-4 h-4" />
+            <button onClick={() => onAction(b.cta_action)}
+              className="group inline-flex items-center gap-3 bg-white text-odoo-dark font-bold px-7 py-3.5 rounded-full text-sm hover:bg-odoo-primary hover:text-white transition-all duration-300 shadow-xl animate-fade-in-up"
+              style={{ animationDelay: '180ms' }}>
+              {b.cta_text}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Arrows */}
       {banners.length > 1 && (
         <>
-          <button
-            onClick={() => { setActive((i) => (i === 0 ? banners.length - 1 : i - 1)); setPaused(true); }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition backdrop-blur-sm"
-          >
+          <button onClick={() => { setActive((i) => (i === 0 ? banners.length - 1 : i - 1)); setPaused(true); }}
+            className="absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm text-white border border-white/20 flex items-center justify-center transition-all hover:scale-110">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button
-            onClick={() => { setActive((i) => (i + 1) % banners.length); setPaused(true); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition backdrop-blur-sm"
-          >
+          <button onClick={() => { setActive((i) => (i + 1) % banners.length); setPaused(true); }}
+            className="absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm text-white border border-white/20 flex items-center justify-center transition-all hover:scale-110">
             <ChevronRight className="w-5 h-5" />
           </button>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+            {banners.map((_, i) => (
+              <button key={i} onClick={() => { setActive(i); setPaused(true); }}
+                className={`rounded-full transition-all duration-400 ${i === active ? 'bg-white w-8 h-2' : 'bg-white/40 w-2 h-2 hover:bg-white/70'}`} />
+            ))}
+          </div>
         </>
       )}
-
-      {/* Dots */}
-      {banners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-1.5">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setActive(i); setPaused(true); }}
-              className={`rounded-full transition-all duration-300 ${
-                i === active ? 'bg-white w-6 h-2' : 'bg-white/50 w-2 h-2 hover:bg-white/75'
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
+  );
+}
+
+// ─── Trust bar ────────────────────────────────────────────────────────────────
+
+function TrustBar() {
+  const features = [
+    { icon: Truck,        title: 'Livraison rapide',    desc: 'Dans toute la ville' },
+    { icon: RotateCcw,    title: 'Retours faciles',     desc: '7 jours pour changer' },
+    { icon: ShieldCheck,  title: 'Paiement sécurisé',   desc: 'Mobile Money & espèces' },
+    { icon: Headphones,   title: 'Assistance client',   desc: 'Réponse rapide' },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-odoo-border border border-odoo-border rounded-2xl overflow-hidden bg-white my-8 shadow-sm">
+      {features.map(({ icon: Icon, title, desc }) => (
+        <div key={title} className="flex items-center gap-3 px-5 py-4">
+          <div className="w-10 h-10 rounded-xl bg-odoo-primary/10 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-odoo-primary" />
+          </div>
+          <div>
+            <p className="font-semibold text-sm text-odoo-dark">{title}</p>
+            <p className="text-xs text-odoo-muted">{desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Category section ─────────────────────────────────────────────────────────
+
+function CategorySection({ categories, products, onSelect }: {
+  categories: Category[];
+  products: Product[];
+  onSelect: (id: string) => void;
+}) {
+  if (categories.length === 0) return null;
+
+  return (
+    <section className="mb-12">
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Parcourez</p>
+          <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">Nos rayons</h2>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        {categories.map((cat, i) => {
+          const count = products.filter((p) => p.category_id === cat.id).length;
+          return (
+            <StaggerItem key={cat.id} index={i}>
+              <button
+                onClick={() => onSelect(cat.id)}
+                className="group w-full relative overflow-hidden rounded-2xl bg-odoo-surface aspect-[3/4] focus:outline-none"
+              >
+                {cat.image_url ? (
+                  <img src={cat.image_url} alt={cat.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-odoo-primary/20 to-odoo-primary/5 flex items-center justify-center">
+                    <Package2 className="w-10 h-10 text-odoo-primary/40" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-odoo-primary/0 group-hover:bg-odoo-primary/20 transition-colors duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
+                  <p className="font-bold text-white text-sm leading-tight drop-shadow">{cat.name}</p>
+                  <p className="text-white/60 text-xs mt-0.5">{count} articles</p>
+                </div>
+              </button>
+            </StaggerItem>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -162,57 +220,157 @@ const BADGE_STYLES: Record<string, string> = {
 };
 
 const CARD_GRADIENTS = [
-  'from-rose-500 to-orange-400',
-  'from-blue-600 to-cyan-400',
-  'from-emerald-600 to-teal-400',
-  'from-violet-600 to-purple-400',
-  'from-amber-500 to-yellow-400',
-  'from-pink-600 to-rose-400',
+  'from-rose-600 to-orange-500',
+  'from-blue-700 to-cyan-500',
+  'from-emerald-700 to-teal-500',
+  'from-violet-700 to-fuchsia-500',
+  'from-amber-600 to-yellow-500',
+  'from-pink-700 to-rose-500',
 ];
 
-function PromotionCard({ promo, index, onAction }: { promo: Promotion; index: number; onAction: (action: string | null) => void }) {
+function PromotionCard({ promo, index, onAction }: { promo: Promotion; index: number; onAction: (a: string | null) => void }) {
   const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
   const badgeStyle = BADGE_STYLES[promo.badge_color] ?? 'bg-red-500 text-white';
 
   return (
-    <div className={`relative flex-shrink-0 w-64 sm:w-72 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group`}
-      style={{ minHeight: '160px' }}>
+    <div
+      className="relative flex-shrink-0 w-72 sm:w-80 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 group cursor-pointer"
+      style={{ height: '200px' }}
+      onClick={() => onAction(promo.cta_action)}
+    >
       {promo.image_url ? (
         <>
-          <img src={promo.image_url} alt={promo.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <img src={promo.image_url} alt={promo.title}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/20" />
         </>
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
       )}
 
-      {/* Badge */}
       {promo.badge_text && (
-        <div className={`absolute top-3 right-3 z-10 ${badgeStyle} text-xs font-extrabold px-2.5 py-1 rounded-full shadow-md`}>
+        <span className={`absolute top-4 left-4 z-10 ${badgeStyle} text-xs font-black px-3 py-1.5 rounded-full shadow-lg tracking-wide`}>
           {promo.badge_text}
-        </div>
+        </span>
       )}
 
-      {/* Content */}
-      <div className="relative z-10 p-4 h-full flex flex-col justify-end" style={{ minHeight: '160px' }}>
-        <div className="mt-auto">
-          <p className="font-bold text-white text-base leading-tight drop-shadow">{promo.title}</p>
-          {promo.subtitle && <p className="text-white/80 text-xs mt-1 leading-relaxed">{promo.subtitle}</p>}
-          {promo.ends_at && (
-            <div className="mt-2 text-white/90">
-              <Countdown endsAt={promo.ends_at} />
+      <div className="absolute inset-0 z-10 p-5 flex flex-col justify-end">
+        <p className="font-black text-white text-xl leading-tight drop-shadow-lg">{promo.title}</p>
+        {promo.subtitle && <p className="text-white/75 text-xs mt-1">{promo.subtitle}</p>}
+        {promo.ends_at && <div className="mt-2 text-white"><Countdown endsAt={promo.ends_at} /></div>}
+        {promo.cta_text && (
+          <div className="mt-3 inline-flex items-center gap-1.5 text-white text-xs font-semibold">
+            {promo.cta_text} <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Product card ─────────────────────────────────────────────────────────────
+
+export function ProductCard({ product, onView, onAdd }: {
+  product: Product;
+  onView: () => void;
+  onAdd: () => void;
+}) {
+  const isOutOfStock = product.stock === 0;
+  const isLowStock = product.stock > 0 && product.stock <= product.low_stock_threshold;
+  const isNew = Date.now() - new Date(product.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
+  const hasBulk = product.bulk_quantity > 0 && product.bulk_price > 0;
+  const [justAdded, setJustAdded] = useState(false);
+  const { toast } = useToast();
+  const ripple = useRipple();
+  const firstImage = parseImages(product.image_url)[0] ?? null;
+
+  function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    if (isOutOfStock) return;
+    ripple(e);
+    onAdd();
+    setJustAdded(true);
+    toast(`${product.name} ajouté au panier`, 'success');
+    setTimeout(() => setJustAdded(false), 1800);
+  }
+
+  return (
+    <div className="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-transparent hover:border-odoo-border">
+      {/* Image zone */}
+      <div className="relative overflow-hidden bg-odoo-surface" style={{ aspectRatio: '1/1.1' }}>
+        <button onClick={onView} className="block w-full h-full focus:outline-none">
+          {firstImage ? (
+            <img src={firstImage} alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-odoo-border to-odoo-surface">
+              <Package2 className="w-14 h-14 text-odoo-muted/40" />
             </div>
           )}
-          {promo.cta_text && (
-            <button
-              onClick={() => onAction(promo.cta_action)}
-              className="mt-3 inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition backdrop-blur-sm"
-            >
-              {promo.cta_text}<ArrowRight className="w-3.5 h-3.5" />
-            </button>
+
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {isNew && !isOutOfStock && (
+              <span className="bg-odoo-dark text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wider uppercase">
+                New
+              </span>
+            )}
+            {hasBulk && (
+              <span className="bg-odoo-success text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+                Lot
+              </span>
+            )}
+          </div>
+
+          {isLowStock && (
+            <span className="absolute top-3 right-3 bg-odoo-warning text-white text-[10px] font-bold px-2 py-1 rounded-full">
+              Stock: {product.stock}
+            </span>
+          )}
+
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
+              <span className="bg-odoo-dark text-white text-xs font-bold px-4 py-2 rounded-full">Rupture de stock</span>
+            </div>
+          )}
+        </button>
+
+        {/* Quick-add overlay — slides up on hover */}
+        {!isOutOfStock && (
+          <button
+            onClick={handleAdd}
+            className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 py-3.5 font-semibold text-sm
+              transition-all duration-300 ease-out
+              translate-y-full group-hover:translate-y-0
+              ${justAdded
+                ? 'bg-odoo-success text-white'
+                : 'bg-odoo-dark text-white hover:bg-odoo-primary'
+              }`}
+          >
+            {justAdded
+              ? <><CheckCircle2 className="w-4 h-4" />Ajouté !</>
+              : <><ShoppingCart className="w-4 h-4" />Ajouter au panier</>}
+          </button>
+        )}
+      </div>
+
+      {/* Text zone */}
+      <button onClick={onView} className="w-full text-left p-4 focus:outline-none">
+        <h3 className="font-semibold text-sm text-odoo-dark line-clamp-2 leading-snug mb-2 group-hover:text-odoo-primary transition-colors duration-200">
+          {product.name}
+        </h3>
+        <div className="flex items-baseline gap-2">
+          <span className="text-base font-black text-odoo-primary">{formatPrice(product.price)}</span>
+          {hasBulk && (
+            <span className="text-xs text-odoo-muted line-through">{formatPrice(product.price)}</span>
           )}
         </div>
-      </div>
+        {hasBulk && (
+          <p className="text-xs text-odoo-success font-semibold mt-0.5">
+            Lot: {formatPrice(product.bulk_price)} / unité
+          </p>
+        )}
+      </button>
     </div>
   );
 }
@@ -228,6 +386,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'price-asc' | 'price-desc' | 'name'>('recent');
+  const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
   const productsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -252,16 +411,13 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
   }, []);
 
   function handleCTA(action: string | null) {
-    if (!action) {
+    if (!action || action === 'shop') {
       productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
       return;
     }
     if (action.startsWith('http')) {
       window.open(action, '_blank', 'noopener,noreferrer');
-    } else if (action === 'shop') {
-      productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      // Treat as category id
       setActiveCategory(action);
       productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -272,250 +428,206 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
     if (activeCategory) list = list.filter((p) => p.category_id === activeCategory);
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q));
     }
     if (sortBy === 'price-asc') list.sort((a, b) => a.price - b.price);
-    if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price);
-    if (sortBy === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price);
+    else if (sortBy === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
     return list;
   }, [products, activeCategory, search, sortBy]);
 
+  const activeCategoryName = activeCategory
+    ? categories.find((c) => c.id === activeCategory)?.name
+    : null;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 page-enter">
+    <div className="page-enter bg-white min-h-screen">
 
-      {/* ── Banner carousel ──────────────────────────────────────────────── */}
-      {!loading && banners.length > 0 ? (
-        <div className="mb-8 animate-fade-in-up">
-          <BannerCarousel banners={banners} onAction={handleCTA} />
-        </div>
-      ) : !loading && banners.length === 0 ? (
-        /* Fallback hero when no banners configured */
-        <div className="relative bg-gradient-to-br from-odoo-primary via-odoo-primary to-odoo-primary-light rounded-2xl p-6 lg:p-10 text-white mb-8 overflow-hidden animate-fade-in-up">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-white/5 rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 -mb-16 w-48 h-48 bg-white/5 rounded-full pointer-events-none" />
-          <div className="absolute right-10 top-1/2 -translate-y-1/2 hidden lg:block animate-float opacity-20 pointer-events-none">
-            <Sparkles className="w-24 h-24" />
-          </div>
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium mb-4">
-              <Sparkles className="w-3.5 h-3.5" />Prix dégressifs sur les achats en gros
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-2">Achetez plus, économisez plus.</h1>
-            <p className="text-white/80 max-w-xl text-sm">
-              Découvrez notre catalogue avec des prix dégressifs. Commandez en ligne et faites-vous livrer rapidement.
-            </p>
-          </div>
-        </div>
+      {/* ── Banner ────────────────────────────────────────────────────────── */}
+      {loading ? (
+        <div className="w-full bg-gradient-to-r from-odoo-border/40 to-odoo-border/20 animate-pulse"
+          style={{ height: 'clamp(320px, 62vh, 680px)' }} />
+      ) : banners.length > 0 ? (
+        <BannerCarousel banners={banners} onAction={handleCTA} />
       ) : (
-        /* Skeleton while loading */
-        <div className="w-full bg-odoo-border/50 rounded-2xl animate-pulse mb-8" style={{ height: 'clamp(220px, 45vw, 520px)' }} />
-      )}
-
-      {/* ── Promotions strip ─────────────────────────────────────────────── */}
-      {promotions.length > 0 && (
-        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-orange-500" />
-            <h2 className="text-lg font-bold">Offres du moment</h2>
-            <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">{promotions.length}</span>
-          </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-            {promotions.map((promo, i) => (
-              <PromotionCard key={promo.id} promo={promo} index={i} onAction={handleCTA} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Search + Sort ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-3 mb-5 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-odoo-muted pointer-events-none" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un produit..."
-            className="input pl-9 focus:shadow-md" />
-        </div>
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)} className="input lg:w-52">
-          <option value="recent">Plus récents</option>
-          <option value="price-asc">Prix croissant</option>
-          <option value="price-desc">Prix décroissant</option>
-          <option value="name">Nom (A-Z)</option>
-        </select>
-      </div>
-
-      {/* ── Category pills ───────────────────────────────────────────────── */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-5">
-        {[{ id: null, name: 'Tout' }, ...categories].map((cat, i) => (
-          <button key={cat.id ?? 'all'} onClick={() => setActiveCategory(cat.id)}
-            style={{ animationDelay: `${i * 35}ms` }}
-            className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 whitespace-nowrap animate-fade-in-up ${
-              activeCategory === cat.id
-                ? 'bg-odoo-primary border-odoo-primary text-white shadow-md shadow-odoo-primary/25'
-                : 'bg-white border-odoo-border hover:border-odoo-primary hover:shadow-sm'
-            }`}>
-            {cat.name}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Category cards ───────────────────────────────────────────────── */}
-      {!activeCategory && !search && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-7">
-          {categories.map((cat, i) => (
-            <StaggerItem key={cat.id} index={i}>
-              <button onClick={() => setActiveCategory(cat.id)}
-                className="group w-full bg-white border border-odoo-border rounded-xl p-3 text-left
-                           hover:border-odoo-primary/50 hover:shadow-lg hover:shadow-odoo-primary/10
-                           hover:-translate-y-1 transition-all duration-300">
-                <div className="aspect-square w-full rounded-lg overflow-hidden bg-odoo-surface mb-2">
-                  {cat.image_url
-                    ? <LazyImage src={cat.image_url} alt={cat.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                    : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-8 h-8 text-odoo-muted" /></div>}
-                </div>
-                <p className="font-medium text-sm truncate">{cat.name}</p>
-                <p className="text-xs text-odoo-muted">{products.filter((p) => p.category_id === cat.id).length} produits</p>
+        /* Fallback hero */
+        <div className="relative overflow-hidden bg-odoo-dark" style={{ height: 'clamp(320px, 62vh, 680px)' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-odoo-primary via-odoo-dark to-black opacity-90" />
+          <div className="absolute top-0 right-0 w-96 h-96 -mr-32 -mt-32 rounded-full bg-odoo-primary/20 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 -ml-16 -mb-16 rounded-full bg-odoo-primary/15 blur-2xl" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-7xl mx-auto w-full px-6 lg:px-12">
+              <p className="text-odoo-primary text-xs font-bold tracking-widest uppercase mb-4">Bienvenue dans notre boutique</p>
+              <h1 className="text-5xl lg:text-7xl font-black text-white leading-none mb-6">
+                Qualité<br /><span className="text-odoo-primary">garantie.</span>
+              </h1>
+              <p className="text-white/60 text-lg max-w-md leading-relaxed mb-8">
+                Découvrez notre catalogue avec des prix dégressifs et une livraison rapide.
+              </p>
+              <button onClick={() => productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                className="group inline-flex items-center gap-3 bg-white text-odoo-dark font-bold px-8 py-4 rounded-full hover:bg-odoo-primary hover:text-white transition-all duration-300 shadow-xl text-sm">
+                Explorer le catalogue <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-            </StaggerItem>
-          ))}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ── Product grid ─────────────────────────────────────────────────── */}
-      <div ref={productsSectionRef}>
-        {activeCategory || search ? (
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="font-semibold text-sm text-odoo-muted">
-              {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
-              {activeCategory && ` — ${categories.find((c) => c.id === activeCategory)?.name ?? ''}`}
-              {search && ` pour "${search}"`}
-            </h2>
-            {(activeCategory || search) && (
-              <button onClick={() => { setActiveCategory(null); setSearch(''); }}
-                className="text-xs text-odoo-primary hover:underline">
-                Effacer
+      {/* ── Content ───────────────────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
+
+        {/* Trust bar */}
+        <TrustBar />
+
+        {/* Categories */}
+        {!activeCategory && !search && (
+          <CategorySection categories={categories} products={products} onSelect={(id) => {
+            setActiveCategory(id);
+            productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }} />
+        )}
+
+        {/* Promotions */}
+        {promotions.length > 0 && !activeCategory && !search && (
+          <section className="mb-12">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-orange-500 uppercase mb-1">Disponible maintenant</p>
+                <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark flex items-center gap-2">
+                  <Flame className="w-7 h-7 text-orange-500" />
+                  Offres du moment
+                </h2>
+              </div>
+            </div>
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
+              {promotions.map((promo, i) => (
+                <PromotionCard key={promo.id} promo={promo} index={i} onAction={handleCTA} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Products section */}
+        <section ref={productsSectionRef} className="pb-16">
+
+          {/* Section heading */}
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              {activeCategoryName ? (
+                <>
+                  <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Catégorie</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">{activeCategoryName}</h2>
+                </>
+              ) : search ? (
+                <>
+                  <p className="text-xs font-semibold tracking-widest text-odoo-muted uppercase mb-1">Résultats</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">"{search}"</h2>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Catalogue</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">Tous les produits</h2>
+                </>
+              )}
+            </div>
+            {(activeCategoryName || search) && (
+              <button
+                onClick={() => { setActiveCategory(null); setSearch(''); }}
+                className="flex items-center gap-1.5 text-sm text-odoo-muted hover:text-odoo-danger transition-colors">
+                <X className="w-4 h-4" />Effacer
               </button>
             )}
           </div>
-        ) : (
-          <div className="flex items-center gap-2 mb-4">
-            <Tag className="w-4 h-4 text-odoo-primary" />
-            <h2 className="font-semibold">Tous les produits</h2>
+
+          {/* Search + filter bar */}
+          <div className="flex gap-2 mb-6">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-odoo-muted pointer-events-none" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher un produit..."
+                className="w-full pl-11 pr-4 py-3 border border-odoo-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-odoo-primary/30 focus:border-odoo-primary transition bg-white shadow-sm"
+              />
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition shadow-sm ${
+                showFilters ? 'bg-odoo-primary text-white border-odoo-primary' : 'bg-white border-odoo-border hover:border-odoo-primary text-odoo-dark'
+              }`}>
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filtres</span>
+            </button>
           </div>
-        )}
 
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 card animate-fade-in-scale">
-            <AlertCircle className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
-            <p className="font-medium">Aucun produit trouvé</p>
-            <p className="text-sm text-odoo-muted mt-1">Essayez de modifier vos filtres</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filtered.map((product, i) => (
-              <StaggerItem key={product.id} index={i % 8}>
-                <ProductCard product={product}
-                  onView={() => setView({ kind: 'product', id: product.id })}
-                  onAdd={() => addToCart(product)} />
-              </StaggerItem>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Product card ─────────────────────────────────────────────────────────────
-
-export function ProductCard({ product, onView, onAdd }: { product: Product; onView: () => void; onAdd: () => void }) {
-  const hasBulk = product.bulk_quantity > 0 && product.bulk_price > 0;
-  const isOutOfStock = product.stock === 0;
-  const isLowStock = product.stock <= product.low_stock_threshold && !isOutOfStock;
-  const isNew = Date.now() - new Date(product.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
-  const [justAdded, setJustAdded] = useState(false);
-  const { toast } = useToast();
-  const ripple = useRipple();
-  const firstImage = parseImages(product.image_url)[0] ?? null;
-
-  function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
-    if (isOutOfStock) return;
-    ripple(e);
-    onAdd();
-    setJustAdded(true);
-    toast(`${product.name} ajouté au panier`, 'success');
-    setTimeout(() => setJustAdded(false), 1800);
-  }
-
-  return (
-    <div className="product-card h-full will-transform group/card">
-      <button onClick={onView}
-        className="block aspect-square w-full bg-odoo-surface overflow-hidden relative focus:outline-none">
-        {firstImage ? (
-          <LazyImage src={firstImage} alt={product.name}
-            className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-            fallback={<div className="w-full h-full flex items-center justify-center bg-odoo-surface"><Package2 className="w-12 h-12 text-odoo-muted" /></div>} />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center"><Package2 className="w-12 h-12 text-odoo-muted" /></div>
-        )}
-
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {hasBulk && (
-            <span className="badge bg-odoo-success text-white shadow-sm text-[10px] px-1.5 py-0.5">
-              <Tag className="w-2.5 h-2.5 mr-1" />Lot
-            </span>
+          {/* Expanded filters */}
+          {showFilters && (
+            <div className="flex flex-wrap gap-3 mb-6 p-4 bg-odoo-surface rounded-xl border border-odoo-border animate-fade-in-up">
+              {/* Sort */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-odoo-muted uppercase tracking-wide">Trier :</span>
+                {(['recent', 'price-asc', 'price-desc', 'name'] as const).map((s) => (
+                  <button key={s} onClick={() => setSortBy(s)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${sortBy === s ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                    {{ recent: 'Récents', 'price-asc': 'Prix ↑', 'price-desc': 'Prix ↓', name: 'A-Z' }[s]}
+                  </button>
+                ))}
+              </div>
+              {/* Category filter */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-odoo-muted uppercase tracking-wide">Rayon :</span>
+                <button onClick={() => setActiveCategory(null)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!activeCategory ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                  Tout
+                </button>
+                {categories.map((cat) => (
+                  <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${activeCategory === cat.id ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
-          {isNew && !isOutOfStock && (
-            <span className="badge bg-odoo-primary text-white shadow-sm text-[10px] px-1.5 py-0.5">
-              <Sparkles className="w-2.5 h-2.5 mr-1" />Nouveau
-            </span>
-          )}
-        </div>
 
-        {isOutOfStock && (
-          <div className="absolute inset-0 bg-white/75 flex items-center justify-center backdrop-blur-[1px]">
-            <span className="badge bg-odoo-danger text-white shadow-sm">Rupture</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-odoo-dark/0 group-hover/card:bg-odoo-dark/5 transition-colors duration-300" />
-      </button>
-
-      <div className="p-3 flex flex-col flex-1">
-        <button onClick={onView} className="text-left group/name focus:outline-none">
-          <h3 className="font-medium text-sm line-clamp-2 mb-1 group-hover/name:text-odoo-primary transition-colors duration-150">
-            {product.name}
-          </h3>
-        </button>
-        <div className="mt-auto pt-2">
-          <div className="flex items-baseline gap-2 mb-1.5">
-            <span className="font-bold text-odoo-primary">{formatPrice(product.price)}</span>
-            {hasBulk && <span className="text-xs text-odoo-muted">lot: {formatPrice(product.bulk_price)}</span>}
-          </div>
-          {isLowStock && (
-            <p className="text-xs text-odoo-warning font-medium mb-2 flex items-center gap-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-odoo-warning animate-pulse" />
-              Stock: {product.stock}
+          {/* Result count */}
+          {!loading && (
+            <p className="text-sm text-odoo-muted mb-4">
+              <span className="font-bold text-odoo-dark">{filtered.length}</span> produit{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
             </p>
           )}
-          <button onClick={handleAdd} disabled={isOutOfStock}
-            className={`w-full relative overflow-hidden inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-              justAdded
-                ? 'bg-odoo-success text-white scale-95'
-                : isOutOfStock
-                  ? 'bg-odoo-muted/20 text-odoo-muted cursor-not-allowed'
-                  : 'bg-odoo-primary hover:bg-odoo-primary-dark active:scale-95 text-white shadow-sm hover:shadow-md hover:shadow-odoo-primary/30'
-            }`}>
-            {justAdded
-              ? <><CheckCircle2 className="w-3.5 h-3.5 animate-success-pop" />Ajouté !</>
-              : isOutOfStock
-                ? 'Indisponible'
-                : <><Plus className="w-3.5 h-3.5" />Ajouter</>}
-          </button>
-        </div>
+
+          {/* Grid */}
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+              {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-24 animate-fade-in-scale">
+              <div className="w-20 h-20 bg-odoo-surface rounded-full flex items-center justify-center mx-auto mb-5">
+                <AlertCircle className="w-9 h-9 text-odoo-muted" />
+              </div>
+              <p className="text-lg font-bold mb-2">Aucun résultat</p>
+              <p className="text-sm text-odoo-muted">Essayez d'autres termes ou explorez toutes les catégories</p>
+              <button onClick={() => { setActiveCategory(null); setSearch(''); }}
+                className="mt-6 inline-flex items-center gap-2 bg-odoo-primary text-white px-6 py-2.5 rounded-full font-medium text-sm hover:bg-odoo-primary-dark transition">
+                Voir tout le catalogue
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+              {filtered.map((product, i) => (
+                <StaggerItem key={product.id} index={i % 8}>
+                  <ProductCard
+                    product={product}
+                    onView={() => setView({ kind: 'product', id: product.id })}
+                    onAdd={() => addToCart(product)}
+                  />
+                </StaggerItem>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

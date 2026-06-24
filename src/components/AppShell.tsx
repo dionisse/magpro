@@ -85,9 +85,19 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
   const year = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen bg-odoo-surface flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+
+      {/* ── Announcement bar (shop only) ──────────────────────────────────── */}
+      {!isAdminView && (
+        <div className="bg-odoo-dark text-white text-xs py-2 text-center font-medium tracking-wide">
+          {settings.phone_number
+            ? `Commandez par téléphone : ${settings.phone_number} · Livraison rapide disponible`
+            : 'Livraison rapide disponible · Paiement Mobile Money accepté'}
+        </div>
+      )}
+
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <header className={`bg-odoo-primary text-white sticky top-0 z-40 transition-shadow duration-300 ${scrolled ? 'shadow-lg shadow-odoo-dark/20' : 'shadow-sm'}`}>
+      <header className={`bg-odoo-primary text-white sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'shadow-lg shadow-odoo-dark/20' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="h-14 flex items-center justify-between gap-4">
             <button onClick={() => setView({ kind: 'shop' })} className="flex items-center gap-2 font-semibold text-lg hover:opacity-90 transition flex-shrink-0">
