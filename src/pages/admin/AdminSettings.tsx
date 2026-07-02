@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Save, Loader2, Store, Building2, Phone, Globe,
-  Image, FileText, CheckCircle2, AlertCircle,
+  Image, FileText, CheckCircle2, AlertCircle, Palette,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useStoreSettings } from '../../contexts/StoreSettingsContext';
@@ -22,6 +22,7 @@ const EMPTY: FormData = {
   whatsapp_url: null,
   legal_mentions: null,
   terms_of_use: null,
+  hero_style: 'auto',
 };
 
 function val(v: string | null | undefined): string {
@@ -49,6 +50,7 @@ export function AdminSettings() {
       whatsapp_url: settings.whatsapp_url,
       legal_mentions: settings.legal_mentions,
       terms_of_use: settings.terms_of_use,
+      hero_style: settings.hero_style ?? 'auto',
     });
   }, [settings]);
 
@@ -146,6 +148,28 @@ export function AdminSettings() {
               />
             </div>
           )}
+        </section>
+
+        {/* Hero style */}
+        <section className="card p-5">
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
+            <Palette className="w-4 h-4 text-odoo-primary" />Style de la bannière
+          </h2>
+          <p className="text-xs text-odoo-muted mb-4">
+            Définit l'apparence de la boutique lorsqu'aucune bannière active n'est configurée.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button type="button" onClick={() => set('hero_style', 'auto')}
+              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'auto' ? 'border-odoo-primary bg-odoo-primary/5' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+              <p className="font-semibold text-sm mb-1">Fond sombre avec titre</p>
+              <p className="text-xs text-odoo-muted">Affiche un hero élégant "Qualité garantie" si aucune bannière n'est active.</p>
+            </button>
+            <button type="button" onClick={() => set('hero_style', 'none')}
+              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'none' ? 'border-odoo-primary bg-odoo-primary/5' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+              <p className="font-semibold text-sm mb-1">Aucun hero (minimal)</p>
+              <p className="text-xs text-odoo-muted">Cache complètement la zone banner si aucune bannière active.</p>
+            </button>
+          </div>
         </section>
 
         {/* Company */}

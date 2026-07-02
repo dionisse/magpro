@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatPrice, parseImages } from '../lib/format';
+import { useStoreSettings } from '../contexts/StoreSettingsContext';
 import type { Banner, Category, Product, Promotion } from '../lib/database.types';
 import { useCart } from '../contexts/CartContext';
 import { LazyImage, SkeletonCard, StaggerItem, useRipple, useToast } from '../components/ui';
@@ -378,6 +379,7 @@ export function ProductCard({ product, onView, onAdd }: {
 // ─── Shop page ────────────────────────────────────────────────────────────────
 
 export function ShopPage({ setView }: { setView: (v: View) => void }) {
+  const { settings } = useStoreSettings();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -449,6 +451,9 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
           style={{ height: 'clamp(320px, 62vh, 680px)' }} />
       ) : banners.length > 0 ? (
         <BannerCarousel banners={banners} onAction={handleCTA} />
+      ) : settings.hero_style === 'none' ? (
+        /* No hero — minimal mode */
+        null
       ) : (
         /* Fallback hero */
         <div className="relative overflow-hidden bg-odoo-dark" style={{ height: 'clamp(320px, 62vh, 680px)' }}>

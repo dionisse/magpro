@@ -55,6 +55,7 @@ export interface StoreSettings {
   whatsapp_url: string | null;
   legal_mentions: string | null;
   terms_of_use: string | null;
+  hero_style: 'auto' | 'none';
   updated_at: string;
 }
 
