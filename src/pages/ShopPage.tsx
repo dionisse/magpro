@@ -102,7 +102,7 @@ function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a
           )}
           {b.cta_text && (
             <button onClick={() => onAction(b.cta_action)}
-              className="group inline-flex items-center gap-3 bg-white text-odoo-dark font-bold px-7 py-3.5 rounded-full text-sm hover:bg-odoo-primary hover:text-white transition-all duration-300 shadow-xl animate-fade-in-up"
+              className="group inline-flex items-center gap-3 bg-white text-brand-dark font-bold px-7 py-3.5 rounded-full text-sm hover:bg-brand-primary hover:text-white transition-all duration-300 shadow-xl animate-fade-in-up"
               style={{ animationDelay: '180ms' }}>
               {b.cta_text}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -144,15 +144,15 @@ function TrustBar() {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-odoo-border border border-odoo-border rounded-2xl overflow-hidden bg-white my-8 shadow-sm">
+    <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-odoo-border border border-brand-border rounded-2xl overflow-hidden bg-white my-8 shadow-sm">
       {features.map(({ icon: Icon, title, desc }) => (
         <div key={title} className="flex items-center gap-3 px-5 py-4">
-          <div className="w-10 h-10 rounded-xl bg-odoo-primary/10 flex items-center justify-center flex-shrink-0">
-            <Icon className="w-5 h-5 text-odoo-primary" />
+          <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-brand-primary" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-odoo-dark">{title}</p>
-            <p className="text-xs text-odoo-muted">{desc}</p>
+            <p className="font-semibold text-sm text-brand-dark">{title}</p>
+            <p className="text-xs text-brand-muted">{desc}</p>
           </div>
         </div>
       ))}
@@ -173,8 +173,8 @@ function CategorySection({ categories, products, onSelect }: {
     <section className="mb-12">
       <div className="flex items-end justify-between mb-6">
         <div>
-          <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Parcourez</p>
-          <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">Nos rayons</h2>
+          <p className="text-xs font-semibold tracking-widest text-brand-primary uppercase mb-1">Parcourez</p>
+          <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">Nos rayons</h2>
         </div>
       </div>
 
@@ -185,18 +185,18 @@ function CategorySection({ categories, products, onSelect }: {
             <StaggerItem key={cat.id} index={i}>
               <button
                 onClick={() => onSelect(cat.id)}
-                className="group w-full relative overflow-hidden rounded-2xl bg-odoo-surface aspect-[3/4] focus:outline-none"
+                className="group w-full relative overflow-hidden rounded-2xl bg-brand-surface aspect-[3/4] focus:outline-none"
               >
                 {cat.image_url ? (
                   <img src={cat.image_url} alt={cat.name}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-odoo-primary/20 to-odoo-primary/5 flex items-center justify-center">
-                    <Package2 className="w-10 h-10 text-odoo-primary/40" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/20 to-brand-primary/5 flex items-center justify-center">
+                    <Package2 className="w-10 h-10 text-brand-primary/40" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <div className="absolute inset-0 bg-odoo-primary/0 group-hover:bg-odoo-primary/20 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/20 transition-colors duration-300" />
                 <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
                   <p className="font-bold text-white text-sm leading-tight drop-shadow">{cat.name}</p>
                   <p className="text-white/60 text-xs mt-0.5">{count} articles</p>
@@ -296,28 +296,28 @@ export function ProductCard({ product, onView, onAdd }: {
   }
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-transparent hover:border-odoo-border">
+    <div className="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-transparent hover:border-brand-border">
       {/* Image zone */}
-      <div className="relative overflow-hidden bg-odoo-surface" style={{ aspectRatio: '1/1.1' }}>
+      <div className="relative overflow-hidden bg-brand-surface" style={{ aspectRatio: '1/1.1' }}>
         <button onClick={onView} className="block w-full h-full focus:outline-none">
           {firstImage ? (
             <img src={firstImage} alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-odoo-border to-odoo-surface">
-              <Package2 className="w-14 h-14 text-odoo-muted/40" />
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-border to-brand-surface">
+              <Package2 className="w-14 h-14 text-brand-muted/40" />
             </div>
           )}
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {isNew && !isOutOfStock && (
-              <span className="bg-odoo-dark text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wider uppercase">
+              <span className="bg-brand-dark text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wider uppercase">
                 New
               </span>
             )}
             {hasBulk && (
-              <span className="bg-odoo-success text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+              <span className="bg-brand-success text-white text-[10px] font-black px-2.5 py-1 rounded-full">
                 Lot
               </span>
             )}
@@ -331,7 +331,7 @@ export function ProductCard({ product, onView, onAdd }: {
 
           {isOutOfStock && (
             <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
-              <span className="bg-odoo-dark text-white text-xs font-bold px-4 py-2 rounded-full">Rupture de stock</span>
+              <span className="bg-brand-dark text-white text-xs font-bold px-4 py-2 rounded-full">Rupture de stock</span>
             </div>
           )}
         </button>
@@ -344,8 +344,8 @@ export function ProductCard({ product, onView, onAdd }: {
               transition-all duration-300 ease-out
               translate-y-full group-hover:translate-y-0
               ${justAdded
-                ? 'bg-odoo-success text-white'
-                : 'bg-odoo-dark text-white hover:bg-odoo-primary'
+                ? 'bg-brand-success text-white'
+                : 'bg-brand-dark text-white hover:bg-brand-primary'
               }`}
           >
             {justAdded
@@ -357,13 +357,13 @@ export function ProductCard({ product, onView, onAdd }: {
 
       {/* Text zone */}
       <button onClick={onView} className="w-full text-left p-4 focus:outline-none">
-        <h3 className="font-semibold text-sm text-odoo-dark line-clamp-2 leading-snug mb-2 group-hover:text-odoo-primary transition-colors duration-200">
+        <h3 className="font-semibold text-sm text-brand-dark line-clamp-2 leading-snug mb-2 group-hover:text-brand-primary transition-colors duration-200">
           {product.name}
         </h3>
         <div className="flex items-baseline gap-2">
-          <span className="text-base font-black text-odoo-primary">{formatPrice(product.price)}</span>
+          <span className="text-base font-black text-brand-primary">{formatPrice(product.price)}</span>
           {hasBulk && (
-            <span className="text-xs text-odoo-muted line-through">{formatPrice(product.price)}</span>
+            <span className="text-xs text-brand-muted line-through">{formatPrice(product.price)}</span>
           )}
         </div>
         {hasBulk && (
@@ -447,7 +447,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
       {/* ── Banner ────────────────────────────────────────────────────────── */}
       {loading ? (
-        <div className="w-full bg-gradient-to-r from-odoo-border/40 to-odoo-border/20 animate-pulse"
+        <div className="w-full bg-gradient-to-r from-brand-border/40 to-brand-border/20 animate-pulse"
           style={{ height: 'clamp(320px, 62vh, 680px)' }} />
       ) : banners.length > 0 ? (
         <BannerCarousel banners={banners} onAction={handleCTA} />
@@ -456,21 +456,21 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
         null
       ) : (
         /* Fallback hero */
-        <div className="relative overflow-hidden bg-odoo-dark" style={{ height: 'clamp(320px, 62vh, 680px)' }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-odoo-primary via-odoo-dark to-black opacity-90" />
-          <div className="absolute top-0 right-0 w-96 h-96 -mr-32 -mt-32 rounded-full bg-odoo-primary/20 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 -ml-16 -mb-16 rounded-full bg-odoo-primary/15 blur-2xl" />
+        <div className="relative overflow-hidden bg-brand-dark" style={{ height: 'clamp(320px, 62vh, 680px)' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-primary via-brand-dark to-black opacity-90" />
+          <div className="absolute top-0 right-0 w-96 h-96 -mr-32 -mt-32 rounded-full bg-brand-accent/10 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 -ml-16 -mb-16 rounded-full bg-brand-accent/10 blur-2xl" />
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-7xl mx-auto w-full px-6 lg:px-12">
-              <p className="text-odoo-primary text-xs font-bold tracking-widest uppercase mb-4">Bienvenue dans notre boutique</p>
+              <p className="text-brand-accent text-xs font-bold tracking-widest uppercase mb-4">Bienvenue dans notre boutique</p>
               <h1 className="text-5xl lg:text-7xl font-black text-white leading-none mb-6">
-                Qualité<br /><span className="text-odoo-primary">garantie.</span>
+                Qualité<br /><span className="text-brand-accent">garantie.</span>
               </h1>
               <p className="text-white/60 text-lg max-w-md leading-relaxed mb-8">
                 Découvrez notre catalogue avec des prix dégressifs et une livraison rapide.
               </p>
               <button onClick={() => productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="group inline-flex items-center gap-3 bg-white text-odoo-dark font-bold px-8 py-4 rounded-full hover:bg-odoo-primary hover:text-white transition-all duration-300 shadow-xl text-sm">
+                className="group inline-flex items-center gap-3 bg-brand-accent text-brand-dark font-bold px-8 py-4 rounded-full hover:bg-brand-accent-dark transition-all duration-300 shadow-accent text-sm">
                 Explorer le catalogue <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -498,7 +498,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
             <div className="flex items-end justify-between mb-6">
               <div>
                 <p className="text-xs font-semibold tracking-widest text-orange-500 uppercase mb-1">Disponible maintenant</p>
-                <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark flex items-center gap-2">
+                <h2 className="text-2xl lg:text-3xl font-black text-brand-dark flex items-center gap-2">
                   <Flame className="w-7 h-7 text-orange-500" />
                   Offres du moment
                 </h2>
@@ -520,25 +520,25 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
             <div>
               {activeCategoryName ? (
                 <>
-                  <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Catégorie</p>
-                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">{activeCategoryName}</h2>
+                  <p className="text-xs font-semibold tracking-widest text-brand-primary uppercase mb-1">Catégorie</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">{activeCategoryName}</h2>
                 </>
               ) : search ? (
                 <>
-                  <p className="text-xs font-semibold tracking-widest text-odoo-muted uppercase mb-1">Résultats</p>
-                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">"{search}"</h2>
+                  <p className="text-xs font-semibold tracking-widest text-brand-muted uppercase mb-1">Résultats</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">"{search}"</h2>
                 </>
               ) : (
                 <>
-                  <p className="text-xs font-semibold tracking-widest text-odoo-primary uppercase mb-1">Catalogue</p>
-                  <h2 className="text-2xl lg:text-3xl font-black text-odoo-dark">Tous les produits</h2>
+                  <p className="text-xs font-semibold tracking-widest text-brand-primary uppercase mb-1">Catalogue</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">Tous les produits</h2>
                 </>
               )}
             </div>
             {(activeCategoryName || search) && (
               <button
                 onClick={() => { setActiveCategory(null); setSearch(''); }}
-                className="flex items-center gap-1.5 text-sm text-odoo-muted hover:text-odoo-danger transition-colors">
+                className="flex items-center gap-1.5 text-sm text-brand-muted hover:text-odoo-danger transition-colors">
                 <X className="w-4 h-4" />Effacer
               </button>
             )}
@@ -547,18 +547,18 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
           {/* Search + filter bar */}
           <div className="flex gap-2 mb-6">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-odoo-muted pointer-events-none" />
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted pointer-events-none" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher un produit..."
-                className="w-full pl-11 pr-4 py-3 border border-odoo-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-odoo-primary/30 focus:border-odoo-primary transition bg-white shadow-sm"
+                className="w-full pl-11 pr-4 py-3 border border-brand-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-odoo-primary/30 focus:border-odoo-primary transition bg-white shadow-sm"
               />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition shadow-sm ${
-                showFilters ? 'bg-odoo-primary text-white border-odoo-primary' : 'bg-white border-odoo-border hover:border-odoo-primary text-odoo-dark'
+                showFilters ? 'bg-brand-primary text-white border-odoo-primary' : 'bg-white border-brand-border hover:border-odoo-primary text-brand-dark'
               }`}>
               <SlidersHorizontal className="w-4 h-4" />
               <span className="hidden sm:inline">Filtres</span>
@@ -567,27 +567,27 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
           {/* Expanded filters */}
           {showFilters && (
-            <div className="flex flex-wrap gap-3 mb-6 p-4 bg-odoo-surface rounded-xl border border-odoo-border animate-fade-in-up">
+            <div className="flex flex-wrap gap-3 mb-6 p-4 bg-brand-surface rounded-xl border border-brand-border animate-fade-in-up">
               {/* Sort */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-odoo-muted uppercase tracking-wide">Trier :</span>
+                <span className="text-xs font-semibold text-brand-muted uppercase tracking-wide">Trier :</span>
                 {(['recent', 'price-asc', 'price-desc', 'name'] as const).map((s) => (
                   <button key={s} onClick={() => setSortBy(s)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${sortBy === s ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${sortBy === s ? 'bg-brand-primary text-white' : 'bg-white border border-brand-border hover:border-odoo-primary'}`}>
                     {{ recent: 'Récents', 'price-asc': 'Prix ↑', 'price-desc': 'Prix ↓', name: 'A-Z' }[s]}
                   </button>
                 ))}
               </div>
               {/* Category filter */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold text-odoo-muted uppercase tracking-wide">Rayon :</span>
+                <span className="text-xs font-semibold text-brand-muted uppercase tracking-wide">Rayon :</span>
                 <button onClick={() => setActiveCategory(null)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!activeCategory ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!activeCategory ? 'bg-brand-primary text-white' : 'bg-white border border-brand-border hover:border-odoo-primary'}`}>
                   Tout
                 </button>
                 {categories.map((cat) => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${activeCategory === cat.id ? 'bg-odoo-primary text-white' : 'bg-white border border-odoo-border hover:border-odoo-primary'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${activeCategory === cat.id ? 'bg-brand-primary text-white' : 'bg-white border border-brand-border hover:border-odoo-primary'}`}>
                     {cat.name}
                   </button>
                 ))}
@@ -597,8 +597,8 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
           {/* Result count */}
           {!loading && (
-            <p className="text-sm text-odoo-muted mb-4">
-              <span className="font-bold text-odoo-dark">{filtered.length}</span> produit{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
+            <p className="text-sm text-brand-muted mb-4">
+              <span className="font-bold text-brand-dark">{filtered.length}</span> produit{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
             </p>
           )}
 
@@ -609,13 +609,13 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-24 animate-fade-in-scale">
-              <div className="w-20 h-20 bg-odoo-surface rounded-full flex items-center justify-center mx-auto mb-5">
-                <AlertCircle className="w-9 h-9 text-odoo-muted" />
+              <div className="w-20 h-20 bg-brand-surface rounded-full flex items-center justify-center mx-auto mb-5">
+                <AlertCircle className="w-9 h-9 text-brand-muted" />
               </div>
               <p className="text-lg font-bold mb-2">Aucun résultat</p>
-              <p className="text-sm text-odoo-muted">Essayez d'autres termes ou explorez toutes les catégories</p>
+              <p className="text-sm text-brand-muted">Essayez d'autres termes ou explorez toutes les catégories</p>
               <button onClick={() => { setActiveCategory(null); setSearch(''); }}
-                className="mt-6 inline-flex items-center gap-2 bg-odoo-primary text-white px-6 py-2.5 rounded-full font-medium text-sm hover:bg-odoo-primary-dark transition">
+                className="mt-6 inline-flex items-center gap-2 bg-brand-primary text-white px-6 py-2.5 rounded-full font-medium text-sm hover:bg-brand-primary-dark transition">
                 Voir tout le catalogue
               </button>
             </div>

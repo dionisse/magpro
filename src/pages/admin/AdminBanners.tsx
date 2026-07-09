@@ -13,9 +13,9 @@ function Modal({ children, title, onClose }: { children: ReactNode; title: strin
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-auto">
-        <div className="sticky top-0 bg-white border-b border-odoo-border px-5 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b border-brand-border px-5 py-4 flex items-center justify-between z-10">
           <h2 className="font-semibold text-lg">{title}</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-odoo-surface rounded-lg transition"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-brand-surface rounded-lg transition"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -33,15 +33,15 @@ function ConfirmDialog({ title, message, onCancel, onConfirm }: {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-5">
         <div className="flex items-start gap-3 mb-4">
-          <AlertTriangle className="w-5 h-5 text-odoo-warning mt-0.5 flex-shrink-0" />
+          <AlertTriangle className="w-5 h-5 text-brand-warning mt-0.5 flex-shrink-0" />
           <div>
             <p className="font-semibold">{title}</p>
-            <p className="text-sm text-odoo-muted mt-1">{message}</p>
+            <p className="text-sm text-brand-muted mt-1">{message}</p>
           </div>
         </div>
         <div className="flex gap-2 justify-end">
           <button onClick={onCancel} className="btn-secondary text-sm">Annuler</button>
-          <button onClick={onConfirm} className="bg-odoo-danger text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-odoo-danger/90 transition">Supprimer</button>
+          <button onClick={onConfirm} className="bg-brand-danger text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-danger/90 transition">Supprimer</button>
         </div>
       </div>
     </div>
@@ -70,43 +70,43 @@ function BannersTab() {
     load();
   }
 
-  if (loading) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-brand-primary animate-spin" /></div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-odoo-muted">{banners.length} bannière{banners.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-brand-muted">{banners.length} bannière{banners.length !== 1 ? 's' : ''}</p>
         <button onClick={() => setCreating(true)} className="btn-primary text-sm gap-1.5"><Plus className="w-4 h-4" />Nouvelle bannière</button>
       </div>
 
       {banners.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-odoo-border rounded-xl">
-          <Megaphone className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
-          <p className="font-medium text-odoo-muted">Aucune bannière</p>
+        <div className="text-center py-16 border-2 border-dashed border-brand-border rounded-xl">
+          <Megaphone className="w-10 h-10 text-brand-muted mx-auto mb-3" />
+          <p className="font-medium text-brand-muted">Aucune bannière</p>
           <button onClick={() => setCreating(true)} className="btn-primary mt-4 text-sm"><Plus className="w-4 h-4" />Créer la première</button>
         </div>
       ) : (
         <div className="space-y-3">
           {banners.map((b) => (
             <div key={b.id} className={`card p-3 flex gap-3 items-start transition-opacity ${!b.is_active ? 'opacity-60' : ''}`}>
-              <GripVertical className="w-4 h-4 text-odoo-muted mt-1 flex-shrink-0" />
-              <div className="w-24 h-16 rounded-lg overflow-hidden bg-odoo-surface flex-shrink-0">
+              <GripVertical className="w-4 h-4 text-brand-muted mt-1 flex-shrink-0" />
+              <div className="w-24 h-16 rounded-lg overflow-hidden bg-brand-surface flex-shrink-0">
                 {b.image_url
                   ? <img src={b.image_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>'; }} />
-                  : <div className="w-full h-full flex items-center justify-center"><ImageOff className="w-5 h-5 text-odoo-muted" /></div>}
+                  : <div className="w-full h-full flex items-center justify-center"><ImageOff className="w-5 h-5 text-brand-muted" /></div>}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{b.title || <em className="text-odoo-muted">Sans titre</em>}</p>
-                {b.subtitle && <p className="text-xs text-odoo-muted truncate mt-0.5">{b.subtitle}</p>}
-                {b.cta_text && <span className="text-xs bg-odoo-primary/10 text-odoo-primary px-1.5 py-0.5 rounded mt-1 inline-block">{b.cta_text}</span>}
+                <p className="font-medium text-sm truncate">{b.title || <em className="text-brand-muted">Sans titre</em>}</p>
+                {b.subtitle && <p className="text-xs text-brand-muted truncate mt-0.5">{b.subtitle}</p>}
+                {b.cta_text && <span className="text-xs bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded mt-1 inline-block">{b.cta_text}</span>}
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button onClick={() => toggleActive(b)} title={b.is_active ? 'Désactiver' : 'Activer'}
-                  className={`p-1.5 rounded transition ${b.is_active ? 'text-odoo-success hover:bg-odoo-success/10' : 'text-odoo-muted hover:bg-odoo-surface'}`}>
+                  className={`p-1.5 rounded transition ${b.is_active ? 'text-brand-success hover:bg-brand-success/10' : 'text-brand-muted hover:bg-brand-surface'}`}>
                   {b.is_active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                 </button>
-                <button onClick={() => setEditing(b)} className="p-1.5 text-odoo-muted hover:text-odoo-primary hover:bg-odoo-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
-                <button onClick={() => setDeletingId(b.id)} className="p-1.5 text-odoo-muted hover:text-odoo-danger hover:bg-odoo-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => setEditing(b)} className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
+                <button onClick={() => setDeletingId(b.id)} className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
           ))}
@@ -172,7 +172,7 @@ function BannerForm({ banner, onClose, onSaved }: { banner: Banner | null; onClo
         <div>
           <label className="block text-sm font-medium mb-1">Image (URL) *</label>
           <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" className="input" required />
-          {imageUrl && <img src={imageUrl} alt="" className="mt-2 w-full h-32 object-cover rounded-lg border border-odoo-border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
+          {imageUrl && <img src={imageUrl} alt="" className="mt-2 w-full h-32 object-cover rounded-lg border border-brand-border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           <div>
@@ -202,8 +202,8 @@ function BannerForm({ banner, onClose, onSaved }: { banner: Banner | null; onClo
             </label>
           </div>
         </div>
-        {error && <p className="text-odoo-danger text-sm bg-odoo-danger/10 p-3 rounded-lg">{error}</p>}
-        <div className="flex gap-2 pt-2 border-t border-odoo-border">
+        {error && <p className="text-brand-danger text-sm bg-brand-danger/10 p-3 rounded-lg">{error}</p>}
+        <div className="flex gap-2 pt-2 border-t border-brand-border">
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary flex-1 gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}Enregistrer
@@ -252,49 +252,49 @@ function PromotionsTab() {
     yellow: 'bg-yellow-100 text-yellow-800',
   }[color] ?? 'bg-gray-100 text-gray-700');
 
-  if (loading) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-brand-primary animate-spin" /></div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-odoo-muted">{promos.length} promotion{promos.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-brand-muted">{promos.length} promotion{promos.length !== 1 ? 's' : ''}</p>
         <button onClick={() => setCreating(true)} className="btn-primary text-sm gap-1.5"><Plus className="w-4 h-4" />Nouvelle promotion</button>
       </div>
 
       {promos.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-odoo-border rounded-xl">
-          <Tag className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
-          <p className="font-medium text-odoo-muted">Aucune promotion</p>
+        <div className="text-center py-16 border-2 border-dashed border-brand-border rounded-xl">
+          <Tag className="w-10 h-10 text-brand-muted mx-auto mb-3" />
+          <p className="font-medium text-brand-muted">Aucune promotion</p>
           <button onClick={() => setCreating(true)} className="btn-primary mt-4 text-sm"><Plus className="w-4 h-4" />Créer la première</button>
         </div>
       ) : (
         <div className="space-y-3">
           {promos.map((p) => (
             <div key={p.id} className={`card p-3 flex gap-3 items-start transition-opacity ${!p.is_active ? 'opacity-60' : ''}`}>
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-odoo-surface flex-shrink-0">
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-brand-surface flex-shrink-0">
                 {p.image_url
                   ? <img src={p.image_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-300 text-xs">?</div>'; }} />
-                  : <div className="w-full h-full flex items-center justify-center text-lg font-bold text-odoo-muted">%</div>}
+                  : <div className="w-full h-full flex items-center justify-center text-lg font-bold text-brand-muted">%</div>}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-medium text-sm truncate">{p.title}</p>
                   {p.badge_text && <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badgeClass(p.badge_color)}`}>{p.badge_text}</span>}
                 </div>
-                {p.subtitle && <p className="text-xs text-odoo-muted truncate mt-0.5">{p.subtitle}</p>}
+                {p.subtitle && <p className="text-xs text-brand-muted truncate mt-0.5">{p.subtitle}</p>}
                 {p.ends_at && (
-                  <p className="text-xs text-odoo-warning flex items-center gap-1 mt-1">
+                  <p className="text-xs text-brand-warning flex items-center gap-1 mt-1">
                     <Clock className="w-3 h-3" />Expire le {new Date(p.ends_at).toLocaleDateString('fr-FR')}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button onClick={() => toggleActive(p)} title={p.is_active ? 'Désactiver' : 'Activer'}
-                  className={`p-1.5 rounded transition ${p.is_active ? 'text-odoo-success hover:bg-odoo-success/10' : 'text-odoo-muted hover:bg-odoo-surface'}`}>
+                  className={`p-1.5 rounded transition ${p.is_active ? 'text-brand-success hover:bg-brand-success/10' : 'text-brand-muted hover:bg-brand-surface'}`}>
                   {p.is_active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                 </button>
-                <button onClick={() => setEditing(p)} className="p-1.5 text-odoo-muted hover:text-odoo-primary hover:bg-odoo-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
-                <button onClick={() => setDeletingId(p.id)} className="p-1.5 text-odoo-muted hover:text-odoo-danger hover:bg-odoo-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => setEditing(p)} className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
+                <button onClick={() => setDeletingId(p.id)} className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
           ))}
@@ -384,7 +384,7 @@ function PromotionForm({ promotion, onClose, onSaved }: { promotion: Promotion |
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium mb-1">Image (URL)</label>
             <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" className="input" />
-            {imageUrl && <img src={imageUrl} alt="" className="mt-2 w-full h-24 object-cover rounded-lg border border-odoo-border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
+            {imageUrl && <img src={imageUrl} alt="" className="mt-2 w-full h-24 object-cover rounded-lg border border-brand-border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Texte CTA</label>
@@ -409,8 +409,8 @@ function PromotionForm({ promotion, onClose, onSaved }: { promotion: Promotion |
             </label>
           </div>
         </div>
-        {error && <p className="text-odoo-danger text-sm bg-odoo-danger/10 p-3 rounded-lg">{error}</p>}
-        <div className="flex gap-2 pt-2 border-t border-odoo-border">
+        {error && <p className="text-brand-danger text-sm bg-brand-danger/10 p-3 rounded-lg">{error}</p>}
+        <div className="flex gap-2 pt-2 border-t border-brand-border">
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary flex-1 gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}Enregistrer
@@ -434,18 +434,18 @@ export function AdminBanners() {
   return (
     <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
       <div className="flex items-center gap-3 mb-6">
-        <Megaphone className="w-6 h-6 text-odoo-primary" />
+        <Megaphone className="w-6 h-6 text-brand-primary" />
         <div>
           <h1 className="text-xl font-bold">Bannières & Promotions</h1>
-          <p className="text-sm text-odoo-muted">Gérez les bannières publicitaires et les offres promotionnelles de la boutique.</p>
+          <p className="text-sm text-brand-muted">Gérez les bannières publicitaires et les offres promotionnelles de la boutique.</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-odoo-border mb-6 gap-1">
+      <div className="flex border-b border-brand-border mb-6 gap-1">
         {tabs.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t.id ? 'border-odoo-primary text-odoo-primary' : 'border-transparent text-odoo-muted hover:text-odoo-dark'}`}>
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition ${tab === t.id ? 'border-brand-primary text-brand-primary' : 'border-transparent text-brand-muted hover:text-brand-dark'}`}>
             {t.icon}{t.label}
           </button>
         ))}

@@ -24,8 +24,8 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
   if (images.length === 0) {
     return (
       <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-        <div className="aspect-square w-full bg-odoo-surface flex items-center justify-center">
-          <Package2 className="w-20 h-20 text-odoo-muted" />
+        <div className="aspect-square w-full bg-brand-surface flex items-center justify-center">
+          <Package2 className="w-20 h-20 text-brand-muted" />
         </div>
       </div>
     );
@@ -34,7 +34,7 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
   return (
     <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '60ms' }}>
       {/* Main image */}
-      <div className="aspect-square w-full bg-odoo-surface relative overflow-hidden group">
+      <div className="aspect-square w-full bg-brand-surface relative overflow-hidden group">
         <LazyImage
           key={images[active]}
           src={images[active]}
@@ -65,13 +65,13 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
 
       {/* Thumbnails */}
       {images.length > 1 && (
-        <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide bg-white border-t border-odoo-border">
+        <div className="flex gap-2 p-3 overflow-x-auto scrollbar-hide bg-white border-t border-brand-border">
           {images.map((src, i) => (
             <button key={i} onClick={() => setActive(i)}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                 i === active
-                  ? 'border-odoo-primary shadow-md shadow-odoo-primary/25 scale-105'
-                  : 'border-odoo-border hover:border-odoo-primary/50 opacity-70 hover:opacity-100'
+                  ? 'border-brand-primary shadow-md shadow-brand-primary/25 scale-105'
+                  : 'border-brand-border hover:border-brand-primary/50 opacity-70 hover:opacity-100'
               }`}>
               <img src={src} alt={`Miniature ${i + 1}`} className="w-full h-full object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
@@ -117,10 +117,10 @@ function OptionSelector({
                   onClick={() => onSelect(group.id, opt)}
                   className={`relative flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
                     isOutOfStock
-                      ? 'border-odoo-border bg-odoo-surface text-odoo-muted cursor-not-allowed opacity-60'
+                      ? 'border-brand-border bg-brand-surface text-brand-muted cursor-not-allowed opacity-60'
                       : isSelected
-                        ? 'border-odoo-primary bg-odoo-primary text-white shadow-md shadow-odoo-primary/25'
-                        : 'border-odoo-border hover:border-odoo-primary/60 hover:shadow-sm'
+                        ? 'border-brand-primary bg-brand-primary text-white shadow-md shadow-brand-primary/25'
+                        : 'border-brand-border hover:border-brand-primary/60 hover:shadow-sm'
                   }`}
                 >
                   {/* Option image thumbnail */}
@@ -128,7 +128,7 @@ function OptionSelector({
                     <img
                       src={opt.image_url}
                       alt={opt.label}
-                      className={`w-7 h-7 rounded-lg object-cover flex-shrink-0 ${isSelected ? 'ring-2 ring-white/60' : 'ring-1 ring-odoo-border'}`}
+                      className={`w-7 h-7 rounded-lg object-cover flex-shrink-0 ${isSelected ? 'ring-2 ring-white/60' : 'ring-1 ring-brand-border'}`}
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   )}
@@ -136,21 +136,21 @@ function OptionSelector({
                   <span>{opt.label}</span>
 
                   {opt.price_modifier !== 0 && (
-                    <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-odoo-muted'}`}>
+                    <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-brand-muted'}`}>
                       {opt.price_modifier > 0 ? '+' : ''}{formatPrice(opt.price_modifier)}
                     </span>
                   )}
 
                   {/* Out of stock overlay */}
                   {isOutOfStock && (
-                    <span className="absolute -top-1.5 -right-1.5 text-[9px] bg-odoo-danger text-white px-1 py-0.5 rounded-full font-bold leading-none">
+                    <span className="absolute -top-1.5 -right-1.5 text-[9px] bg-brand-danger text-white px-1 py-0.5 rounded-full font-bold leading-none">
                       Rupture
                     </span>
                   )}
 
                   {/* Low stock indicator */}
                   {!isOutOfStock && opt.stock <= 5 && (
-                    <span className={`text-[9px] ${isSelected ? 'text-white/70' : 'text-odoo-warning'} font-medium`}>
+                    <span className={`text-[9px] ${isSelected ? 'text-white/70' : 'text-brand-warning'} font-medium`}>
                       ({opt.stock})
                     </span>
                   )}
@@ -204,13 +204,13 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
   if (loading) return (
     <div className="flex items-center justify-center py-32">
-      <Loader2 className="w-8 h-8 text-odoo-primary animate-spin" />
+      <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
     </div>
   );
 
   if (!product) return (
     <div className="max-w-md mx-auto px-4 py-16 text-center animate-fade-in-scale">
-      <AlertCircle className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
+      <AlertCircle className="w-10 h-10 text-brand-muted mx-auto mb-3" />
       <p className="font-medium">Produit introuvable</p>
       <button onClick={() => setView({ kind: 'shop' })} className="btn-primary mt-4">Retour</button>
     </div>
@@ -286,29 +286,29 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
         {/* Details panel */}
         <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
           {product.sku && (
-            <p className="text-xs text-odoo-muted mb-2 font-medium tracking-wide uppercase">SKU: {product.sku}</p>
+            <p className="text-xs text-brand-muted mb-2 font-medium tracking-wide uppercase">SKU: {product.sku}</p>
           )}
           <h1 className="text-2xl lg:text-3xl font-bold mb-3">{product.name}</h1>
 
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-4">
-            <span className="text-3xl font-bold text-odoo-primary transition-all duration-200">
+            <span className="text-3xl font-bold text-brand-primary transition-all duration-200">
               {formatPrice(effectivePrice)}
             </span>
             {hasBulk && quantity >= product.bulk_quantity && (
-              <span className="text-base text-odoo-muted line-through">{formatPrice(product.price)}</span>
+              <span className="text-base text-brand-muted line-through">{formatPrice(product.price)}</span>
             )}
           </div>
 
           {/* Bulk pricing badge */}
           {hasBulk && (
-            <div className="bg-odoo-success/8 border border-odoo-success/25 rounded-xl p-3.5 mb-4 flex items-start gap-2.5">
-              <Tag className="w-4 h-4 text-odoo-success mt-0.5 flex-shrink-0" />
+            <div className="bg-brand-success/8 border border-brand-success/25 rounded-xl p-3.5 mb-4 flex items-start gap-2.5">
+              <Tag className="w-4 h-4 text-brand-success mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="font-semibold text-odoo-success">Prix de gros disponible</p>
-                <p className="text-odoo-muted text-xs mt-0.5">
+                <p className="font-semibold text-brand-success">Prix de gros disponible</p>
+                <p className="text-brand-muted text-xs mt-0.5">
                   Achetez {product.bulk_quantity}+ unités : {formatPrice(product.bulk_price)}/unité
-                  <span className="ml-1 text-odoo-success font-medium">({Math.round((1 - product.bulk_price / product.price) * 100)}% de remise)</span>
+                  <span className="ml-1 text-brand-success font-medium">({Math.round((1 - product.bulk_price / product.price) * 100)}% de remise)</span>
                 </p>
               </div>
             </div>
@@ -318,7 +318,7 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
           {product.description && (
             <div className="mb-5">
               <h2 className="text-sm font-semibold mb-1.5">Description</h2>
-              <p className="text-sm text-odoo-muted leading-relaxed">{product.description}</p>
+              <p className="text-sm text-brand-muted leading-relaxed">{product.description}</p>
             </div>
           )}
 
@@ -327,7 +327,7 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
           {/* Selection required hint */}
           {missingSelection && (
-            <p className="text-xs text-odoo-warning mb-3 flex items-center gap-1">
+            <p className="text-xs text-brand-warning mb-3 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5" />
               Veuillez sélectionner une option dans chaque groupe
             </p>
@@ -337,14 +337,14 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm font-semibold">Stock :</span>
             {isOutOfStock ? (
-              <span className="badge bg-odoo-danger/15 text-odoo-danger">Rupture de stock</span>
+              <span className="badge bg-brand-danger/15 text-brand-danger">Rupture de stock</span>
             ) : effectiveStock <= product.low_stock_threshold ? (
-              <span className="badge bg-odoo-warning/15 text-odoo-warning flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-odoo-warning animate-pulse" />
+              <span className="badge bg-brand-warning/15 text-brand-warning flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-warning animate-pulse" />
                 Faible ({effectiveStock})
               </span>
             ) : (
-              <span className="badge bg-odoo-success/15 text-odoo-success">En stock ({effectiveStock})</span>
+              <span className="badge bg-brand-success/15 text-brand-success">En stock ({effectiveStock})</span>
             )}
           </div>
 
@@ -353,16 +353,16 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
             <>
               <div className="mb-4">
                 <label className="block text-sm font-semibold mb-2">Quantité</label>
-                <div className="flex items-center border border-odoo-border rounded-xl w-fit overflow-hidden shadow-sm">
+                <div className="flex items-center border border-brand-border rounded-xl w-fit overflow-hidden shadow-sm">
                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2.5 hover:bg-odoo-surface active:bg-odoo-border transition-colors duration-100">
+                    className="p-2.5 hover:bg-brand-surface active:bg-brand-border transition-colors duration-100">
                     <Minus className="w-4 h-4" />
                   </button>
                   <input type="number" value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, Math.min(effectiveStock, parseInt(e.target.value) || 1)))}
-                    className="w-16 text-center font-bold border-x border-odoo-border py-2 focus:outline-none bg-white" />
+                    className="w-16 text-center font-bold border-x border-brand-border py-2 focus:outline-none bg-white" />
                   <button onClick={() => setQuantity(Math.min(effectiveStock, quantity + 1))}
-                    className="p-2.5 hover:bg-odoo-surface active:bg-odoo-border transition-colors duration-100">
+                    className="p-2.5 hover:bg-brand-surface active:bg-brand-border transition-colors duration-100">
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
@@ -370,14 +370,14 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
 
               {/* Total box */}
               <div className={`rounded-xl p-3.5 mb-5 border transition-all duration-300 ${
-                savings > 0 ? 'bg-odoo-success/5 border-odoo-success/25' : 'bg-odoo-surface border-odoo-border'
+                savings > 0 ? 'bg-brand-success/5 border-brand-success/25' : 'bg-brand-surface border-brand-border'
               }`}>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-odoo-muted">Total</span>
-                  <span className="text-xl font-bold text-odoo-primary">{formatPrice(total)}</span>
+                  <span className="text-sm text-brand-muted">Total</span>
+                  <span className="text-xl font-bold text-brand-primary">{formatPrice(total)}</span>
                 </div>
                 {savings > 0 && (
-                  <p className="text-xs text-odoo-success font-medium mt-1 flex items-center gap-1">
+                  <p className="text-xs text-brand-success font-medium mt-1 flex items-center gap-1">
                     <Tag className="w-3 h-3" />Économie : {formatPrice(savings)}
                   </p>
                 )}
@@ -391,7 +391,7 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
               onClick={handleAdd}
               disabled={isOutOfStock || missingSelection}
               title={missingSelection ? 'Sélectionnez toutes les options' : undefined}
-              className={`btn-primary flex-1 transition-all duration-200 ${added ? 'bg-odoo-success hover:bg-odoo-success' : ''}`}
+              className={`btn-primary flex-1 transition-all duration-200 ${added ? 'bg-brand-success hover:bg-brand-success' : ''}`}
             >
               {added
                 ? <><CheckCircle2 className="w-4 h-4 animate-success-pop" />Ajouté au panier !</>

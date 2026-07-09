@@ -138,7 +138,7 @@ export function AdminProducts() {
     return true;
   });
 
-  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 page-enter">
@@ -146,18 +146,18 @@ export function AdminProducts() {
       <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">Produits</h1>
-          <p className="text-sm text-odoo-muted">{products.length} produit{products.length !== 1 ? 's' : ''} · {brands.length} marque{brands.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-brand-muted">{products.length} produit{products.length !== 1 ? 's' : ''} · {brands.length} marque{brands.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm"><RefreshCw className="w-3.5 h-3.5" />Actualiser</button>
           {/* Mode toggle */}
-          <div className="flex border border-odoo-border rounded-lg overflow-hidden text-sm">
+          <div className="flex border border-brand-border rounded-lg overflow-hidden text-sm">
             <button onClick={() => setMode('list')}
-              className={`px-3 py-2 flex items-center gap-1.5 transition ${mode === 'list' ? 'bg-odoo-primary text-white' : 'hover:bg-odoo-surface'}`}>
+              className={`px-3 py-2 flex items-center gap-1.5 transition ${mode === 'list' ? 'bg-brand-primary text-white' : 'hover:bg-brand-surface'}`}>
               <List className="w-3.5 h-3.5" />Liste
             </button>
             <button onClick={() => setMode('bulk')}
-              className={`px-3 py-2 flex items-center gap-1.5 transition border-l border-odoo-border ${mode === 'bulk' ? 'bg-odoo-primary text-white' : 'hover:bg-odoo-surface'}`}>
+              className={`px-3 py-2 flex items-center gap-1.5 transition border-l border-brand-border ${mode === 'bulk' ? 'bg-brand-primary text-white' : 'hover:bg-brand-surface'}`}>
               <TableProperties className="w-3.5 h-3.5" />Saisie groupée
             </button>
           </div>
@@ -172,7 +172,7 @@ export function AdminProducts() {
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-odoo-muted pointer-events-none" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted pointer-events-none" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par nom ou SKU…" className="input pl-9" />
             </div>
             <select value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)} className="input sm:w-44">
@@ -189,7 +189,7 @@ export function AdminProducts() {
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-odoo-surface text-left text-xs font-medium text-odoo-muted uppercase tracking-wide">
+                <thead className="bg-brand-surface text-left text-xs font-medium text-brand-muted uppercase tracking-wide">
                   <tr>
                     <th className="p-3">Produit / SKU</th>
                     <th className="p-3 hidden md:table-cell">Marque</th>
@@ -201,37 +201,37 @@ export function AdminProducts() {
                     <th className="p-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-odoo-border">
+                <tbody className="divide-y divide-brand-border">
                   {filtered.map((p) => {
                     const cat = categories.find((c) => c.id === p.category_id);
                     const brand = brands.find((b) => b.id === p.brand_id);
                     const isLow = p.stock > 0 && p.stock <= p.low_stock_threshold;
                     return (
-                      <tr key={p.id} className="hover:bg-odoo-surface/40 transition-colors">
+                      <tr key={p.id} className="hover:bg-brand-surface/40 transition-colors">
                         <td className="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-odoo-surface rounded-lg flex-shrink-0 overflow-hidden border border-odoo-border">
+                            <div className="w-9 h-9 bg-brand-surface rounded-lg flex-shrink-0 overflow-hidden border border-brand-border">
                               {p.image_url
                                 ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                                : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-4 h-4 text-odoo-muted" /></div>}
+                                : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-4 h-4 text-brand-muted" /></div>}
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium truncate">{p.name}</p>
-                              <p className="text-xs text-odoo-muted font-mono">{p.sku || '—'}</p>
+                              <p className="text-xs text-brand-muted font-mono">{p.sku || '—'}</p>
                             </div>
                           </div>
                         </td>
                         <td className="p-3 hidden md:table-cell">
                           {brand ? (
-                            <span className="inline-flex items-center gap-1 text-xs bg-odoo-primary/8 text-odoo-primary px-2 py-0.5 rounded-full border border-odoo-primary/20">
+                            <span className="inline-flex items-center gap-1 text-xs bg-brand-primary/8 text-brand-primary px-2 py-0.5 rounded-full border border-brand-primary/20">
                               <Tag className="w-3 h-3" />{brand.name}
                             </span>
-                          ) : <span className="text-odoo-muted text-xs">—</span>}
+                          ) : <span className="text-brand-muted text-xs">—</span>}
                         </td>
-                        <td className="p-3 hidden md:table-cell text-odoo-muted text-xs">{cat?.name || '—'}</td>
+                        <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{cat?.name || '—'}</td>
                         <td className="p-3 text-right font-semibold">{formatPrice(p.price)}</td>
                         <td className="p-3 text-center">
-                          <span className={`badge text-xs font-semibold ${p.stock === 0 ? 'bg-odoo-danger/15 text-odoo-danger' : isLow ? 'bg-odoo-warning/15 text-odoo-warning' : 'bg-odoo-success/15 text-odoo-success'}`}>
+                          <span className={`badge text-xs font-semibold ${p.stock === 0 ? 'bg-brand-danger/15 text-brand-danger' : isLow ? 'bg-brand-warning/15 text-brand-warning' : 'bg-brand-success/15 text-brand-success'}`}>
                             {p.stock}
                           </span>
                         </td>
@@ -239,12 +239,12 @@ export function AdminProducts() {
                           <OptionsBadge productId={p.id} />
                         </td>
                         <td className="p-3 text-center hidden sm:table-cell">
-                          <span className={`w-2 h-2 rounded-full inline-block ${p.is_active ? 'bg-odoo-success' : 'bg-odoo-border'}`} />
+                          <span className={`w-2 h-2 rounded-full inline-block ${p.is_active ? 'bg-brand-success' : 'bg-brand-border'}`} />
                         </td>
                         <td className="p-3">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => setEditing(p)} className="p-1.5 text-odoo-muted hover:text-odoo-primary hover:bg-odoo-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
-                            <button onClick={() => setDeletingId(p.id)} className="p-1.5 text-odoo-muted hover:text-odoo-danger hover:bg-odoo-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => setEditing(p)} className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
+                            <button onClick={() => setDeletingId(p.id)} className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -254,8 +254,8 @@ export function AdminProducts() {
               </table>
               {filtered.length === 0 && (
                 <div className="p-12 text-center">
-                  <Package2 className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
-                  <p className="font-medium text-odoo-muted">Aucun produit trouvé</p>
+                  <Package2 className="w-10 h-10 text-brand-muted mx-auto mb-3" />
+                  <p className="font-medium text-brand-muted">Aucun produit trouvé</p>
                   <button onClick={() => setCreating(true)} className="btn-primary mt-4 text-sm"><Plus className="w-4 h-4" />Créer un produit</button>
                 </div>
               )}
@@ -301,10 +301,10 @@ function OptionsBadge({ productId }: { productId: string }) {
       .eq('product_id', productId)
       .then(({ count: c }) => setCount(c ?? 0));
   }, [productId]);
-  if (count === null) return <span className="text-odoo-muted text-xs">…</span>;
-  if (count === 0) return <span className="text-odoo-muted text-xs">—</span>;
+  if (count === null) return <span className="text-brand-muted text-xs">…</span>;
+  if (count === 0) return <span className="text-brand-muted text-xs">—</span>;
   return (
-    <span className="inline-flex items-center gap-1 text-xs bg-odoo-info/10 text-odoo-info px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs bg-brand-info/10 text-brand-info px-2 py-0.5 rounded-full">
       <Layers className="w-3 h-3" />{count}
     </span>
   );
@@ -478,10 +478,10 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
   return (
     <Modal onClose={onClose} title={product ? 'Modifier le produit' : 'Nouveau produit'}>
       {/* Tabs */}
-      <div className="flex border-b border-odoo-border -mx-4 px-4 mb-4 gap-4">
+      <div className="flex border-b border-brand-border -mx-4 px-4 mb-4 gap-4">
         {tabs.map((t) => (
           <button key={t.id} type="button" onClick={() => setActiveTab(t.id)}
-            className={`pb-2.5 text-sm font-medium border-b-2 transition ${activeTab === t.id ? 'border-odoo-primary text-odoo-primary' : 'border-transparent text-odoo-muted hover:text-odoo-dark'}`}>
+            className={`pb-2.5 text-sm font-medium border-b-2 transition ${activeTab === t.id ? 'border-brand-primary text-brand-primary' : 'border-transparent text-brand-muted hover:text-brand-dark'}`}>
             {t.label}
           </button>
         ))}
@@ -499,16 +499,16 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
               <div>
                 <label className="block text-sm font-medium mb-1 flex items-center justify-between">
                   <span>SKU</span>
-                  <label className="flex items-center gap-1.5 text-xs font-normal text-odoo-muted cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-xs font-normal text-brand-muted cursor-pointer">
                     <input type="checkbox" checked={skuAuto} onChange={(e) => setSkuAuto(e.target.checked)} className="w-3.5 h-3.5" />
                     Auto
                   </label>
                 </label>
                 <input value={sku} onChange={(e) => { setSkuAuto(false); setSku(e.target.value); }}
                   placeholder={skuAuto ? 'Généré automatiquement' : ''}
-                  className={`input font-mono text-sm ${skuAuto ? 'bg-odoo-surface text-odoo-muted' : ''}`}
+                  className={`input font-mono text-sm ${skuAuto ? 'bg-brand-surface text-brand-muted' : ''}`}
                   readOnly={skuAuto} />
-                {skuAuto && <p className="text-xs text-odoo-muted mt-1">Aperçu : <span className="font-mono">{sku || '—'}</span></p>}
+                {skuAuto && <p className="text-xs text-brand-muted mt-1">Aperçu : <span className="font-mono">{sku || '—'}</span></p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Catégorie</label>
@@ -543,7 +543,7 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
             <div>
               <label className="block text-sm font-medium mb-1">
                 Photos du produit
-                <span className="text-xs text-odoo-muted font-normal ml-1">— séparez plusieurs URLs par <code className="bg-odoo-surface px-1 rounded">, </code></span>
+                <span className="text-xs text-brand-muted font-normal ml-1">— séparez plusieurs URLs par <code className="bg-brand-surface px-1 rounded">, </code></span>
               </label>
               <textarea
                 value={imageUrl}
@@ -555,13 +555,13 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
 
               {/* Optimization status banner */}
               {optimizing && (
-                <div className="mt-2 flex items-center gap-2 text-xs text-odoo-primary bg-odoo-primary/8 border border-odoo-primary/20 rounded-lg px-3 py-2">
+                <div className="mt-2 flex items-center gap-2 text-xs text-brand-primary bg-brand-primary/8 border border-brand-primary/20 rounded-lg px-3 py-2">
                   <Loader2 className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
                   Optimisation en cours — conversion WebP, compression, hébergement CDN…
                 </div>
               )}
               {optimizeInfo && !optimizing && (
-                <div className="mt-2 flex items-center gap-2 text-xs text-odoo-success bg-odoo-success/8 border border-odoo-success/20 rounded-lg px-3 py-2">
+                <div className="mt-2 flex items-center gap-2 text-xs text-brand-success bg-brand-success/8 border border-brand-success/20 rounded-lg px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
                   {optimizeInfo}
                 </div>
@@ -577,7 +577,7 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
                         <img
                           src={src}
                           alt={`Photo ${i + 1}`}
-                          className="w-16 h-16 object-cover rounded-lg border border-odoo-border"
+                          className="w-16 h-16 object-cover rounded-lg border border-brand-border"
                           onError={(e) => {
                             const el = e.target as HTMLImageElement;
                             el.style.display = 'none';
@@ -586,14 +586,14 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
                           }}
                         />
                         {/* Error placeholder */}
-                        <div className="w-16 h-16 rounded-lg border border-odoo-border bg-odoo-surface items-center justify-center hidden">
-                          <AlertCircle className="w-5 h-5 text-odoo-muted" />
+                        <div className="w-16 h-16 rounded-lg border border-brand-border bg-brand-surface items-center justify-center hidden">
+                          <AlertCircle className="w-5 h-5 text-brand-muted" />
                         </div>
                         {/* Status badge */}
                         <span className={`absolute -top-1.5 -right-1.5 flex items-center gap-0.5 text-[9px] font-bold px-1 py-0.5 rounded-full leading-none shadow-sm ${
                           stored
-                            ? 'bg-odoo-success text-white'
-                            : 'bg-odoo-warning text-odoo-dark'
+                            ? 'bg-brand-success text-white'
+                            : 'bg-brand-warning text-brand-dark'
                         }`}>
                           {stored
                             ? <><Cloud className="w-2.5 h-2.5" />CDN</>
@@ -601,7 +601,7 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
                           }
                         </span>
                         {i === 0 && (
-                          <span className="absolute -bottom-1.5 -left-1.5 bg-odoo-primary text-white text-[9px] font-bold px-1 py-0.5 rounded-full leading-none">1re</span>
+                          <span className="absolute -bottom-1.5 -left-1.5 bg-brand-primary text-white text-[9px] font-bold px-1 py-0.5 rounded-full leading-none">1re</span>
                         )}
                       </div>
                     );
@@ -611,8 +611,8 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
 
               {/* Hint for external images */}
               {imageUrl.split(',').some((u) => u.trim() && !isStorageUrl(u.trim())) && (
-                <p className="mt-2 text-xs text-odoo-muted flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-odoo-warning" />
+                <p className="mt-2 text-xs text-brand-muted flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-brand-warning" />
                   Les images externes seront automatiquement optimisées (WebP, CDN) lors de l'enregistrement.
                 </p>
               )}
@@ -648,9 +648,9 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
           <OptionGroupEditor groups={groups} onChange={setGroups} basePrice={Number(price)} loading={loadingOptions} />
         )}
 
-        {error && <div className="bg-odoo-danger/10 text-odoo-danger text-sm p-3 rounded-lg mt-4">{error}</div>}
+        {error && <div className="bg-brand-danger/10 text-brand-danger text-sm p-3 rounded-lg mt-4">{error}</div>}
 
-        <div className="flex gap-2 pt-4 mt-4 border-t border-odoo-border">
+        <div className="flex gap-2 pt-4 mt-4 border-t border-brand-border">
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Annuler</button>
           <button type="submit" disabled={saving} className="btn-primary flex-1 gap-2">
             {saving
@@ -703,50 +703,50 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
     ));
   }
 
-  if (loading) return <div className="flex items-center justify-center py-10"><Loader2 className="w-6 h-6 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center py-10"><Loader2 className="w-6 h-6 text-brand-primary animate-spin" /></div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-odoo-muted">
+        <p className="text-sm text-brand-muted">
           Variantes (taille, couleur…) avec prix, stock et image par option.
         </p>
         <button type="button" onClick={addGroup} className="btn-secondary text-sm gap-1.5"><Plus className="w-3.5 h-3.5" />Groupe</button>
       </div>
 
       {groups.length === 0 && (
-        <div className="text-center py-10 border-2 border-dashed border-odoo-border rounded-xl">
-          <Layers className="w-8 h-8 text-odoo-muted mx-auto mb-2" />
-          <p className="text-sm text-odoo-muted">Aucun groupe d'options</p>
+        <div className="text-center py-10 border-2 border-dashed border-brand-border rounded-xl">
+          <Layers className="w-8 h-8 text-brand-muted mx-auto mb-2" />
+          <p className="text-sm text-brand-muted">Aucun groupe d'options</p>
           <button type="button" onClick={addGroup} className="btn-secondary mt-3 text-sm"><Plus className="w-3.5 h-3.5" />Ajouter un groupe</button>
         </div>
       )}
 
       {groups.map((g) => (
-        <div key={g._key} className="border border-odoo-border rounded-xl overflow-hidden">
+        <div key={g._key} className="border border-brand-border rounded-xl overflow-hidden">
           {/* Group header */}
-          <div className="flex items-center gap-2 bg-odoo-surface px-3 py-2.5 border-b border-odoo-border">
-            <GripVertical className="w-4 h-4 text-odoo-muted flex-shrink-0" />
+          <div className="flex items-center gap-2 bg-brand-surface px-3 py-2.5 border-b border-brand-border">
+            <GripVertical className="w-4 h-4 text-brand-muted flex-shrink-0" />
             <input
               value={g.name}
               onChange={(e) => updateGroup(g._key, e.target.value)}
               placeholder="Nom du groupe (ex: Taille, Couleur…)"
-              className="flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-odoo-muted/60"
+              className="flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-brand-muted/60"
             />
-            <button type="button" onClick={() => removeGroup(g._key)} className="p-1 text-odoo-muted hover:text-odoo-danger rounded transition flex-shrink-0"><X className="w-4 h-4" /></button>
+            <button type="button" onClick={() => removeGroup(g._key)} className="p-1 text-brand-muted hover:text-brand-danger rounded transition flex-shrink-0"><X className="w-4 h-4" /></button>
           </div>
 
           {/* Options */}
           <div className="p-3 space-y-3">
             {g.options.length === 0 && (
-              <p className="text-xs text-odoo-muted italic">Aucune option — ajoutez-en ci-dessous</p>
+              <p className="text-xs text-brand-muted italic">Aucune option — ajoutez-en ci-dessous</p>
             )}
             {g.options.map((o) => {
               const finalPrice = basePrice + o.price_modifier;
               return (
-                <div key={o._key} className="border border-odoo-border rounded-lg overflow-hidden">
+                <div key={o._key} className="border border-brand-border rounded-lg overflow-hidden">
                   {/* Row 1: label + price + delete */}
-                  <div className="flex items-center gap-2 p-2 bg-odoo-surface/50">
+                  <div className="flex items-center gap-2 p-2 bg-brand-surface/50">
                     <input
                       value={o.label}
                       onChange={(e) => updateOption(g._key, o._key, 'label', e.target.value)}
@@ -754,7 +754,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
                       className="input text-sm flex-1 h-8 py-1"
                     />
                     <div className="relative flex-shrink-0">
-                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-odoo-muted">±</span>
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-brand-muted">±</span>
                       <input
                         type="number" step={50}
                         value={o.price_modifier}
@@ -763,17 +763,17 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
                         title="Modificateur de prix"
                       />
                     </div>
-                    <span className="text-xs text-odoo-muted whitespace-nowrap w-24 text-right flex-shrink-0">
+                    <span className="text-xs text-brand-muted whitespace-nowrap w-24 text-right flex-shrink-0">
                       = {formatPrice(Math.max(0, finalPrice))}
                     </span>
-                    <button type="button" onClick={() => removeOption(g._key, o._key)} className="p-1 text-odoo-muted hover:text-odoo-danger rounded transition flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => removeOption(g._key, o._key)} className="p-1 text-brand-muted hover:text-brand-danger rounded transition flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
                   </div>
 
                   {/* Row 2: stock + image */}
                   <div className="flex items-start gap-2 p-2 pt-1.5">
                     {/* Stock */}
                     <div className="flex-shrink-0">
-                      <label className="text-[10px] font-medium text-odoo-muted uppercase tracking-wide block mb-1">Stock</label>
+                      <label className="text-[10px] font-medium text-brand-muted uppercase tracking-wide block mb-1">Stock</label>
                       <input
                         type="number" min={0}
                         value={o.stock}
@@ -784,7 +784,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
 
                     {/* Image URL */}
                     <div className="flex-1">
-                      <label className="text-[10px] font-medium text-odoo-muted uppercase tracking-wide block mb-1">Photo de l'option (URL)</label>
+                      <label className="text-[10px] font-medium text-brand-muted uppercase tracking-wide block mb-1">Photo de l'option (URL)</label>
                       <input
                         value={o.image_url}
                         onChange={(e) => updateOption(g._key, o._key, 'image_url', e.target.value)}
@@ -800,7 +800,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
                         <img
                           src={o.image_url}
                           alt={o.label}
-                          className="w-10 h-10 rounded-lg object-cover border border-odoo-border"
+                          className="w-10 h-10 rounded-lg object-cover border border-brand-border"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                       </div>
@@ -810,7 +810,7 @@ function OptionGroupEditor({ groups, onChange, basePrice, loading }: {
               );
             })}
             <button type="button" onClick={() => addOption(g._key)}
-              className="w-full text-xs text-odoo-primary hover:bg-odoo-primary/5 border border-dashed border-odoo-primary/30 rounded-lg py-1.5 transition flex items-center justify-center gap-1">
+              className="w-full text-xs text-brand-primary hover:bg-brand-primary/5 border border-dashed border-brand-primary/30 rounded-lg py-1.5 transition flex items-center justify-center gap-1">
               <Plus className="w-3.5 h-3.5" />Ajouter une option
             </button>
           </div>
@@ -949,7 +949,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
         </div>
         <div className="flex items-center gap-2">
           {savedCount !== null && (
-            <span className="text-sm text-odoo-success flex items-center gap-1"><Check className="w-4 h-4" />{savedCount} enregistré(s)</span>
+            <span className="text-sm text-brand-success flex items-center gap-1"><Check className="w-4 h-4" />{savedCount} enregistré(s)</span>
           )}
           <button onClick={saveAll} disabled={saving || dirtyCount === 0} className="btn-primary gap-2 text-sm">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -960,13 +960,13 @@ function BulkEditor({ products, categories, brands, onSaved }: {
 
       {/* CSV import panel */}
       {showImport && (
-        <div className="card p-4 mb-4 border-l-4 border-l-odoo-info">
+        <div className="card p-4 mb-4 border-l-4 border-l-brand-info">
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="font-medium text-sm">Importer depuis CSV ou tableur</p>
-              <p className="text-xs text-odoo-muted mt-0.5">Collez vos données (séparées par tabulation ou point-virgule). Colonnes : <span className="font-mono">Nom ; SKU ; Marque ; Catégorie ; Prix ; Stock ; Qté lot ; Prix lot</span></p>
+              <p className="text-xs text-brand-muted mt-0.5">Collez vos données (séparées par tabulation ou point-virgule). Colonnes : <span className="font-mono">Nom ; SKU ; Marque ; Catégorie ; Prix ; Stock ; Qté lot ; Prix lot</span></p>
             </div>
-            <button onClick={() => setShowImport(false)} className="text-odoo-muted hover:text-odoo-dark"><X className="w-4 h-4" /></button>
+            <button onClick={() => setShowImport(false)} className="text-brand-muted hover:text-brand-dark"><X className="w-4 h-4" /></button>
           </div>
           <textarea
             value={importText} onChange={(e) => setImportText(e.target.value)}
@@ -980,7 +980,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[900px]">
-            <thead className="bg-odoo-surface text-xs font-medium text-odoo-muted uppercase tracking-wide">
+            <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase tracking-wide">
               <tr>
                 <th className="px-2 py-2 w-6"></th>
                 {BULK_COLUMNS.map((c) => <th key={c} className="px-2 py-2 text-left whitespace-nowrap">{c}</th>)}
@@ -988,7 +988,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
                 <th className="px-2 py-2"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-odoo-border">
+            <tbody className="divide-y divide-brand-border">
               {rows.map((row) => (
                 <BulkRow key={row._key} row={row} onChange={(f, v) => updateCell(row._key, f, v)} onRemove={() => removeRow(row._key)} />
               ))}
@@ -996,7 +996,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
           </table>
           {rows.length === 0 && (
             <div className="p-10 text-center">
-              <p className="text-odoo-muted text-sm">Aucune ligne — ajoutez-en ou importez un CSV</p>
+              <p className="text-brand-muted text-sm">Aucune ligne — ajoutez-en ou importez un CSV</p>
               <button onClick={addRow} className="btn-primary mt-3 text-sm"><Plus className="w-4 h-4" />Ajouter une ligne</button>
             </div>
           )}
@@ -1013,10 +1013,10 @@ function BulkRow({ row, onChange, onRemove }: {
 }) {
   const cellCls = 'input text-xs py-1.5 px-2 h-8 min-w-0';
   return (
-    <tr className={`group ${row._error ? 'bg-odoo-danger/5' : row._dirty ? 'bg-odoo-warning/3' : ''}`}>
+    <tr className={`group ${row._error ? 'bg-brand-danger/5' : row._dirty ? 'bg-brand-warning/3' : ''}`}>
       <td className="px-2 py-1 text-center">
-        {row._dirty && !row._error && <span className="w-1.5 h-1.5 bg-odoo-warning rounded-full inline-block" title="Non enregistré" />}
-        {row._error && <span className="w-1.5 h-1.5 bg-odoo-danger rounded-full inline-block" title={row._error} />}
+        {row._dirty && !row._error && <span className="w-1.5 h-1.5 bg-brand-warning rounded-full inline-block" title="Non enregistré" />}
+        {row._error && <span className="w-1.5 h-1.5 bg-brand-danger rounded-full inline-block" title={row._error} />}
       </td>
       <td className="px-1 py-1"><input value={row.name} onChange={(e) => onChange('name', e.target.value)} className={`${cellCls} w-36`} placeholder="Nom…" /></td>
       <td className="px-1 py-1"><input value={row.sku} onChange={(e) => onChange('sku', e.target.value)} className={`${cellCls} w-24 font-mono`} placeholder="Auto" /></td>
@@ -1030,7 +1030,7 @@ function BulkRow({ row, onChange, onRemove }: {
         <input type="checkbox" checked={row.is_active} onChange={(e) => onChange('is_active', e.target.checked)} className="w-4 h-4" />
       </td>
       <td className="px-1 py-1">
-        <button onClick={onRemove} className="p-1 text-odoo-muted hover:text-odoo-danger rounded opacity-0 group-hover:opacity-100 transition"><X className="w-3.5 h-3.5" /></button>
+        <button onClick={onRemove} className="p-1 text-brand-muted hover:text-brand-danger rounded opacity-0 group-hover:opacity-100 transition"><X className="w-3.5 h-3.5" /></button>
       </td>
     </tr>
   );
@@ -1043,9 +1043,9 @@ export function Modal({ children, title, onClose }: { children: ReactNode; title
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-auto">
-        <div className="sticky top-0 bg-white border-b border-odoo-border px-5 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b border-brand-border px-5 py-4 flex items-center justify-between z-10">
           <h2 className="font-semibold text-lg">{title}</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-odoo-surface rounded-lg transition"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-brand-surface rounded-lg transition"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -1063,12 +1063,12 @@ export function ConfirmDialog({ title, message, onCancel, onConfirm }: {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-5">
         <div className="flex items-start gap-3 mb-4">
-          <div className="w-10 h-10 bg-odoo-danger/10 rounded-full flex items-center justify-center flex-shrink-0"><AlertTriangle className="w-5 h-5 text-odoo-danger" /></div>
-          <div><h3 className="font-semibold">{title}</h3><p className="text-sm text-odoo-muted mt-1">{message}</p></div>
+          <div className="w-10 h-10 bg-brand-danger/10 rounded-full flex items-center justify-center flex-shrink-0"><AlertTriangle className="w-5 h-5 text-brand-danger" /></div>
+          <div><h3 className="font-semibold">{title}</h3><p className="text-sm text-brand-muted mt-1">{message}</p></div>
         </div>
         <div className="flex gap-2">
           <button onClick={onCancel} className="btn-secondary flex-1">Annuler</button>
-          <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-odoo-danger hover:bg-odoo-danger/90 text-white font-medium rounded-md transition">Confirmer</button>
+          <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-brand-danger hover:bg-brand-danger/90 text-white font-medium rounded-md transition">Confirmer</button>
         </div>
       </div>
     </div>

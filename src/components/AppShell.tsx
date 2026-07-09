@@ -89,7 +89,7 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
 
       {/* ── Announcement bar (shop only) ──────────────────────────────────── */}
       {!isAdminView && (
-        <div className="bg-odoo-dark text-white text-xs py-2 text-center font-medium tracking-wide">
+        <div className="bg-brand-dark text-white text-xs py-2 text-center font-medium tracking-wide">
           {settings.phone_number
             ? `Commandez par téléphone : ${settings.phone_number} · Livraison rapide disponible`
             : 'Livraison rapide disponible · Paiement Mobile Money accepté'}
@@ -97,7 +97,7 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
       )}
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <header className={`bg-odoo-primary text-white sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'shadow-lg shadow-odoo-dark/20' : ''}`}>
+      <header className={`bg-brand-primary text-white sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'shadow-lg shadow-odoo-dark/20' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="h-14 flex items-center justify-between gap-4">
             <button onClick={() => setView({ kind: 'shop' })} className="flex items-center gap-2 font-semibold text-lg hover:opacity-90 transition flex-shrink-0">
@@ -130,7 +130,7 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
                 <button onClick={() => setView({ kind: 'cart' })} className="relative p-2 hover:bg-white/10 active:scale-90 rounded-md transition-all duration-150">
                   <ShoppingCart className="w-5 h-5" />
                   {itemCount > 0 && (
-                    <span className={`absolute -top-0.5 -right-0.5 bg-odoo-warning text-odoo-dark text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center transition-transform ${badgeAnim ? 'animate-badge-bounce' : ''}`}>
+                    <span className={`absolute -top-0.5 -right-0.5 bg-odoo-warning text-brand-dark text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center transition-transform ${badgeAnim ? 'animate-badge-bounce' : ''}`}>
                       {itemCount > 9 ? '9+' : itemCount}
                     </span>
                   )}
@@ -160,26 +160,26 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
                   {userMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-odoo-border z-40 text-odoo-dark overflow-hidden">
-                        <div className="p-3 border-b border-odoo-border">
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-brand-border z-40 text-brand-dark overflow-hidden">
+                        <div className="p-3 border-b border-brand-border">
                           <p className="font-medium text-sm truncate">{profile?.full_name || 'Utilisateur'}</p>
-                          <p className="text-xs text-odoo-muted truncate">{user.email}</p>
-                          <span className={`inline-block mt-1.5 badge capitalize ${profile?.role === 'admin' ? 'bg-odoo-primary/15 text-odoo-primary' : profile?.role === 'cashier' ? 'bg-odoo-info/15 text-odoo-info' : profile?.role === 'employee' ? 'bg-odoo-success/15 text-odoo-success' : 'bg-odoo-muted/15 text-odoo-muted'}`}>
+                          <p className="text-xs text-brand-muted truncate">{user.email}</p>
+                          <span className={`inline-block mt-1.5 badge capitalize ${profile?.role === 'admin' ? 'bg-brand-primary/15 text-odoo-primary' : profile?.role === 'cashier' ? 'bg-odoo-info/15 text-odoo-info' : profile?.role === 'employee' ? 'bg-odoo-success/15 text-odoo-success' : 'bg-odoo-muted/15 text-brand-muted'}`}>
                             {profile?.role || 'customer'}
                           </span>
                         </div>
                         <button onClick={() => { setView({ kind: 'orders' }); setUserMenuOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2">
-                          <Package className="w-4 h-4 text-odoo-muted" />Mes commandes
+                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2">
+                          <Package className="w-4 h-4 text-brand-muted" />Mes commandes
                         </button>
                         {isStaff && (
                           <button onClick={() => { setView({ kind: 'admin-dashboard' }); setUserMenuOpen(false); }}
-                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2">
-                            <Settings className="w-4 h-4 text-odoo-muted" />Espace administrateur
+                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-brand-muted" />Espace administrateur
                           </button>
                         )}
                         <button onClick={() => { signOut(); setUserMenuOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-odoo-surface flex items-center gap-2 text-odoo-danger border-t border-odoo-border">
+                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2 text-odoo-danger border-t border-brand-border">
                           <LogOut className="w-4 h-4" />Déconnexion
                         </button>
                       </div>
@@ -205,55 +205,55 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl flex flex-col">
-            <div className="p-4 border-b border-odoo-border flex items-center justify-between">
-              <span className="font-semibold text-odoo-dark">Menu</span>
-              <button onClick={() => setMobileOpen(false)} className="p-1 hover:bg-odoo-surface rounded"><X className="w-5 h-5" /></button>
+            <div className="p-4 border-b border-brand-border flex items-center justify-between">
+              <span className="font-semibold text-brand-dark">Menu</span>
+              <button onClick={() => setMobileOpen(false)} className="p-1 hover:bg-brand-surface rounded"><X className="w-5 h-5" /></button>
             </div>
             <nav className="flex-1 p-2 overflow-auto">
               {isAdminView ? (
                 <>
                   {adminNav.map((item) => (
                     <button key={item.kind} onClick={() => { setView({ kind: item.kind }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                      <span className="text-odoo-muted">{item.icon}</span>{item.label}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                      <span className="text-brand-muted">{item.icon}</span>{item.label}
                     </button>
                   ))}
-                  <div className="my-2 border-t border-odoo-border" />
+                  <div className="my-2 border-t border-brand-border" />
                   <button onClick={() => { setView({ kind: 'shop' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                    <span className="text-odoo-muted"><Store className="w-4 h-4" /></span>Voir la boutique
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                    <span className="text-brand-muted"><Store className="w-4 h-4" /></span>Voir la boutique
                   </button>
                 </>
               ) : (
                 <>
                   <button onClick={() => { setView({ kind: 'shop' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                    <span className="text-odoo-muted"><Store className="w-4 h-4" /></span>Boutique
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                    <span className="text-brand-muted"><Store className="w-4 h-4" /></span>Boutique
                   </button>
                   <button onClick={() => { setView({ kind: 'cart' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                    <span className="text-odoo-muted"><ShoppingCart className="w-4 h-4" /></span>Panier ({itemCount})
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                    <span className="text-brand-muted"><ShoppingCart className="w-4 h-4" /></span>Panier ({itemCount})
                   </button>
                   {user && (
                     <button onClick={() => { setView({ kind: 'orders' }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                      <span className="text-odoo-muted"><Package className="w-4 h-4" /></span>Mes commandes
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                      <span className="text-brand-muted"><Package className="w-4 h-4" /></span>Mes commandes
                     </button>
                   )}
-                  <div className="my-2 border-t border-odoo-border" />
+                  <div className="my-2 border-t border-brand-border" />
                   {isStaff && (
                     <button onClick={() => { setView({ kind: 'admin-dashboard' }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-odoo-dark hover:bg-odoo-surface rounded-md text-left">
-                      <span className="text-odoo-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                      <span className="text-brand-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
                     </button>
                   )}
                 </>
               )}
             </nav>
             {user && (
-              <div className="p-3 border-t border-odoo-border">
+              <div className="p-3 border-t border-brand-border">
                 <button onClick={() => { signOut(); setMobileOpen(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-odoo-danger hover:bg-odoo-surface rounded-md">
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-odoo-danger hover:bg-brand-surface rounded-md">
                   <LogOut className="w-4 h-4" />Déconnexion
                 </button>
               </div>
@@ -265,7 +265,7 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
       <main className="flex-1 page-enter" key={view.kind}>{children}</main>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer className="bg-odoo-dark text-white/70 mt-12">
+      <footer className="bg-brand-dark text-white/70 mt-12">
         {/* Main footer grid */}
         <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-10 pb-6">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-8 border-b border-white/10">

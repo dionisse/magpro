@@ -21,25 +21,25 @@ export function LegalPage({ kind, setView }: LegalPageProps) {
       </button>
 
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-odoo-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
           {isLegal
-            ? <Scale className="w-5 h-5 text-odoo-primary" />
-            : <FileText className="w-5 h-5 text-odoo-primary" />
+            ? <Scale className="w-5 h-5 text-brand-primary" />
+            : <FileText className="w-5 h-5 text-brand-primary" />
           }
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-odoo-dark">{title}</h1>
-          <p className="text-sm text-odoo-muted">{settings.company_name || settings.store_name}</p>
+          <h1 className="text-2xl font-bold text-brand-dark">{title}</h1>
+          <p className="text-sm text-brand-muted">{settings.company_name || settings.store_name}</p>
         </div>
       </div>
 
       <div className="card p-6 lg:p-8">
         {content ? (
-          <div className="prose prose-sm max-w-none text-odoo-dark leading-relaxed whitespace-pre-line">
+          <div className="prose prose-sm max-w-none text-brand-dark leading-relaxed whitespace-pre-line">
             {content}
           </div>
         ) : (
-          <div className="text-center py-12 text-odoo-muted">
+          <div className="text-center py-12 text-brand-muted">
             <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="font-medium">Contenu non disponible</p>
             <p className="text-sm mt-1">Cette page sera complétée prochainement.</p>

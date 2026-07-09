@@ -54,13 +54,13 @@ export function AdminDashboard({ setView }: { setView: (v: View) => void }) {
     };
   }
 
-  if (loading || !stats) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>;
+  if (loading || !stats) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <p className="text-sm text-odoo-muted mt-1">Vue d'ensemble de votre activité</p>
+        <p className="text-sm text-brand-muted mt-1">Vue d'ensemble de votre activité</p>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
         <StatCard icon={<DollarSign className="w-5 h-5" />} label="Ventes du jour" value={formatPrice(stats.todaySales)} color="primary" />
@@ -69,41 +69,41 @@ export function AdminDashboard({ setView }: { setView: (v: View) => void }) {
         <StatCard icon={<Clock className="w-5 h-5" />} label="En attente" value={stats.pendingOrders.toString()} color="warning" />
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
-        <button onClick={() => setView({ kind: 'admin-products' })} className="card p-4 text-left hover:border-odoo-primary transition">
-          <Package className="w-5 h-5 text-odoo-primary mb-2" />
-          <p className="text-xs text-odoo-muted">Produits</p>
+        <button onClick={() => setView({ kind: 'admin-products' })} className="card p-4 text-left hover:border-brand-primary transition">
+          <Package className="w-5 h-5 text-brand-primary mb-2" />
+          <p className="text-xs text-brand-muted">Produits</p>
           <p className="text-xl font-bold">{stats.totalProducts}</p>
         </button>
-        <button onClick={() => setView({ kind: 'admin-products' })} className="card p-4 text-left hover:border-odoo-warning transition">
-          <AlertTriangle className="w-5 h-5 text-odoo-warning mb-2" />
-          <p className="text-xs text-odoo-muted">Stock faible</p>
+        <button onClick={() => setView({ kind: 'admin-products' })} className="card p-4 text-left hover:border-brand-warning transition">
+          <AlertTriangle className="w-5 h-5 text-brand-warning mb-2" />
+          <p className="text-xs text-brand-muted">Stock faible</p>
           <p className="text-xl font-bold">{stats.lowStockCount}</p>
         </button>
-        <button onClick={() => setView({ kind: 'admin-orders' })} className="card p-4 text-left hover:border-odoo-primary transition">
-          <ShoppingBag className="w-5 h-5 text-odoo-primary mb-2" />
-          <p className="text-xs text-odoo-muted">Commandes</p>
+        <button onClick={() => setView({ kind: 'admin-orders' })} className="card p-4 text-left hover:border-brand-primary transition">
+          <ShoppingBag className="w-5 h-5 text-brand-primary mb-2" />
+          <p className="text-xs text-brand-muted">Commandes</p>
           <p className="text-sm font-medium">Voir toutes</p>
         </button>
-        <button onClick={() => setView({ kind: 'admin-pos' })} className="card p-4 text-left hover:border-odoo-success transition bg-gradient-to-br from-odoo-success/5 to-transparent">
-          <DollarSign className="w-5 h-5 text-odoo-success mb-2" />
-          <p className="text-xs text-odoo-muted">Caisse</p>
+        <button onClick={() => setView({ kind: 'admin-pos' })} className="card p-4 text-left hover:border-brand-success transition bg-gradient-to-br from-brand-success/5 to-transparent">
+          <DollarSign className="w-5 h-5 text-brand-success mb-2" />
+          <p className="text-xs text-brand-muted">Caisse</p>
           <p className="text-sm font-medium">Ouvrir POS</p>
         </button>
       </div>
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="card">
-          <div className="p-4 border-b border-odoo-border flex items-center justify-between">
+          <div className="p-4 border-b border-brand-border flex items-center justify-between">
             <h2 className="font-semibold">Commandes récentes</h2>
-            <button onClick={() => setView({ kind: 'admin-orders' })} className="text-xs text-odoo-primary hover:underline">Voir tout</button>
+            <button onClick={() => setView({ kind: 'admin-orders' })} className="text-xs text-brand-primary hover:underline">Voir tout</button>
           </div>
           {stats.recentOrders.length === 0
-            ? <p className="p-6 text-sm text-odoo-muted text-center">Aucune commande</p>
-            : <div className="divide-y divide-odoo-border">
+            ? <p className="p-6 text-sm text-brand-muted text-center">Aucune commande</p>
+            : <div className="divide-y divide-brand-border">
               {stats.recentOrders.map((o) => (
                 <div key={o.id} className="p-3 flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-mono text-sm font-medium truncate">{o.order_number}</p>
-                    <p className="text-xs text-odoo-muted">{formatDate(o.created_at)}</p>
+                    <p className="text-xs text-brand-muted">{formatDate(o.created_at)}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <StatusBadge status={o.status} />
@@ -114,20 +114,20 @@ export function AdminDashboard({ setView }: { setView: (v: View) => void }) {
             </div>}
         </div>
         <div className="card">
-          <div className="p-4 border-b border-odoo-border flex items-center justify-between">
+          <div className="p-4 border-b border-brand-border flex items-center justify-between">
             <h2 className="font-semibold">Alertes stock</h2>
-            <button onClick={() => setView({ kind: 'admin-products' })} className="text-xs text-odoo-primary hover:underline">Gérer</button>
+            <button onClick={() => setView({ kind: 'admin-products' })} className="text-xs text-brand-primary hover:underline">Gérer</button>
           </div>
           {stats.lowStockProducts.length === 0
-            ? <p className="p-6 text-sm text-odoo-muted text-center">Tous les stocks sont OK</p>
-            : <div className="divide-y divide-odoo-border">
+            ? <p className="p-6 text-sm text-brand-muted text-center">Tous les stocks sont OK</p>
+            : <div className="divide-y divide-brand-border">
               {stats.lowStockProducts.map((p) => (
                 <div key={p.id} className="p-3 flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-medium text-sm truncate">{p.name}</p>
-                    <p className="text-xs text-odoo-muted">{p.sku || '—'}</p>
+                    <p className="text-xs text-brand-muted">{p.sku || '—'}</p>
                   </div>
-                  <span className={`badge ${p.stock === 0 ? 'bg-odoo-danger/15 text-odoo-danger' : 'bg-odoo-warning/15 text-odoo-warning'}`}>
+                  <span className={`badge ${p.stock === 0 ? 'bg-brand-danger/15 text-brand-danger' : 'bg-brand-warning/15 text-brand-warning'}`}>
                     {p.stock} en stock
                   </span>
                 </div>
@@ -140,11 +140,11 @@ export function AdminDashboard({ setView }: { setView: (v: View) => void }) {
 }
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: 'primary' | 'success' | 'warning' | 'info' }) {
-  const cls = { primary: 'bg-odoo-primary/10 text-odoo-primary', success: 'bg-odoo-success/10 text-odoo-success', warning: 'bg-odoo-warning/10 text-odoo-warning', info: 'bg-odoo-info/10 text-odoo-info' };
+  const cls = { primary: 'bg-brand-primary/10 text-brand-primary', success: 'bg-brand-success/10 text-brand-success', warning: 'bg-brand-warning/10 text-brand-warning', info: 'bg-brand-info/10 text-brand-info' };
   return (
     <div className="card p-4">
       <div className={`w-9 h-9 rounded-md flex items-center justify-center mb-2 ${cls[color]}`}>{icon}</div>
-      <p className="text-xs text-odoo-muted">{label}</p>
+      <p className="text-xs text-brand-muted">{label}</p>
       <p className="text-lg lg:text-xl font-bold mt-0.5">{value}</p>
     </div>
   );

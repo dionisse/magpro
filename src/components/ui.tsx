@@ -31,7 +31,7 @@ export function LazyImage({ src, alt, className = '', fallback }: LazyImageProps
   return (
     <span ref={ref} className="relative block w-full h-full">
       {!loaded && !error && (
-        <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-odoo-border via-white to-odoo-border bg-[length:200%_100%]" />
+        <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-brand-border via-white to-brand-border bg-[length:200%_100%]" />
       )}
       {inView && !error && (
         <img
@@ -44,7 +44,7 @@ export function LazyImage({ src, alt, className = '', fallback }: LazyImageProps
           className={`${className} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
-      {error && (fallback ?? <span className="absolute inset-0 flex items-center justify-center bg-odoo-surface text-odoo-muted text-xs">Image</span>)}
+      {error && (fallback ?? <span className="absolute inset-0 flex items-center justify-center bg-brand-surface text-brand-muted text-xs">Image</span>)}
     </span>
   );
 }
@@ -148,7 +148,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const icons = { success: <CheckCircle2 className="w-4 h-4" />, error: <AlertCircle className="w-4 h-4" />, info: <Info className="w-4 h-4" /> };
-  const colors = { success: 'bg-odoo-success', error: 'bg-odoo-danger', info: 'bg-odoo-primary' };
+  const colors = { success: 'bg-brand-success', error: 'bg-brand-danger', info: 'bg-brand-primary' };
 
   return (
     <ToastCtx.Provider value={{ toast }}>

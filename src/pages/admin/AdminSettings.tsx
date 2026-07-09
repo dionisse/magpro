@@ -89,16 +89,16 @@ export function AdminSettings() {
     <div className="max-w-3xl mx-auto px-4 lg:px-6 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-odoo-dark">Paramètres de la boutique</h1>
-          <p className="text-sm text-odoo-muted mt-0.5">Personnalisez l'identité et les informations de votre boutique</p>
+          <h1 className="text-xl font-bold text-brand-dark">Paramètres de la boutique</h1>
+          <p className="text-sm text-brand-muted mt-0.5">Personnalisez l'identité et les informations de votre boutique</p>
         </div>
         {status === 'success' && (
-          <div className="flex items-center gap-1.5 text-sm text-odoo-success font-medium">
+          <div className="flex items-center gap-1.5 text-sm text-brand-success font-medium">
             <CheckCircle2 className="w-4 h-4" />Enregistré
           </div>
         )}
         {status === 'error' && (
-          <div className="flex items-center gap-1.5 text-sm text-odoo-danger">
+          <div className="flex items-center gap-1.5 text-sm text-brand-danger">
             <AlertCircle className="w-4 h-4" />{errorMsg}
           </div>
         )}
@@ -108,12 +108,12 @@ export function AdminSettings() {
 
         {/* Identity */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <Store className="w-4 h-4 text-odoo-primary" />Identité de la boutique
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Store className="w-4 h-4 text-brand-primary" />Identité de la boutique
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Nom de la boutique <span className="text-odoo-danger">*</span></label>
+              <label className="block text-sm font-medium mb-1">Nom de la boutique <span className="text-brand-danger">*</span></label>
               <input
                 value={val(form.store_name)}
                 onChange={(e) => set('store_name', e.target.value)}
@@ -125,7 +125,7 @@ export function AdminSettings() {
             <div>
               <label className="block text-sm font-medium mb-1">
                 URL du logo
-                <span className="text-xs text-odoo-muted font-normal ml-1">(lien image)</span>
+                <span className="text-xs text-brand-muted font-normal ml-1">(lien image)</span>
               </label>
               <input
                 value={val(form.logo_url)}
@@ -137,9 +137,9 @@ export function AdminSettings() {
             </div>
           </div>
           {form.logo_url && (
-            <div className="mt-3 flex items-center gap-3 p-3 bg-odoo-surface rounded-lg border border-odoo-border">
-              <Image className="w-4 h-4 text-odoo-muted flex-shrink-0" />
-              <span className="text-xs text-odoo-muted">Aperçu :</span>
+            <div className="mt-3 flex items-center gap-3 p-3 bg-brand-surface rounded-lg border border-brand-border">
+              <Image className="w-4 h-4 text-brand-muted flex-shrink-0" />
+              <span className="text-xs text-brand-muted">Aperçu :</span>
               <img
                 src={form.logo_url}
                 alt="Logo aperçu"
@@ -152,30 +152,30 @@ export function AdminSettings() {
 
         {/* Hero style */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <Palette className="w-4 h-4 text-odoo-primary" />Style de la bannière
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Palette className="w-4 h-4 text-brand-primary" />Style de la bannière
           </h2>
-          <p className="text-xs text-odoo-muted mb-4">
+          <p className="text-xs text-brand-muted mb-4">
             Définit l'apparence de la boutique lorsqu'aucune bannière active n'est configurée.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button type="button" onClick={() => set('hero_style', 'auto')}
-              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'auto' ? 'border-odoo-primary bg-odoo-primary/5' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'auto' ? 'border-brand-primary bg-brand-primary/5' : 'border-brand-border hover:border-brand-primary/50'}`}>
               <p className="font-semibold text-sm mb-1">Fond sombre avec titre</p>
-              <p className="text-xs text-odoo-muted">Affiche un hero élégant "Qualité garantie" si aucune bannière n'est active.</p>
+              <p className="text-xs text-brand-muted">Affiche un hero élégant "Qualité garantie" si aucune bannière n'est active.</p>
             </button>
             <button type="button" onClick={() => set('hero_style', 'none')}
-              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'none' ? 'border-odoo-primary bg-odoo-primary/5' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+              className={`flex-1 p-4 rounded-xl border-2 text-left transition-all ${form.hero_style === 'none' ? 'border-brand-primary bg-brand-primary/5' : 'border-brand-border hover:border-brand-primary/50'}`}>
               <p className="font-semibold text-sm mb-1">Aucun hero (minimal)</p>
-              <p className="text-xs text-odoo-muted">Cache complètement la zone banner si aucune bannière active.</p>
+              <p className="text-xs text-brand-muted">Cache complètement la zone banner si aucune bannière active.</p>
             </button>
           </div>
         </section>
 
         {/* Company */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <Building2 className="w-4 h-4 text-odoo-primary" />Informations légales de la société
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Building2 className="w-4 h-4 text-brand-primary" />Informations légales de la société
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
@@ -210,8 +210,8 @@ export function AdminSettings() {
 
         {/* Contact */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <Phone className="w-4 h-4 text-odoo-primary" />Contact
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Phone className="w-4 h-4 text-brand-primary" />Contact
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
@@ -233,15 +233,15 @@ export function AdminSettings() {
                 placeholder="+22997000000"
                 type="tel"
               />
-              <p className="text-xs text-odoo-muted mt-1">Format international sans espaces pour le lien cliquable</p>
+              <p className="text-xs text-brand-muted mt-1">Format international sans espaces pour le lien cliquable</p>
             </div>
           </div>
         </section>
 
         {/* Social media */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <Globe className="w-4 h-4 text-odoo-primary" />Réseaux sociaux
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Globe className="w-4 h-4 text-brand-primary" />Réseaux sociaux
           </h2>
           <div className="space-y-3">
             <div>
@@ -279,10 +279,10 @@ export function AdminSettings() {
 
         {/* Legal pages */}
         <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-odoo-dark">
-            <FileText className="w-4 h-4 text-odoo-primary" />Pages légales
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <FileText className="w-4 h-4 text-brand-primary" />Pages légales
           </h2>
-          <p className="text-xs text-odoo-muted mb-4">
+          <p className="text-xs text-brand-muted mb-4">
             Ces textes seront affichés sur des pages dédiées accessibles depuis le pied de page.
             Vous pouvez utiliser des sauts de ligne pour structurer le contenu.
           </p>

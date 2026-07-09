@@ -45,7 +45,7 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
       </button>
 
       <div className="card overflow-hidden">
-        <div className="bg-odoo-primary p-6 text-white text-center">
+        <div className="bg-brand-primary p-6 text-white text-center">
           <div className="w-14 h-14 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3">
             <Shield className="w-7 h-7" />
           </div>
@@ -56,22 +56,22 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
         <div className="p-6">
           {success ? (
             <div className="text-center py-4">
-              <CheckCircle2 className="w-12 h-12 text-odoo-success mx-auto mb-3" />
+              <CheckCircle2 className="w-12 h-12 text-brand-success mx-auto mb-3" />
               <p className="font-semibold text-lg">Accès administrateur activé !</p>
-              <p className="text-sm text-odoo-muted mt-1">Redirection en cours...</p>
+              <p className="text-sm text-brand-muted mt-1">Redirection en cours...</p>
             </div>
           ) : !user ? (
             <div className="text-center py-4">
-              <AlertTriangle className="w-10 h-10 text-odoo-warning mx-auto mb-3" />
+              <AlertTriangle className="w-10 h-10 text-brand-warning mx-auto mb-3" />
               <p className="font-medium mb-3">Connexion requise</p>
               <button onClick={() => setView({ kind: 'auth' })} className="btn-primary">Se connecter</button>
             </div>
           ) : (
             <>
-              <div className="bg-odoo-surface rounded-lg p-4 mb-5 text-sm">
-                <p className="font-medium mb-2 flex items-center gap-2"><KeyRound className="w-4 h-4 text-odoo-primary" />Code d'activation requis</p>
-                <p className="text-odoo-muted">Entrez le code d'activation fourni par l'administrateur système pour débloquer l'accès.</p>
-                <div className="mt-3 p-2 bg-odoo-primary/10 rounded text-xs text-odoo-primary font-medium">
+              <div className="bg-brand-surface rounded-lg p-4 mb-5 text-sm">
+                <p className="font-medium mb-2 flex items-center gap-2"><KeyRound className="w-4 h-4 text-brand-primary" />Code d'activation requis</p>
+                <p className="text-brand-muted">Entrez le code d'activation fourni par l'administrateur système pour débloquer l'accès.</p>
+                <div className="mt-3 p-2 bg-brand-primary/10 rounded text-xs text-brand-primary font-medium">
                   Contactez l'administrateur système pour obtenir le code d'accès.
                 </div>
               </div>
@@ -90,7 +90,7 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
                   />
                 </div>
                 {error && (
-                  <div className="flex items-center gap-2 bg-odoo-danger/10 text-odoo-danger text-sm p-3 rounded">
+                  <div className="flex items-center gap-2 bg-brand-danger/10 text-brand-danger text-sm p-3 rounded">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                     {error}
                   </div>
@@ -100,13 +100,13 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
                 </button>
               </form>
 
-              <div className="mt-5 pt-5 border-t border-odoo-border">
-                <p className="text-xs text-odoo-muted text-center font-medium mb-3">Rôles disponibles</p>
+              <div className="mt-5 pt-5 border-t border-brand-border">
+                <p className="text-xs text-brand-muted text-center font-medium mb-3">Rôles disponibles</p>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { role: 'Admin', desc: 'Accès complet', color: 'bg-odoo-primary/10 text-odoo-primary' },
-                    { role: 'Caissier', desc: 'POS + commandes', color: 'bg-odoo-info/10 text-odoo-info' },
-                    { role: 'Client', desc: 'Achat en ligne', color: 'bg-odoo-success/10 text-odoo-success' },
+                    { role: 'Admin', desc: 'Accès complet', color: 'bg-brand-primary/10 text-brand-primary' },
+                    { role: 'Caissier', desc: 'POS + commandes', color: 'bg-brand-info/10 text-brand-info' },
+                    { role: 'Client', desc: 'Achat en ligne', color: 'bg-brand-success/10 text-brand-success' },
                   ].map((r) => (
                     <div key={r.role} className={`text-center p-2 rounded-lg text-xs ${r.color}`}>
                       <p className="font-semibold">{r.role}</p>

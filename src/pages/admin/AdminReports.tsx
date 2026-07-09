@@ -128,13 +128,13 @@ export function AdminReports() {
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><BarChart3 className="w-6 h-6 text-odoo-primary" />Rapports financiers</h1>
-          <p className="text-sm text-odoo-muted mt-1">{orders.length} commandes sur la période</p>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><BarChart3 className="w-6 h-6 text-brand-primary" />Rapports financiers</h1>
+          <p className="text-sm text-brand-muted mt-1">{orders.length} commandes sur la période</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {(['today', 'week', 'month', 'year'] as Period[]).map((p) => (
             <button key={p} onClick={() => setPeriod(p)}
-              className={`px-4 py-2 rounded-md text-sm font-medium border transition ${period === p ? 'bg-odoo-primary border-odoo-primary text-white' : 'bg-white border-odoo-border hover:border-odoo-primary'}`}>
+              className={`px-4 py-2 rounded-md text-sm font-medium border transition ${period === p ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border hover:border-brand-primary'}`}>
               {p === 'today' ? "Aujourd'hui" : p === 'week' ? '7 jours' : p === 'month' ? 'Ce mois' : 'Cette année'}
             </button>
           ))}
@@ -142,7 +142,7 @@ export function AdminReports() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>
+        <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>
       ) : (
         <>
           {/* KPI Row 1 — Ventes */}
@@ -155,70 +155,70 @@ export function AdminReports() {
 
           {/* KPI Row 2 — Résultat financier */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            <div className="card p-5 border-l-4 border-l-odoo-success">
+            <div className="card p-5 border-l-4 border-l-brand-success">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs text-odoo-muted font-medium uppercase tracking-wide mb-1">Marge Brute</p>
-                  <p className="text-2xl font-bold text-odoo-success">{formatPrice(grossMargin)}</p>
-                  <p className="text-xs text-odoo-muted mt-1">Après coût marchandises estimé</p>
+                  <p className="text-xs text-brand-muted font-medium uppercase tracking-wide mb-1">Marge Brute</p>
+                  <p className="text-2xl font-bold text-brand-success">{formatPrice(grossMargin)}</p>
+                  <p className="text-xs text-brand-muted mt-1">Après coût marchandises estimé</p>
                 </div>
-                <div className="bg-odoo-success/10 text-odoo-success rounded-lg p-2">
+                <div className="bg-brand-success/10 text-brand-success rounded-lg p-2">
                   <TrendingUp className="w-5 h-5" />
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-odoo-border">
-                <div className="flex justify-between text-xs text-odoo-muted mb-1">
+              <div className="mt-3 pt-3 border-t border-brand-border">
+                <div className="flex justify-between text-xs text-brand-muted mb-1">
                   <span>Taux de marge</span>
-                  <span className="font-semibold text-odoo-success">{grossMarginPct.toFixed(1)}%</span>
+                  <span className="font-semibold text-brand-success">{grossMarginPct.toFixed(1)}%</span>
                 </div>
-                <div className="h-1.5 bg-odoo-border rounded-full overflow-hidden">
-                  <div className="h-full bg-odoo-success rounded-full" style={{ width: `${Math.min(grossMarginPct, 100)}%` }} />
+                <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
+                  <div className="h-full bg-brand-success rounded-full" style={{ width: `${Math.min(grossMarginPct, 100)}%` }} />
                 </div>
               </div>
             </div>
 
-            <div className="card p-5 border-l-4 border-l-odoo-danger">
+            <div className="card p-5 border-l-4 border-l-brand-danger">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs text-odoo-muted font-medium uppercase tracking-wide mb-1">Dépenses & Charges</p>
-                  <p className="text-2xl font-bold text-odoo-danger">{formatPrice(totalExpenses)}</p>
-                  <p className="text-xs text-odoo-muted mt-1">{expenses.length} entrée{expenses.length !== 1 ? 's' : ''} sur la période</p>
+                  <p className="text-xs text-brand-muted font-medium uppercase tracking-wide mb-1">Dépenses & Charges</p>
+                  <p className="text-2xl font-bold text-brand-danger">{formatPrice(totalExpenses)}</p>
+                  <p className="text-xs text-brand-muted mt-1">{expenses.length} entrée{expenses.length !== 1 ? 's' : ''} sur la période</p>
                 </div>
-                <div className="bg-odoo-danger/10 text-odoo-danger rounded-lg p-2">
+                <div className="bg-brand-danger/10 text-brand-danger rounded-lg p-2">
                   <TrendingDown className="w-5 h-5" />
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-odoo-border">
-                <div className="flex justify-between text-xs text-odoo-muted mb-1">
+              <div className="mt-3 pt-3 border-t border-brand-border">
+                <div className="flex justify-between text-xs text-brand-muted mb-1">
                   <span>% du CA</span>
-                  <span className="font-semibold text-odoo-danger">{totalRevenue > 0 ? ((totalExpenses / totalRevenue) * 100).toFixed(1) : '0.0'}%</span>
+                  <span className="font-semibold text-brand-danger">{totalRevenue > 0 ? ((totalExpenses / totalRevenue) * 100).toFixed(1) : '0.0'}%</span>
                 </div>
-                <div className="h-1.5 bg-odoo-border rounded-full overflow-hidden">
-                  <div className="h-full bg-odoo-danger rounded-full" style={{ width: totalRevenue > 0 ? `${Math.min((totalExpenses / totalRevenue) * 100, 100)}%` : '0%' }} />
+                <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
+                  <div className="h-full bg-brand-danger rounded-full" style={{ width: totalRevenue > 0 ? `${Math.min((totalExpenses / totalRevenue) * 100, 100)}%` : '0%' }} />
                 </div>
               </div>
             </div>
 
-            <div className={`card p-5 border-l-4 ${netProfit >= 0 ? 'border-l-odoo-primary' : 'border-l-odoo-warning'}`}>
+            <div className={`card p-5 border-l-4 ${netProfit >= 0 ? 'border-l-brand-primary' : 'border-l-brand-warning'}`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs text-odoo-muted font-medium uppercase tracking-wide mb-1">Bénéfice Net Avant Impôt</p>
-                  <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-odoo-primary' : 'text-odoo-warning'}`}>{formatPrice(netProfit)}</p>
-                  <p className="text-xs text-odoo-muted mt-1">Marge brute − dépenses</p>
+                  <p className="text-xs text-brand-muted font-medium uppercase tracking-wide mb-1">Bénéfice Net Avant Impôt</p>
+                  <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-brand-primary' : 'text-brand-warning'}`}>{formatPrice(netProfit)}</p>
+                  <p className="text-xs text-brand-muted mt-1">Marge brute − dépenses</p>
                 </div>
-                <div className={`rounded-lg p-2 ${netProfit >= 0 ? 'bg-odoo-primary/10 text-odoo-primary' : 'bg-odoo-warning/10 text-odoo-warning'}`}>
+                <div className={`rounded-lg p-2 ${netProfit >= 0 ? 'bg-brand-primary/10 text-brand-primary' : 'bg-brand-warning/10 text-brand-warning'}`}>
                   <Wallet className="w-5 h-5" />
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-odoo-border">
-                <div className="flex justify-between text-xs text-odoo-muted mb-1">
+              <div className="mt-3 pt-3 border-t border-brand-border">
+                <div className="flex justify-between text-xs text-brand-muted mb-1">
                   <span>Marge nette</span>
-                  <span className={`font-semibold ${netProfit >= 0 ? 'text-odoo-primary' : 'text-odoo-warning'}`}>
+                  <span className={`font-semibold ${netProfit >= 0 ? 'text-brand-primary' : 'text-brand-warning'}`}>
                     {totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : '0.0'}%
                   </span>
                 </div>
-                <div className="h-1.5 bg-odoo-border rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full ${netProfit >= 0 ? 'bg-odoo-primary' : 'bg-odoo-warning'}`}
+                <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${netProfit >= 0 ? 'bg-brand-primary' : 'bg-brand-warning'}`}
                     style={{ width: totalRevenue > 0 ? `${Math.min(Math.abs(netProfit / totalRevenue) * 100, 100)}%` : '0%' }} />
                 </div>
               </div>
@@ -236,13 +236,13 @@ export function AdminReports() {
                     return (
                       <div key={d.date} className="flex flex-col items-center gap-1 group" style={{ minWidth: 36 }}>
                         <div className="relative w-full flex items-end justify-center" style={{ height: 110 }}>
-                          <div className="w-7 rounded-t-sm bg-odoo-primary/20 group-hover:bg-odoo-primary transition-colors duration-150" style={{ height: `${Math.max(pct, 2)}%` }}>
-                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap text-xs bg-odoo-dark text-white px-2 py-0.5 rounded">
+                          <div className="w-7 rounded-t-sm bg-brand-primary/20 group-hover:bg-brand-primary transition-colors duration-150" style={{ height: `${Math.max(pct, 2)}%` }}>
+                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap text-xs bg-brand-dark text-white px-2 py-0.5 rounded">
                               {formatPrice(d.total)} ({d.count})
                             </div>
                           </div>
                         </div>
-                        <p className="text-xs text-odoo-muted">{d.date.slice(8)}/{d.date.slice(5, 7)}</p>
+                        <p className="text-xs text-brand-muted">{d.date.slice(8)}/{d.date.slice(5, 7)}</p>
                       </div>
                     );
                   })}
@@ -257,10 +257,10 @@ export function AdminReports() {
               <h2 className="font-semibold mb-3">Statuts des commandes</h2>
               <div className="space-y-2">
                 {[
-                  { label: 'En attente', key: 'pending' as const, color: 'bg-odoo-warning' },
-                  { label: 'En traitement', key: 'processing' as const, color: 'bg-odoo-info' },
-                  { label: 'Expédiées', key: 'shipped' as const, color: 'bg-odoo-primary' },
-                  { label: 'Livrées', key: 'delivered' as const, color: 'bg-odoo-success' },
+                  { label: 'En attente', key: 'pending' as const, color: 'bg-brand-warning' },
+                  { label: 'En traitement', key: 'processing' as const, color: 'bg-brand-info' },
+                  { label: 'Expédiées', key: 'shipped' as const, color: 'bg-brand-primary' },
+                  { label: 'Livrées', key: 'delivered' as const, color: 'bg-brand-success' },
                 ].map((s) => (
                   <div key={s.key} className="flex items-center gap-2">
                     <div className={`w-2.5 h-2.5 rounded-full ${s.color}`} />
@@ -279,16 +279,16 @@ export function AdminReports() {
                   return (
                     <div key={method}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-odoo-muted">{labels[method] || method}</span>
+                        <span className="text-brand-muted">{labels[method] || method}</span>
                         <span className="font-medium">{formatPrice(amount)}</span>
                       </div>
-                      <div className="h-1.5 bg-odoo-border rounded-full overflow-hidden">
-                        <div className="h-full bg-odoo-primary rounded-full" style={{ width: `${(amount / totalRevenue) * 100}%` }} />
+                      <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
+                        <div className="h-full bg-brand-primary rounded-full" style={{ width: `${(amount / totalRevenue) * 100}%` }} />
                       </div>
                     </div>
                   );
                 })}
-                {Object.keys(paymentBreakdown).length === 0 && <p className="text-sm text-odoo-muted text-center py-2">Aucune donnée</p>}
+                {Object.keys(paymentBreakdown).length === 0 && <p className="text-sm text-brand-muted text-center py-2">Aucune donnée</p>}
               </div>
             </div>
 
@@ -296,8 +296,8 @@ export function AdminReports() {
               <h2 className="font-semibold mb-3">Canaux de vente</h2>
               <div className="space-y-3">
                 {[
-                  { label: 'Boutique en ligne', value: onlineSales, count: orders.filter((o) => o.source === 'online').length, color: 'bg-odoo-primary' },
-                  { label: 'Caisse POS', value: posSales, count: orders.filter((o) => o.source === 'pos').length, color: 'bg-odoo-secondary' },
+                  { label: 'Boutique en ligne', value: onlineSales, count: orders.filter((o) => o.source === 'online').length, color: 'bg-brand-primary' },
+                  { label: 'Caisse POS', value: posSales, count: orders.filter((o) => o.source === 'pos').length, color: 'bg-brand-secondary' },
                 ].map((s) => (
                   <div key={s.label}>
                     <div className="flex justify-between text-sm mb-1">
@@ -305,7 +305,7 @@ export function AdminReports() {
                       <span className="font-medium">{s.count} cmd.</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-odoo-border rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-brand-border rounded-full overflow-hidden">
                         <div className={`h-full ${s.color} rounded-full`} style={{ width: totalRevenue > 0 ? `${(s.value / totalRevenue) * 100}%` : '0%' }} />
                       </div>
                       <span className="text-xs font-medium w-20 text-right">{formatPrice(s.value)}</span>
@@ -318,10 +318,10 @@ export function AdminReports() {
 
           {/* Dépenses & Charges */}
           <div className="card mb-5">
-            <div className="p-4 border-b border-odoo-border flex items-center justify-between gap-3 flex-wrap">
+            <div className="p-4 border-b border-brand-border flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h2 className="font-semibold flex items-center gap-2"><Receipt className="w-4 h-4 text-odoo-danger" />Dépenses & Charges</h2>
-                <p className="text-xs text-odoo-muted mt-0.5">Total : <span className="font-bold text-odoo-danger">{formatPrice(totalExpenses)}</span></p>
+                <h2 className="font-semibold flex items-center gap-2"><Receipt className="w-4 h-4 text-brand-danger" />Dépenses & Charges</h2>
+                <p className="text-xs text-brand-muted mt-0.5">Total : <span className="font-bold text-brand-danger">{formatPrice(totalExpenses)}</span></p>
               </div>
               <button onClick={() => setShowExpenseForm(true)} className="btn-primary text-sm gap-1.5">
                 <Plus className="w-4 h-4" />Ajouter une dépense
@@ -329,7 +329,7 @@ export function AdminReports() {
             </div>
 
             {showExpenseForm && (
-              <div className="p-4 bg-odoo-surface border-b border-odoo-border">
+              <div className="p-4 bg-brand-surface border-b border-brand-border">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                   <div className="lg:col-span-2">
                     <label className="block text-xs font-medium mb-1">Libellé *</label>
@@ -359,7 +359,7 @@ export function AdminReports() {
                       onChange={(e) => setExpenseForm((f) => ({ ...f, notes: e.target.value }))} />
                   </div>
                 </div>
-                {expenseError && <p className="text-xs text-odoo-danger mb-2">{expenseError}</p>}
+                {expenseError && <p className="text-xs text-brand-danger mb-2">{expenseError}</p>}
                 <div className="flex gap-2">
                   <button onClick={saveExpense} disabled={savingExpense} className="btn-primary text-sm">
                     {savingExpense ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Enregistrer'}
@@ -371,14 +371,14 @@ export function AdminReports() {
 
             {/* Répartition par catégorie */}
             {Object.keys(expenseByCategory).length > 0 && (
-              <div className="p-4 border-b border-odoo-border">
-                <p className="text-xs font-medium text-odoo-muted uppercase tracking-wide mb-3">Répartition par catégorie</p>
+              <div className="p-4 border-b border-brand-border">
+                <p className="text-xs font-medium text-brand-muted uppercase tracking-wide mb-3">Répartition par catégorie</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                   {Object.entries(expenseByCategory).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
-                    <div key={cat} className="bg-odoo-danger/5 border border-odoo-danger/10 rounded-lg p-3">
-                      <p className="text-xs text-odoo-muted mb-1">{CAT_LABELS[cat] || cat}</p>
-                      <p className="font-bold text-sm text-odoo-danger">{formatPrice(amt)}</p>
-                      <p className="text-xs text-odoo-muted mt-0.5">{totalExpenses > 0 ? ((amt / totalExpenses) * 100).toFixed(0) : 0}%</p>
+                    <div key={cat} className="bg-brand-danger/5 border border-brand-danger/10 rounded-lg p-3">
+                      <p className="text-xs text-brand-muted mb-1">{CAT_LABELS[cat] || cat}</p>
+                      <p className="font-bold text-sm text-brand-danger">{formatPrice(amt)}</p>
+                      <p className="text-xs text-brand-muted mt-0.5">{totalExpenses > 0 ? ((amt / totalExpenses) * 100).toFixed(0) : 0}%</p>
                     </div>
                   ))}
                 </div>
@@ -387,7 +387,7 @@ export function AdminReports() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-odoo-surface text-xs font-medium text-odoo-muted uppercase">
+                <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                   <tr>
                     <th className="p-3 text-left">Libellé</th>
                     <th className="p-3 text-left hidden sm:table-cell">Catégorie</th>
@@ -397,18 +397,18 @@ export function AdminReports() {
                     <th className="p-3 w-10" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-odoo-border">
+                <tbody className="divide-y divide-brand-border">
                   {expenses.map((e) => (
-                    <tr key={e.id} className="hover:bg-odoo-surface/50">
+                    <tr key={e.id} className="hover:bg-brand-surface/50">
                       <td className="p-3 font-medium">{e.label}</td>
                       <td className="p-3 hidden sm:table-cell">
-                        <span className="badge bg-odoo-danger/10 text-odoo-danger text-xs">{CAT_LABELS[e.category] || e.category}</span>
+                        <span className="badge bg-brand-danger/10 text-brand-danger text-xs">{CAT_LABELS[e.category] || e.category}</span>
                       </td>
-                      <td className="p-3 hidden md:table-cell text-odoo-muted text-xs">{e.date}</td>
-                      <td className="p-3 hidden lg:table-cell text-odoo-muted text-xs">{e.notes || '—'}</td>
-                      <td className="p-3 text-right font-bold text-odoo-danger">{formatPrice(Number(e.amount))}</td>
+                      <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{e.date}</td>
+                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{e.notes || '—'}</td>
+                      <td className="p-3 text-right font-bold text-brand-danger">{formatPrice(Number(e.amount))}</td>
                       <td className="p-3">
-                        <button onClick={() => deleteExpense(e.id)} className="text-odoo-muted hover:text-odoo-danger transition-colors">
+                        <button onClick={() => deleteExpense(e.id)} className="text-brand-muted hover:text-brand-danger transition-colors">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </td>
@@ -417,14 +417,14 @@ export function AdminReports() {
                 </tbody>
               </table>
               {expenses.length === 0 && (
-                <p className="p-8 text-center text-odoo-muted text-sm">Aucune dépense enregistrée sur cette période</p>
+                <p className="p-8 text-center text-brand-muted text-sm">Aucune dépense enregistrée sur cette période</p>
               )}
             </div>
           </div>
 
           {/* Commandes */}
           <div className="card">
-            <div className="p-4 border-b border-odoo-border flex items-center justify-between">
+            <div className="p-4 border-b border-brand-border flex items-center justify-between">
               <h2 className="font-semibold">Détail des commandes ({orders.length})</h2>
               <button onClick={() => exportCSV(orders)} className="btn-secondary text-xs gap-1.5">
                 <Download className="w-3.5 h-3.5" />Exporter CSV
@@ -432,7 +432,7 @@ export function AdminReports() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-odoo-surface text-xs font-medium text-odoo-muted uppercase">
+                <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                   <tr>
                     <th className="p-3 text-left">Commande</th>
                     <th className="p-3 text-left hidden md:table-cell">Client</th>
@@ -442,24 +442,24 @@ export function AdminReports() {
                     <th className="p-3 text-right">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-odoo-border">
+                <tbody className="divide-y divide-brand-border">
                   {orders.slice(0, 50).map((o) => (
-                    <tr key={o.id} className="hover:bg-odoo-surface/50">
+                    <tr key={o.id} className="hover:bg-brand-surface/50">
                       <td className="p-3 font-mono font-medium text-xs">{o.order_number}</td>
                       <td className="p-3 hidden md:table-cell">{o.customer_name || '—'}</td>
-                      <td className="p-3 hidden lg:table-cell text-odoo-muted text-xs">{formatDate(o.created_at)}</td>
+                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{formatDate(o.created_at)}</td>
                       <td className="p-3 text-center hidden sm:table-cell">
-                        <span className={`badge text-xs ${o.source === 'pos' ? 'bg-odoo-info/15 text-odoo-info' : 'bg-odoo-primary/10 text-odoo-primary'}`}>
+                        <span className={`badge text-xs ${o.source === 'pos' ? 'bg-brand-info/15 text-brand-info' : 'bg-brand-primary/10 text-brand-primary'}`}>
                           {o.source === 'pos' ? 'POS' : 'Web'}
                         </span>
                       </td>
-                      <td className="p-3 text-center hidden md:table-cell text-xs text-odoo-muted capitalize">{o.payment_method.replace('_', ' ')}</td>
-                      <td className="p-3 text-right font-bold text-odoo-primary">{formatPrice(o.total)}</td>
+                      <td className="p-3 text-center hidden md:table-cell text-xs text-brand-muted capitalize">{o.payment_method.replace('_', ' ')}</td>
+                      <td className="p-3 text-right font-bold text-brand-primary">{formatPrice(o.total)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {orders.length === 0 && <p className="p-8 text-center text-odoo-muted">Aucune commande sur cette période</p>}
+              {orders.length === 0 && <p className="p-8 text-center text-brand-muted">Aucune commande sur cette période</p>}
             </div>
           </div>
         </>
@@ -469,13 +469,13 @@ export function AdminReports() {
 }
 
 function KpiCard({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string; sub: string; color: 'primary' | 'success' | 'warning' | 'info' }) {
-  const cls = { primary: 'bg-odoo-primary/10 text-odoo-primary', success: 'bg-odoo-success/10 text-odoo-success', warning: 'bg-odoo-warning/10 text-odoo-warning', info: 'bg-odoo-info/10 text-odoo-info' };
+  const cls = { primary: 'bg-brand-primary/10 text-brand-primary', success: 'bg-brand-success/10 text-brand-success', warning: 'bg-brand-warning/10 text-brand-warning', info: 'bg-brand-info/10 text-brand-info' };
   return (
     <div className="card p-4">
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${cls[color]}`}>{icon}</div>
-      <p className="text-xs text-odoo-muted">{label}</p>
+      <p className="text-xs text-brand-muted">{label}</p>
       <p className="text-xl font-bold mt-0.5">{value}</p>
-      <p className="text-xs text-odoo-muted mt-1">{sub}</p>
+      <p className="text-xs text-brand-muted mt-1">{sub}</p>
     </div>
   );
 }

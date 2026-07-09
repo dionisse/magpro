@@ -10,7 +10,7 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-odoo-surface text-odoo-dark;
+    @apply bg-brand-surface text-brand-dark;
   }
   h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   p { line-height: 1.5; }
@@ -28,31 +28,31 @@
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
-           bg-odoo-primary hover:bg-odoo-primary-dark active:scale-95
-           text-white font-medium rounded-md
+           bg-brand-accent hover:bg-brand-accent-dark active:scale-95
+           text-brand-dark font-semibold rounded-md
            transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-odoo-primary focus:ring-offset-2
+           focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
-           bg-white hover:bg-odoo-surface active:scale-95
-           text-odoo-dark border border-odoo-border font-medium rounded-md
+           bg-white hover:bg-brand-surface active:scale-95
+           text-brand-dark border border-brand-border font-medium rounded-md
            transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-odoo-primary focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-3 py-2
-           text-odoo-muted hover:text-odoo-primary hover:bg-odoo-surface active:scale-95
+           text-brand-muted hover:text-brand-primary hover:bg-brand-surface active:scale-95
            rounded-md transition-all duration-150;
   }
   .input {
-    @apply w-full px-3 py-2.5 border border-odoo-border rounded-md text-sm
-           focus:outline-none focus:ring-2 focus:ring-odoo-primary focus:border-transparent
+    @apply w-full px-3 py-2.5 border border-brand-border rounded-md text-sm
+           focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent
            transition-all duration-150 bg-white;
   }
   .card {
-    @apply bg-white border border-odoo-border rounded-lg overflow-hidden;
+    @apply bg-white border border-brand-border rounded-lg overflow-hidden;
   }
   .badge {
     @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
@@ -63,12 +63,12 @@
     @apply card flex flex-col cursor-pointer
            transition-all duration-300 ease-out
            hover:-translate-y-1.5 hover:shadow-xl
-           hover:border-odoo-primary/40;
+           hover:border-brand-accent/60;
   }
 
   /* Shimmer skeleton */
   .skeleton {
-    @apply rounded bg-gradient-to-r from-odoo-border via-odoo-surface to-odoo-border
+    @apply rounded bg-gradient-to-r from-brand-border via-brand-surface to-brand-border
            bg-[length:200%_100%];
     animation: shimmer 1.5s infinite linear;
   }
@@ -83,9 +83,9 @@
     transform: translateX(-50%);
     animation: toastIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  .toast-success { @apply bg-odoo-success; }
-  .toast-error   { @apply bg-odoo-danger; }
-  .toast-info    { @apply bg-odoo-primary; }
+  .toast-success { @apply bg-brand-success; }
+  .toast-error   { @apply bg-brand-danger; }
+  .toast-info    { @apply bg-brand-primary; }
 
   /* Page enter animation */
   .page-enter {

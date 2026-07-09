@@ -174,7 +174,7 @@ export function AdminPOS() {
     loadAll();
   }
 
-  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
@@ -183,9 +183,9 @@ export function AdminPOS() {
         {/* ── Product grid ── */}
         <div className="lg:col-span-3 flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <ScanBarcode className="w-5 h-5 text-odoo-primary flex-shrink-0" />
+            <ScanBarcode className="w-5 h-5 text-brand-primary flex-shrink-0" />
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-odoo-muted" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nom, SKU…" autoFocus className="input pl-9" />
             </div>
           </div>
@@ -193,14 +193,14 @@ export function AdminPOS() {
           {categories.length > 0 && (
             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
               <button onClick={() => setActiveCategory(null)}
-                className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${!activeCategory ? 'bg-odoo-primary border-odoo-primary text-white' : 'bg-white border-odoo-border'}`}>
+                className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${!activeCategory ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border'}`}>
                 Tout
               </button>
               {categories.map((cid) => {
                 const count = products.filter((p) => p.category_id === cid).length;
                 return (
                   <button key={cid} onClick={() => setActiveCategory(cid)}
-                    className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${activeCategory === cid ? 'bg-odoo-primary border-odoo-primary text-white' : 'bg-white border-odoo-border'}`}>
+                    className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${activeCategory === cid ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border'}`}>
                     Cat. ({count})
                   </button>
                 );
@@ -214,49 +214,49 @@ export function AdminPOS() {
               const hasOptions = (optionsByProduct[p.id]?.length ?? 0) > 0;
               return (
                 <button key={p.id} onClick={() => handleProductClick(p)} disabled={p.stock === 0}
-                  className={`card overflow-hidden text-left hover:border-odoo-primary hover:shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed group relative ${inCart > 0 ? 'ring-2 ring-odoo-primary' : ''}`}>
+                  className={`card overflow-hidden text-left hover:border-brand-primary hover:shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed group relative ${inCart > 0 ? 'ring-2 ring-brand-primary' : ''}`}>
                   {inCart > 0 && (
-                    <div className="absolute top-1 right-1 w-5 h-5 bg-odoo-primary text-white text-xs font-bold rounded-full flex items-center justify-center z-10">
+                    <div className="absolute top-1 right-1 w-5 h-5 bg-brand-primary text-white text-xs font-bold rounded-full flex items-center justify-center z-10">
                       {inCart}
                     </div>
                   )}
-                  <div className="aspect-square bg-odoo-surface relative overflow-hidden">
-                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-8 h-8 text-odoo-muted" /></div>}
-                    {p.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-xs font-semibold text-odoo-danger">Rupture</span></div>}
-                    {p.bulk_quantity > 0 && <div className="absolute top-1 left-1"><Tag className="w-3.5 h-3.5 text-odoo-success" /></div>}
-                    {hasOptions && <div className="absolute bottom-1 right-1 bg-odoo-info text-white rounded-full p-0.5"><Layers className="w-3 h-3" /></div>}
+                  <div className="aspect-square bg-brand-surface relative overflow-hidden">
+                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-8 h-8 text-brand-muted" /></div>}
+                    {p.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-xs font-semibold text-brand-danger">Rupture</span></div>}
+                    {p.bulk_quantity > 0 && <div className="absolute top-1 left-1"><Tag className="w-3.5 h-3.5 text-brand-success" /></div>}
+                    {hasOptions && <div className="absolute bottom-1 right-1 bg-brand-info text-white rounded-full p-0.5"><Layers className="w-3 h-3" /></div>}
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-medium line-clamp-1">{p.name}</p>
-                    <p className="text-sm font-bold text-odoo-primary">{formatPrice(p.price)}</p>
-                    <p className="text-xs text-odoo-muted">Stock: {p.stock}{hasOptions && ' · options'}</p>
+                    <p className="text-sm font-bold text-brand-primary">{formatPrice(p.price)}</p>
+                    <p className="text-xs text-brand-muted">Stock: {p.stock}{hasOptions && ' · options'}</p>
                   </div>
                 </button>
               );
             })}
-            {filtered.length === 0 && <div className="col-span-full text-center py-16 text-odoo-muted text-sm">Aucun produit</div>}
+            {filtered.length === 0 && <div className="col-span-full text-center py-16 text-brand-muted text-sm">Aucun produit</div>}
           </div>
         </div>
 
         {/* ── Cart panel ── */}
         <div className="lg:col-span-2 card flex flex-col">
-          <div className="p-4 bg-odoo-primary/5 border-b border-odoo-border flex items-center justify-between">
-            <h2 className="font-semibold flex items-center gap-2 text-odoo-dark">
-              <Receipt className="w-4 h-4 text-odoo-primary" />Ticket de caisse
+          <div className="p-4 bg-brand-primary/5 border-b border-brand-border flex items-center justify-between">
+            <h2 className="font-semibold flex items-center gap-2 text-brand-dark">
+              <Receipt className="w-4 h-4 text-brand-primary" />Ticket de caisse
             </h2>
             {cart.length > 0 && (
-              <button onClick={() => setCart([])} className="text-xs text-odoo-muted hover:text-odoo-danger transition">Effacer</button>
+              <button onClick={() => setCart([])} className="text-xs text-brand-muted hover:text-brand-danger transition">Effacer</button>
             )}
           </div>
 
           <div className="flex-1 overflow-auto">
             {cart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full py-12 text-odoo-muted text-sm">
+              <div className="flex flex-col items-center justify-center h-full py-12 text-brand-muted text-sm">
                 <ScanBarcode className="w-10 h-10 mb-3 opacity-30" />
                 Aucun article — cliquez sur un produit
               </div>
             ) : (
-              <div className="divide-y divide-odoo-border">
+              <div className="divide-y divide-brand-border">
                 {cart.map((it) => {
                   const key = it.cartKey ?? it.product.id;
                   const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
@@ -267,28 +267,28 @@ export function AdminPOS() {
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{it.product.name}</p>
                           {it.optionLabel && (
-                            <span className="inline-flex items-center gap-1 text-xs text-odoo-info bg-odoo-info/8 px-1.5 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-xs text-brand-info bg-brand-info/8 px-1.5 py-0.5 rounded">
                               <Layers className="w-2.5 h-2.5" />{it.optionLabel}
                             </span>
                           )}
-                          {isBulk && <span className="badge bg-odoo-success/10 text-odoo-success text-xs ml-1"><Tag className="w-2.5 h-2.5 mr-0.5" />Lot</span>}
+                          {isBulk && <span className="badge bg-brand-success/10 text-brand-success text-xs ml-1"><Tag className="w-2.5 h-2.5 mr-0.5" />Lot</span>}
                         </div>
                         <button onClick={() => setCart((prev) => prev.filter((i) => (i.cartKey ?? i.product.id) !== key))}
-                          className="text-odoo-muted hover:text-odoo-danger transition flex-shrink-0 ml-2">
+                          className="text-brand-muted hover:text-brand-danger transition flex-shrink-0 ml-2">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center border border-odoo-border rounded overflow-hidden">
-                          <button onClick={() => updateQty(key, -1)} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted"><Minus className="w-3 h-3" /></button>
+                        <div className="flex items-center border border-brand-border rounded overflow-hidden">
+                          <button onClick={() => updateQty(key, -1)} className="px-2 py-1 hover:bg-brand-surface transition text-brand-muted"><Minus className="w-3 h-3" /></button>
                           <input type="number" value={it.quantity} onChange={(e) => setQty(key, parseInt(e.target.value) || 0)}
-                            className="w-10 text-center text-sm font-medium border-x border-odoo-border py-1 focus:outline-none" />
-                          <button onClick={() => updateQty(key, 1)} disabled={it.quantity >= it.product.stock} className="px-2 py-1 hover:bg-odoo-surface transition text-odoo-muted disabled:opacity-40"><Plus className="w-3 h-3" /></button>
+                            className="w-10 text-center text-sm font-medium border-x border-brand-border py-1 focus:outline-none" />
+                          <button onClick={() => updateQty(key, 1)} disabled={it.quantity >= it.product.stock} className="px-2 py-1 hover:bg-brand-surface transition text-brand-muted disabled:opacity-40"><Plus className="w-3 h-3" /></button>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-odoo-primary text-sm">{formatPrice(price * it.quantity)}</p>
+                          <p className="font-bold text-brand-primary text-sm">{formatPrice(price * it.quantity)}</p>
                           {(isBulk || (it.priceModifier ?? 0) !== 0) && (
-                            <p className="text-xs text-odoo-muted line-through">{formatPrice(it.product.price * it.quantity)}</p>
+                            <p className="text-xs text-brand-muted line-through">{formatPrice(it.product.price * it.quantity)}</p>
                           )}
                         </div>
                       </div>
@@ -299,7 +299,7 @@ export function AdminPOS() {
             )}
           </div>
 
-          <div className="border-t border-odoo-border p-4 space-y-3 bg-white">
+          <div className="border-t border-brand-border p-4 space-y-3 bg-white">
             <div className="grid grid-cols-2 gap-2">
               <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Nom client" className="input text-sm" />
               <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Téléphone" className="input text-sm" type="tel" />
@@ -308,21 +308,21 @@ export function AdminPOS() {
             <div className="grid grid-cols-2 gap-1.5">
               {(['cash', 'mobile_money_mtn', 'mobile_money_moov', 'mobile_money_celtis', 'bank_transfer', 'cash_on_delivery'] as PaymentMethod[]).map((m) => (
                 <button key={m} onClick={() => setPayment(m)}
-                  className={`py-2 border rounded text-xs font-medium transition ${payment === m ? 'bg-odoo-primary border-odoo-primary text-white' : 'border-odoo-border hover:border-odoo-primary bg-white'}`}>
+                  className={`py-2 border rounded text-xs font-medium transition ${payment === m ? 'bg-brand-primary border-brand-primary text-white' : 'border-brand-border hover:border-brand-primary bg-white'}`}>
                   {PAYMENT_LABELS[m]}
                 </button>
               ))}
             </div>
 
-            <div className="pt-1 border-t border-odoo-border space-y-1">
+            <div className="pt-1 border-t border-brand-border space-y-1">
               {hasBulkItems && discount > 0 && (
-                <div className="flex justify-between text-sm text-odoo-success">
+                <div className="flex justify-between text-sm text-brand-success">
                   <span>Remise de gros</span><span>-{formatPrice(discount)}</span>
                 </div>
               )}
               <div className="flex justify-between items-baseline">
                 <span className="font-bold text-base">TOTAL</span>
-                <span className="text-2xl font-bold text-odoo-primary">{formatPrice(subtotal)}</span>
+                <span className="text-2xl font-bold text-brand-primary">{formatPrice(subtotal)}</span>
               </div>
             </div>
 
@@ -376,35 +376,35 @@ function OptionPickerModal({ product, groups, onConfirm, onClose }: {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white w-full sm:max-w-md sm:rounded-xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between p-4 border-b border-odoo-border">
+        <div className="flex items-start justify-between p-4 border-b border-brand-border">
           <div className="flex-1 min-w-0 mr-3">
-            <p className="text-xs text-odoo-muted uppercase tracking-wide font-medium mb-0.5">Choisir les options</p>
+            <p className="text-xs text-brand-muted uppercase tracking-wide font-medium mb-0.5">Choisir les options</p>
             <p className="font-semibold truncate">{product.name}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-odoo-surface rounded-lg flex-shrink-0"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-brand-surface rounded-lg flex-shrink-0"><X className="w-4 h-4" /></button>
         </div>
 
         {/* Option groups */}
         <div className="flex-1 overflow-auto p-4 space-y-5">
           {groups.map((group) => (
             <div key={group.id}>
-              <p className="text-sm font-semibold mb-2 text-odoo-dark">{group.name}</p>
+              <p className="text-sm font-semibold mb-2 text-brand-dark">{group.name}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {((group.product_options as ProductOption[]) ?? []).map((opt) => {
                   const isSelected = selected[group.id]?.id === opt.id;
                   const adjusted = product.price + opt.price_modifier;
                   return (
                     <button key={opt.id} onClick={() => setSelected((prev) => ({ ...prev, [group.id]: opt }))}
-                      className={`border rounded-xl p-2.5 text-left transition-all ${isSelected ? 'border-odoo-primary bg-odoo-primary/5 ring-1 ring-odoo-primary' : 'border-odoo-border hover:border-odoo-primary/50'}`}>
+                      className={`border rounded-xl p-2.5 text-left transition-all ${isSelected ? 'border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary' : 'border-brand-border hover:border-brand-primary/50'}`}>
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="text-sm font-medium">{opt.label}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-odoo-primary flex-shrink-0" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-brand-primary flex-shrink-0" />}
                       </div>
-                      <p className={`text-xs font-semibold ${isSelected ? 'text-odoo-primary' : 'text-odoo-muted'}`}>
+                      <p className={`text-xs font-semibold ${isSelected ? 'text-brand-primary' : 'text-brand-muted'}`}>
                         {formatPrice(Math.max(0, adjusted))}
                       </p>
                       {opt.price_modifier !== 0 && (
-                        <p className="text-xs text-odoo-muted">
+                        <p className="text-xs text-brand-muted">
                           {opt.price_modifier > 0 ? '+' : ''}{formatPrice(opt.price_modifier)}
                         </p>
                       )}
@@ -417,13 +417,13 @@ function OptionPickerModal({ product, groups, onConfirm, onClose }: {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-odoo-border bg-odoo-surface/50">
+        <div className="p-4 border-t border-brand-border bg-brand-surface/50">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-odoo-muted">Prix total</span>
-            <span className="text-xl font-bold text-odoo-primary">{formatPrice(finalPrice)}</span>
+            <span className="text-sm text-brand-muted">Prix total</span>
+            <span className="text-xl font-bold text-brand-primary">{formatPrice(finalPrice)}</span>
           </div>
           {!allGroupsSelected && (
-            <p className="text-xs text-odoo-warning mb-2">Veuillez sélectionner une option pour chaque groupe.</p>
+            <p className="text-xs text-brand-warning mb-2">Veuillez sélectionner une option pour chaque groupe.</p>
           )}
           <button onClick={confirm} disabled={!allGroupsSelected}
             className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed">
@@ -484,12 +484,12 @@ function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative bg-white rounded-xl w-full max-w-sm shadow-2xl overflow-hidden">
-        <div className="bg-odoo-success/10 p-6 text-center border-b border-dashed border-odoo-border">
-          <CheckCircle2 className="w-14 h-14 text-odoo-success mx-auto mb-3" />
-          <p className="text-odoo-muted text-sm">Vente enregistrée avec succès</p>
-          <p className="font-mono font-semibold text-lg mt-1 text-odoo-dark">{receipt.orderNumber}</p>
-          <p className="text-3xl font-bold text-odoo-primary mt-1">{formatPrice(receipt.total)}</p>
-          <p className="text-sm text-odoo-muted mt-1">{PAYMENT_LABELS[receipt.payment]} — {receipt.customerName}</p>
+        <div className="bg-brand-success/10 p-6 text-center border-b border-dashed border-brand-border">
+          <CheckCircle2 className="w-14 h-14 text-brand-success mx-auto mb-3" />
+          <p className="text-brand-muted text-sm">Vente enregistrée avec succès</p>
+          <p className="font-mono font-semibold text-lg mt-1 text-brand-dark">{receipt.orderNumber}</p>
+          <p className="text-3xl font-bold text-brand-primary mt-1">{formatPrice(receipt.total)}</p>
+          <p className="text-sm text-brand-muted mt-1">{PAYMENT_LABELS[receipt.payment]} — {receipt.customerName}</p>
         </div>
         <div className="p-4 max-h-52 overflow-auto text-sm">
           {receipt.items.map((it) => {
@@ -497,18 +497,18 @@ function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () 
             const price = getEffectivePrice(it.product, it.quantity, it.priceModifier ?? 0);
             const isBulk = it.product.bulk_quantity > 0 && it.quantity >= it.product.bulk_quantity && it.product.bulk_price > 0;
             return (
-              <div key={key} className="flex justify-between py-1.5 border-b border-odoo-border last:border-0 gap-2">
+              <div key={key} className="flex justify-between py-1.5 border-b border-brand-border last:border-0 gap-2">
                 <div className="min-w-0">
                   <span className="font-medium">{it.quantity}× {it.product.name}</span>
-                  {it.optionLabel && <p className="text-xs text-odoo-muted">{it.optionLabel}</p>}
-                  {isBulk && <span className="ml-1 text-xs text-odoo-success">(-{Math.round((1 - it.product.bulk_price / it.product.price) * 100)}%)</span>}
+                  {it.optionLabel && <p className="text-xs text-brand-muted">{it.optionLabel}</p>}
+                  {isBulk && <span className="ml-1 text-xs text-brand-success">(-{Math.round((1 - it.product.bulk_price / it.product.price) * 100)}%)</span>}
                 </div>
                 <span className="font-semibold flex-shrink-0">{formatPrice(price * it.quantity)}</span>
               </div>
             );
           })}
         </div>
-        <div className="p-4 border-t border-odoo-border grid grid-cols-2 gap-2">
+        <div className="p-4 border-t border-brand-border grid grid-cols-2 gap-2">
           <button onClick={printReceipt} className="btn-secondary gap-1.5 text-sm">
             <Printer className="w-4 h-4" />Imprimer
           </button>

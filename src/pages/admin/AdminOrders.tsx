@@ -32,17 +32,17 @@ export function AdminOrders() {
     return true;
   });
 
-  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>;
+  if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
       <div className="mb-4">
         <h1 className="text-2xl font-bold">Commandes</h1>
-        <p className="text-sm text-odoo-muted">{orders.length} commandes</p>
+        <p className="text-sm text-brand-muted">{orders.length} commandes</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-odoo-muted" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher numéro, client, téléphone..." className="input pl-9" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'all')} className="input sm:w-52">
@@ -53,7 +53,7 @@ export function AdminOrders() {
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-odoo-surface text-left text-xs font-medium text-odoo-muted uppercase">
+            <thead className="bg-brand-surface text-left text-xs font-medium text-brand-muted uppercase">
               <tr>
                 <th className="p-3">N° / Date</th>
                 <th className="p-3 hidden md:table-cell">Client</th>
@@ -63,13 +63,13 @@ export function AdminOrders() {
                 <th className="p-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-odoo-border">
+            <tbody className="divide-y divide-brand-border">
               {filtered.map((o) => (
-                <tr key={o.id} className="hover:bg-odoo-surface/50">
-                  <td className="p-3"><p className="font-mono font-medium">{o.order_number}</p><p className="text-xs text-odoo-muted">{formatDate(o.created_at)}</p></td>
-                  <td className="p-3 hidden md:table-cell"><p className="font-medium">{o.customer_name || '—'}</p><p className="text-xs text-odoo-muted">{o.customer_phone}</p></td>
+                <tr key={o.id} className="hover:bg-brand-surface/50">
+                  <td className="p-3"><p className="font-mono font-medium">{o.order_number}</p><p className="text-xs text-brand-muted">{formatDate(o.created_at)}</p></td>
+                  <td className="p-3 hidden md:table-cell"><p className="font-medium">{o.customer_name || '—'}</p><p className="text-xs text-brand-muted">{o.customer_phone}</p></td>
                   <td className="p-3 hidden lg:table-cell">
-                    <span className={`badge ${o.source === 'pos' ? 'bg-odoo-info/15 text-odoo-info' : 'bg-odoo-primary/10 text-odoo-primary'}`}>{o.source === 'pos' ? 'POS' : 'En ligne'}</span>
+                    <span className={`badge ${o.source === 'pos' ? 'bg-brand-info/15 text-brand-info' : 'bg-brand-primary/10 text-brand-primary'}`}>{o.source === 'pos' ? 'POS' : 'En ligne'}</span>
                   </td>
                   <td className="p-3 text-right font-bold">{formatPrice(o.total)}</td>
                   <td className="p-3"><StatusBadge status={o.status} /></td>
@@ -78,7 +78,7 @@ export function AdminOrders() {
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && <p className="p-8 text-center text-odoo-muted">Aucune commande</p>}
+          {filtered.length === 0 && <p className="p-8 text-center text-brand-muted">Aucune commande</p>}
         </div>
       </div>
       {selected && <OrderDrawer order={selected} onClose={() => setSelected(null)} onUpdated={() => { load(); setSelected(null); }} />}
@@ -109,31 +109,31 @@ function OrderDrawer({ order, onClose, onUpdated }: { order: Order; onClose: () 
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white w-full max-w-md h-full overflow-auto shadow-xl">
-        <div className="sticky top-0 bg-white border-b border-odoo-border p-4 flex items-center justify-between">
-          <div><p className="text-xs text-odoo-muted">Commande</p><h2 className="font-bold font-mono">{order.order_number}</h2></div>
-          <button onClick={onClose} className="p-1 hover:bg-odoo-surface rounded"><X className="w-5 h-5" /></button>
+        <div className="sticky top-0 bg-white border-b border-brand-border p-4 flex items-center justify-between">
+          <div><p className="text-xs text-brand-muted">Commande</p><h2 className="font-bold font-mono">{order.order_number}</h2></div>
+          <button onClick={onClose} className="p-1 hover:bg-brand-surface rounded"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-4 space-y-4">
           <div>
             <h3 className="text-sm font-semibold mb-2">Client</h3>
-            <div className="bg-odoo-surface p-3 rounded text-sm">
+            <div className="bg-brand-surface p-3 rounded text-sm">
               <p className="font-medium">{order.customer_name || '—'}</p>
-              <p className="text-odoo-muted">{order.customer_phone || '—'}</p>
-              {order.delivery_address && <p className="mt-2 text-odoo-muted">{order.delivery_address}</p>}
+              <p className="text-brand-muted">{order.customer_phone || '—'}</p>
+              {order.delivery_address && <p className="mt-2 text-brand-muted">{order.delivery_address}</p>}
             </div>
           </div>
           <div>
             <h3 className="text-sm font-semibold mb-2">Articles</h3>
-            <div className="border border-odoo-border rounded divide-y divide-odoo-border">
+            <div className="border border-brand-border rounded divide-y divide-brand-border">
               {items.map((it) => (
                 <div key={it.id} className="p-3 flex justify-between text-sm">
-                  <div><p className="font-medium">{it.product_name}</p><p className="text-xs text-odoo-muted">{it.quantity} × {formatPrice(it.unit_price)}</p></div>
+                  <div><p className="font-medium">{it.product_name}</p><p className="text-xs text-brand-muted">{it.quantity} × {formatPrice(it.unit_price)}</p></div>
                   <span className="font-semibold">{formatPrice(it.subtotal)}</span>
                 </div>
               ))}
-              <div className="p-3 bg-odoo-surface flex justify-between items-baseline">
+              <div className="p-3 bg-brand-surface flex justify-between items-baseline">
                 <span className="font-medium">Total</span>
-                <span className="text-lg font-bold text-odoo-primary">{formatPrice(order.total)}</span>
+                <span className="text-lg font-bold text-brand-primary">{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>
@@ -147,8 +147,8 @@ function OrderDrawer({ order, onClose, onUpdated }: { order: Order; onClose: () 
             <label className="block text-sm font-semibold mb-1 flex items-center gap-1.5"><Truck className="w-4 h-4" />Livreur assigné</label>
             <input value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="Nom du livreur" className="input" />
           </div>
-          {order.notes && <div><h3 className="text-sm font-semibold mb-1">Notes</h3><p className="text-sm text-odoo-muted bg-odoo-surface p-3 rounded">{order.notes}</p></div>}
-          <div className="flex flex-col gap-2 pt-2 border-t border-odoo-border">
+          {order.notes && <div><h3 className="text-sm font-semibold mb-1">Notes</h3><p className="text-sm text-brand-muted bg-brand-surface p-3 rounded">{order.notes}</p></div>}
+          <div className="flex flex-col gap-2 pt-2 border-t border-brand-border">
             <button onClick={save} disabled={saving} className="btn-primary w-full">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}</button>
             {order.customer_phone && (
               <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer" className="btn-secondary w-full">

@@ -30,8 +30,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-odoo-surface">
-        <Loader2 className="w-8 h-8 text-odoo-primary animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-brand-surface">
+        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
       </div>
     );
   }
@@ -43,9 +43,9 @@ function App() {
     return (
       <AppShell view={view} setView={setView}>
         <div className="max-w-md mx-auto px-4 py-16 text-center">
-          <ShieldAlert className="w-12 h-12 text-odoo-warning mx-auto mb-3" />
+          <ShieldAlert className="w-12 h-12 text-brand-warning mx-auto mb-3" />
           <h1 className="text-xl font-semibold mb-2">Accès restreint</h1>
-          <p className="text-odoo-muted mb-4">Vous n'avez pas les droits pour accéder à cette section.</p>
+          <p className="text-brand-muted mb-4">Vous n'avez pas les droits pour accéder à cette section.</p>
           <button onClick={() => setView({ kind: 'admin-setup' })} className="btn-primary">
             Activer l'accès admin
           </button>
@@ -60,9 +60,9 @@ function App() {
       return (
         <AppShell view={view} setView={setView}>
           <div className="max-w-md mx-auto px-4 py-16 text-center">
-            <ShieldAlert className="w-12 h-12 text-odoo-danger mx-auto mb-3" />
+            <ShieldAlert className="w-12 h-12 text-brand-danger mx-auto mb-3" />
             <h1 className="text-xl font-semibold mb-2">Module non autorisé</h1>
-            <p className="text-odoo-muted mb-4">Votre section ne vous donne pas accès à ce module.</p>
+            <p className="text-brand-muted mb-4">Votre section ne vous donne pas accès à ce module.</p>
             <button onClick={() => setView({ kind: 'admin-dashboard' })} className="btn-primary">
               Retour au dashboard
             </button>

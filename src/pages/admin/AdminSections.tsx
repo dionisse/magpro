@@ -168,9 +168,9 @@ export function AdminSections() {
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-odoo-primary" />Sections & Accès
+            <ShieldCheck className="w-6 h-6 text-brand-primary" />Sections & Accès
           </h1>
-          <p className="text-sm text-odoo-muted mt-1">Gérez les profils d'accès et créez des comptes pour vos collaborateurs</p>
+          <p className="text-sm text-brand-muted mt-1">Gérez les profils d'accès et créez des comptes pour vos collaborateurs</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm"><RefreshCw className="w-3.5 h-3.5" />Actualiser</button>
@@ -181,13 +181,13 @@ export function AdminSections() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Sections', value: sections.length, color: 'text-odoo-primary' },
+          { label: 'Sections', value: sections.length, color: 'text-brand-primary' },
           { label: 'Membres assignés', value: allProfiles.filter((p) => p.section_id).length, color: '' },
-          { label: 'Non assignés', value: unassigned.length, color: 'text-odoo-warning' },
+          { label: 'Non assignés', value: unassigned.length, color: 'text-brand-warning' },
           { label: 'Modules', value: ALL_MODULES.length, color: '' },
         ].map((s) => (
           <div key={s.label} className="card p-4">
-            <p className="text-xs text-odoo-muted mb-1">{s.label}</p>
+            <p className="text-xs text-brand-muted mb-1">{s.label}</p>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
           </div>
         ))}
@@ -196,12 +196,12 @@ export function AdminSections() {
       {/* Section form */}
       {showForm && (
         <div className="card mb-6 border-l-4 overflow-hidden" style={{ borderLeftColor: formColor }}>
-          <div className="p-4 border-b border-odoo-border bg-odoo-surface flex items-center justify-between">
+          <div className="p-4 border-b border-brand-border bg-brand-surface flex items-center justify-between">
             <h2 className="font-semibold flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-odoo-primary" />
+              <ShieldCheck className="w-4 h-4 text-brand-primary" />
               {editingSection ? 'Modifier la section' : 'Nouvelle section'}
             </h2>
-            <button onClick={() => setShowForm(false)} className="text-odoo-muted hover:text-odoo-dark"><X className="w-5 h-5" /></button>
+            <button onClick={() => setShowForm(false)} className="text-brand-muted hover:text-brand-dark"><X className="w-5 h-5" /></button>
           </div>
           <div className="p-5">
             <div className="grid sm:grid-cols-2 gap-4 mb-5">
@@ -219,7 +219,7 @@ export function AdminSections() {
               <div className="flex gap-2 flex-wrap">
                 {COLORS.map((c) => (
                   <button key={c} type="button" onClick={() => setFormColor(c)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${formColor === c ? 'border-odoo-dark scale-110' : 'border-transparent'}`}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${formColor === c ? 'border-brand-dark scale-110' : 'border-transparent'}`}
                     style={{ backgroundColor: c }} />
                 ))}
               </div>
@@ -227,7 +227,7 @@ export function AdminSections() {
             <div className="mb-5">
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-xs font-medium">Modules autorisés</label>
-                <span className="text-xs text-odoo-muted">{formModules.size} sélectionné(s)</span>
+                <span className="text-xs text-brand-muted">{formModules.size} sélectionné(s)</span>
               </div>
               <div className="space-y-3">
                 {MODULE_GROUPS.map((group) => {
@@ -235,24 +235,24 @@ export function AdminSections() {
                   const allSel = gm.every((m) => formModules.has(m.key));
                   const someSel = gm.some((m) => formModules.has(m.key));
                   return (
-                    <div key={group} className="border border-odoo-border rounded-xl overflow-hidden">
+                    <div key={group} className="border border-brand-border rounded-xl overflow-hidden">
                       <button type="button" onClick={() => toggleGroup(group)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition ${allSel ? 'bg-odoo-primary/8 text-odoo-primary' : someSel ? 'bg-odoo-warning/5' : 'bg-odoo-surface'}`}>
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition ${allSel ? 'bg-brand-primary/8 text-brand-primary' : someSel ? 'bg-brand-warning/5' : 'bg-brand-surface'}`}>
                         <span>{group}</span>
                         <div className="flex items-center gap-2">
-                          {allSel && <span className="text-xs bg-odoo-primary text-white px-2 py-0.5 rounded-full">Tout</span>}
-                          {someSel && !allSel && <span className="text-xs bg-odoo-warning/20 text-odoo-warning px-2 py-0.5 rounded-full">Partiel</span>}
+                          {allSel && <span className="text-xs bg-brand-primary text-white px-2 py-0.5 rounded-full">Tout</span>}
+                          {someSel && !allSel && <span className="text-xs bg-brand-warning/20 text-brand-warning px-2 py-0.5 rounded-full">Partiel</span>}
                         </div>
                       </button>
-                      <div className="grid sm:grid-cols-2 border-t border-odoo-border">
+                      <div className="grid sm:grid-cols-2 border-t border-brand-border">
                         {gm.map((mod) => (
                           <button key={mod.key} type="button" onClick={() => toggleModule(mod.key)}
-                            className={`flex items-center gap-3 px-4 py-3 text-sm text-left transition ${formModules.has(mod.key) ? 'bg-odoo-primary/5' : 'hover:bg-odoo-surface'}`}>
-                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition ${formModules.has(mod.key) ? 'bg-odoo-primary border-odoo-primary' : 'border-odoo-border'}`}>
+                            className={`flex items-center gap-3 px-4 py-3 text-sm text-left transition ${formModules.has(mod.key) ? 'bg-brand-primary/5' : 'hover:bg-brand-surface'}`}>
+                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition ${formModules.has(mod.key) ? 'bg-brand-primary border-brand-primary' : 'border-brand-border'}`}>
                               {formModules.has(mod.key) && <Check className="w-3 h-3 text-white" />}
                             </div>
-                            <span className="text-odoo-muted">{mod.icon}</span>
-                            <span className={`font-medium ${formModules.has(mod.key) ? 'text-odoo-primary' : ''}`}>{mod.label}</span>
+                            <span className="text-brand-muted">{mod.icon}</span>
+                            <span className={`font-medium ${formModules.has(mod.key) ? 'text-brand-primary' : ''}`}>{mod.label}</span>
                           </button>
                         ))}
                       </div>
@@ -262,7 +262,7 @@ export function AdminSections() {
               </div>
             </div>
             {formError && (
-              <div className="flex items-center gap-2 text-odoo-danger text-sm bg-odoo-danger/5 border border-odoo-danger/20 rounded-lg px-3 py-2 mb-3">
+              <div className="flex items-center gap-2 text-brand-danger text-sm bg-brand-danger/5 border border-brand-danger/20 rounded-lg px-3 py-2 mb-3">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />{formError}
               </div>
             )}
@@ -279,12 +279,12 @@ export function AdminSections() {
 
       {/* Search */}
       <div className="relative max-w-xs mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-odoo-muted pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted pointer-events-none" />
         <input className="input pl-9 text-sm" placeholder="Rechercher une section…" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>
       ) : (
         <div className="space-y-4">
           {filtered.map((section) => {
@@ -306,17 +306,17 @@ export function AdminSections() {
                     <div className="min-w-0">
                       <h3 className="font-semibold flex items-center gap-2 flex-wrap">
                         {section.name}
-                        <span className="text-xs text-odoo-muted font-normal bg-odoo-surface px-2 py-0.5 rounded-full border border-odoo-border">
+                        <span className="text-xs text-brand-muted font-normal bg-brand-surface px-2 py-0.5 rounded-full border border-brand-border">
                           {members.length} membre{members.length !== 1 ? 's' : ''}
                         </span>
                       </h3>
-                      {section.description && <p className="text-xs text-odoo-muted mt-0.5">{section.description}</p>}
+                      {section.description && <p className="text-xs text-brand-muted mt-0.5">{section.description}</p>}
                       <div className="flex flex-wrap gap-1 mt-2">
                         {perms.length === 0 ? (
-                          <span className="badge bg-odoo-danger/10 text-odoo-danger text-xs">Aucun accès</span>
+                          <span className="badge bg-brand-danger/10 text-brand-danger text-xs">Aucun accès</span>
                         ) : (
                           ALL_MODULES.filter((m) => perms.includes(m.key)).map((m) => (
-                            <span key={m.key} className="inline-flex items-center gap-1 badge bg-odoo-surface text-odoo-muted text-xs border border-odoo-border">
+                            <span key={m.key} className="inline-flex items-center gap-1 badge bg-brand-surface text-brand-muted text-xs border border-brand-border">
                               {m.icon}<span>{m.label}</span>
                             </span>
                           ))
@@ -327,29 +327,29 @@ export function AdminSections() {
 
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => openEdit(section)} title="Modifier"
-                      className="p-1.5 text-odoo-muted hover:text-odoo-primary hover:bg-odoo-primary/10 rounded-md transition">
+                      className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition">
                       <Edit2 className="w-4 h-4" />
                     </button>
                     {/* Create user in this section */}
                     <button
                       onClick={() => { setCreatingUserSection(isCreating ? null : section); setAssigningSection(null); }}
                       title="Créer un compte"
-                      className={`p-1.5 rounded-md transition ${isCreating ? 'bg-odoo-success/10 text-odoo-success' : 'text-odoo-muted hover:text-odoo-success hover:bg-odoo-success/10'}`}>
+                      className={`p-1.5 rounded-md transition ${isCreating ? 'bg-brand-success/10 text-brand-success' : 'text-brand-muted hover:text-brand-success hover:bg-brand-success/10'}`}>
                       <UserPlus className="w-4 h-4" />
                     </button>
                     {/* Assign existing user */}
                     <button
                       onClick={() => { setAssigningSection(isAssigning ? null : section); setCreatingUserSection(null); }}
                       title="Assigner un membre existant"
-                      className={`p-1.5 rounded-md transition ${isAssigning ? 'bg-odoo-info/10 text-odoo-info' : 'text-odoo-muted hover:text-odoo-info hover:bg-odoo-info/10'}`}>
+                      className={`p-1.5 rounded-md transition ${isAssigning ? 'bg-brand-info/10 text-brand-info' : 'text-brand-muted hover:text-brand-info hover:bg-brand-info/10'}`}>
                       <UserCog className="w-4 h-4" />
                     </button>
                     <button onClick={() => deleteSection(section.id)} title="Supprimer"
-                      className="p-1.5 text-odoo-muted hover:text-odoo-danger hover:bg-odoo-danger/10 rounded-md transition">
+                      className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded-md transition">
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <button onClick={() => setExpandedId(isExpanded ? null : section.id)}
-                      className="p-1.5 text-odoo-muted hover:text-odoo-primary hover:bg-odoo-surface rounded-md transition">
+                      className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-surface rounded-md transition">
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>
@@ -357,14 +357,14 @@ export function AdminSections() {
 
                 {/* Member list */}
                 {isExpanded && (
-                  <div className="border-t border-odoo-border bg-odoo-surface/50 px-4 py-3">
-                    <p className="text-xs font-semibold text-odoo-muted uppercase mb-2 tracking-wide">Membres ({members.length})</p>
+                  <div className="border-t border-brand-border bg-brand-surface/50 px-4 py-3">
+                    <p className="text-xs font-semibold text-brand-muted uppercase mb-2 tracking-wide">Membres ({members.length})</p>
                     {members.length === 0 ? (
-                      <p className="text-sm text-odoo-muted italic">Aucun membre — créez ou assignez des comptes</p>
+                      <p className="text-sm text-brand-muted italic">Aucun membre — créez ou assignez des comptes</p>
                     ) : (
                       <div className="space-y-1.5">
                         {members.map((m) => (
-                          <div key={m.id} className="flex items-center justify-between bg-white border border-odoo-border rounded-lg px-3 py-2 gap-2">
+                          <div key={m.id} className="flex items-center justify-between bg-white border border-brand-border rounded-lg px-3 py-2 gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                                 style={{ backgroundColor: section.color || COLORS[0] }}>
@@ -373,14 +373,14 @@ export function AdminSections() {
                               <div className="min-w-0">
                                 <p className="font-medium text-sm">{m.full_name}</p>
                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                  {m.employee_number && <span className="text-xs text-odoo-muted">#{m.employee_number}</span>}
-                                  <span className={`badge text-xs ${m.role === 'cashier' ? 'bg-odoo-info/15 text-odoo-info' : m.role === 'employee' ? 'bg-odoo-success/15 text-odoo-success' : 'bg-odoo-muted/15 text-odoo-muted'}`}>
+                                  {m.employee_number && <span className="text-xs text-brand-muted">#{m.employee_number}</span>}
+                                  <span className={`badge text-xs ${m.role === 'cashier' ? 'bg-brand-info/15 text-brand-info' : m.role === 'employee' ? 'bg-brand-success/15 text-brand-success' : 'bg-brand-muted/15 text-brand-muted'}`}>
                                     {m.role}
                                   </span>
                                 </div>
                               </div>
                             </div>
-                            <button onClick={() => removeMember(m.id)} className="text-xs text-odoo-danger hover:underline flex-shrink-0">Retirer</button>
+                            <button onClick={() => removeMember(m.id)} className="text-xs text-brand-danger hover:underline flex-shrink-0">Retirer</button>
                           </div>
                         ))}
                       </div>
@@ -413,9 +413,9 @@ export function AdminSections() {
 
           {filtered.length === 0 && (
             <div className="card p-12 text-center">
-              <ShieldCheck className="w-10 h-10 text-odoo-muted mx-auto mb-3" />
+              <ShieldCheck className="w-10 h-10 text-brand-muted mx-auto mb-3" />
               <p className="font-medium">Aucune section créée</p>
-              <p className="text-sm text-odoo-muted mt-1">Créez une section pour définir les accès d'un groupe d'utilisateurs</p>
+              <p className="text-sm text-brand-muted mt-1">Créez une section pour définir les accès d'un groupe d'utilisateurs</p>
               <button onClick={openCreate} className="btn-primary mt-4"><Plus className="w-4 h-4" />Créer une section</button>
             </div>
           )}
@@ -424,12 +424,12 @@ export function AdminSections() {
 
       {/* Unassigned staff */}
       {unassigned.length > 0 && (
-        <div className="mt-6 card overflow-hidden border-l-4 border-l-odoo-warning">
-          <div className="p-4 bg-odoo-warning/5 border-b border-odoo-border">
-            <p className="font-semibold flex items-center gap-2 text-odoo-warning">
+        <div className="mt-6 card overflow-hidden border-l-4 border-l-brand-warning">
+          <div className="p-4 bg-brand-warning/5 border-b border-brand-border">
+            <p className="font-semibold flex items-center gap-2 text-brand-warning">
               <AlertTriangle className="w-4 h-4" />Utilisateurs sans section ({unassigned.length})
             </p>
-            <p className="text-xs text-odoo-muted mt-0.5">Ces utilisateurs n'ont accès à aucun module admin.</p>
+            <p className="text-xs text-brand-muted mt-0.5">Ces utilisateurs n'ont accès à aucun module admin.</p>
           </div>
           <div className="p-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {unassigned.map((p) => (
@@ -499,13 +499,13 @@ function CreateUserPanel({ section, onCreated, onClose }: {
   }
 
   return (
-    <div className="border-t border-odoo-border bg-odoo-surface/30 p-5">
+    <div className="border-t border-brand-border bg-brand-surface/30 p-5">
       <div className="flex items-center justify-between mb-4">
         <p className="font-semibold text-sm flex items-center gap-2">
-          <UserPlus className="w-4 h-4 text-odoo-success" />
+          <UserPlus className="w-4 h-4 text-brand-success" />
           Créer un compte — <span style={{ color: section.color }}>{section.name}</span>
         </p>
-        <button onClick={onClose} className="text-odoo-muted hover:text-odoo-dark"><X className="w-4 h-4" /></button>
+        <button onClick={onClose} className="text-brand-muted hover:text-brand-dark"><X className="w-4 h-4" /></button>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3 mb-3">
@@ -520,13 +520,13 @@ function CreateUserPanel({ section, onCreated, onClose }: {
         <div>
           <label className="block text-xs font-medium mb-1 flex items-center gap-1">
             Mot de passe *
-            <button type="button" onClick={() => setPassword(genPassword())} className="ml-1 text-odoo-primary text-xs hover:underline">Générer</button>
+            <button type="button" onClick={() => setPassword(genPassword())} className="ml-1 text-brand-primary text-xs hover:underline">Générer</button>
           </label>
           <div className="relative">
             <input className="input text-sm pr-9 font-mono" type={showPwd ? 'text' : 'password'}
               value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShowPwd((v) => !v)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-odoo-muted hover:text-odoo-dark">
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-dark">
               {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
@@ -542,7 +542,7 @@ function CreateUserPanel({ section, onCreated, onClose }: {
         <div className="flex gap-2">
           {(['employee', 'cashier'] as const).map((r) => (
             <button key={r} type="button" onClick={() => setRole(r)}
-              className={`flex-1 py-2 rounded-lg border text-sm font-medium transition ${role === r ? 'bg-odoo-primary border-odoo-primary text-white' : 'bg-white border-odoo-border hover:border-odoo-primary'}`}>
+              className={`flex-1 py-2 rounded-lg border text-sm font-medium transition ${role === r ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border hover:border-brand-primary'}`}>
               {r === 'employee' ? 'Employé' : 'Caissier'}
             </button>
           ))}
@@ -550,7 +550,7 @@ function CreateUserPanel({ section, onCreated, onClose }: {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-odoo-danger text-sm bg-odoo-danger/5 border border-odoo-danger/20 rounded-lg px-3 py-2 mb-3">
+        <div className="flex items-center gap-2 text-brand-danger text-sm bg-brand-danger/5 border border-brand-danger/20 rounded-lg px-3 py-2 mb-3">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />{error}
         </div>
       )}
@@ -581,7 +581,7 @@ function CredentialsModal({ creds, onClose }: { creds: CreatedCredentials; onClo
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-scale">
         {/* Header */}
-        <div className="bg-odoo-success p-5 text-white text-center">
+        <div className="bg-brand-success p-5 text-white text-center">
           <CheckCircle2 className="w-10 h-10 mx-auto mb-2" />
           <h2 className="text-lg font-bold">Compte créé avec succès !</h2>
           <p className="text-white/80 text-sm mt-1">Transmettez ces identifiants à <span className="font-semibold">{creds.full_name}</span></p>
@@ -589,18 +589,18 @@ function CredentialsModal({ creds, onClose }: { creds: CreatedCredentials; onClo
 
         {/* Credentials */}
         <div className="p-5 space-y-3">
-          <div className="bg-odoo-surface border border-odoo-border rounded-xl p-4 space-y-3">
+          <div className="bg-brand-surface border border-brand-border rounded-xl p-4 space-y-3">
             <CredField label="Email" value={creds.email} field="email" copiedField={copiedField} onCopy={copy}
-              icon={<Mail className="w-4 h-4 text-odoo-muted" />} />
-            <div className="border-t border-odoo-border pt-3">
+              icon={<Mail className="w-4 h-4 text-brand-muted" />} />
+            <div className="border-t border-brand-border pt-3">
               <CredField label="Mot de passe" value={creds.password} field="password" copiedField={copiedField} onCopy={copy}
-                icon={<KeyRound className="w-4 h-4 text-odoo-muted" />} mono />
+                icon={<KeyRound className="w-4 h-4 text-brand-muted" />} mono />
             </div>
           </div>
 
-          <div className="bg-odoo-warning/8 border border-odoo-warning/25 rounded-xl p-3 flex items-start gap-2.5">
-            <AlertTriangle className="w-4 h-4 text-odoo-warning mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-odoo-dark">
+          <div className="bg-brand-warning/8 border border-brand-warning/25 rounded-xl p-3 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-brand-warning mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-brand-dark">
               Notez et transmettez ce mot de passe maintenant. Il ne sera plus affiché après fermeture de cette fenêtre.
             </p>
           </div>
@@ -610,7 +610,7 @@ function CredentialsModal({ creds, onClose }: { creds: CreatedCredentials; onClo
               copy(`Email: ${creds.email}\nMot de passe: ${creds.password}`, 'all');
             }}
             className="btn-secondary w-full gap-2 text-sm">
-            {copiedField === 'all' ? <CheckCircle2 className="w-4 h-4 text-odoo-success" /> : <Copy className="w-4 h-4" />}
+            {copiedField === 'all' ? <CheckCircle2 className="w-4 h-4 text-brand-success" /> : <Copy className="w-4 h-4" />}
             {copiedField === 'all' ? 'Copié !' : 'Copier les deux identifiants'}
           </button>
 
@@ -630,12 +630,12 @@ function CredField({ label, value, field, copiedField, onCopy, icon, mono = fals
       <div className="flex items-center gap-2 min-w-0">
         {icon}
         <div className="min-w-0">
-          <p className="text-xs text-odoo-muted">{label}</p>
+          <p className="text-xs text-brand-muted">{label}</p>
           <p className={`text-sm font-semibold truncate ${mono ? 'font-mono' : ''}`}>{value}</p>
         </div>
       </div>
       <button onClick={() => onCopy(value, field)}
-        className={`p-1.5 rounded-md flex-shrink-0 transition ${copiedField === field ? 'text-odoo-success' : 'text-odoo-muted hover:text-odoo-primary hover:bg-odoo-surface'}`}>
+        className={`p-1.5 rounded-md flex-shrink-0 transition ${copiedField === field ? 'text-brand-success' : 'text-brand-muted hover:text-brand-primary hover:bg-brand-surface'}`}>
         {copiedField === field ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
       </button>
     </div>
@@ -658,40 +658,40 @@ function MemberAssignPanel({ section, allProfiles, onAssign, onRoleChange, onClo
   );
 
   return (
-    <div className="border-t border-odoo-border p-4">
+    <div className="border-t border-brand-border p-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold flex items-center gap-1.5">
-          <UserCog className="w-4 h-4 text-odoo-info" />Assigner un membre existant
+          <UserCog className="w-4 h-4 text-brand-info" />Assigner un membre existant
         </p>
-        <button onClick={onClose} className="text-odoo-muted hover:text-odoo-dark"><X className="w-4 h-4" /></button>
+        <button onClick={onClose} className="text-brand-muted hover:text-brand-dark"><X className="w-4 h-4" /></button>
       </div>
       <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-odoo-muted pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-brand-muted pointer-events-none" />
         <input className="input pl-8 text-xs py-1.5" placeholder="Rechercher…" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
       {available.length === 0 ? (
-        <p className="text-xs text-odoo-muted italic text-center py-3">Aucun utilisateur disponible</p>
+        <p className="text-xs text-brand-muted italic text-center py-3">Aucun utilisateur disponible</p>
       ) : (
         <div className="space-y-1.5 max-h-52 overflow-auto">
           {available.map((p) => (
-            <div key={p.id} className="flex items-center justify-between bg-odoo-surface border border-odoo-border rounded-lg px-3 py-2 gap-2">
+            <div key={p.id} className="flex items-center justify-between bg-brand-surface border border-brand-border rounded-lg px-3 py-2 gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-full bg-odoo-primary/15 text-odoo-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-brand-primary/15 text-brand-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
                   {p.full_name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">{p.full_name}</p>
-                  <span className={`badge text-xs ${p.role === 'cashier' ? 'bg-odoo-info/15 text-odoo-info' : 'bg-odoo-success/15 text-odoo-success'}`}>{p.role}</span>
+                  <span className={`badge text-xs ${p.role === 'cashier' ? 'bg-brand-info/15 text-brand-info' : 'bg-brand-success/15 text-brand-success'}`}>{p.role}</span>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <select className="text-xs border border-odoo-border rounded px-1.5 py-1 bg-white"
+                <select className="text-xs border border-brand-border rounded px-1.5 py-1 bg-white"
                   value={p.role} onChange={(e) => onRoleChange(p.id, e.target.value)}>
                   <option value="employee">Employé</option>
                   <option value="cashier">Caissier</option>
                 </select>
                 <button onClick={() => onAssign(p.id, section.id)}
-                  className="px-2 py-1 bg-odoo-primary text-white text-xs rounded-md hover:bg-odoo-primary-dark transition">
+                  className="px-2 py-1 bg-brand-primary text-white text-xs rounded-md hover:bg-brand-primary-dark transition">
                   Assigner
                 </button>
               </div>
@@ -711,19 +711,19 @@ function UnassignedUserRow({ profile, sections, onAssign, onRoleChange }: {
   onRoleChange: (profileId: string, role: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-2 bg-white border border-odoo-border rounded-lg px-3 py-2">
-      <div className="w-7 h-7 rounded-full bg-odoo-muted/20 flex items-center justify-center text-xs font-bold flex-shrink-0">
+    <div className="flex items-center gap-2 bg-white border border-brand-border rounded-lg px-3 py-2">
+      <div className="w-7 h-7 rounded-full bg-brand-muted/20 flex items-center justify-center text-xs font-bold flex-shrink-0">
         {profile.full_name.charAt(0).toUpperCase()}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{profile.full_name}</p>
       </div>
-      <select className="text-xs border border-odoo-border rounded px-1.5 py-1 bg-white"
+      <select className="text-xs border border-brand-border rounded px-1.5 py-1 bg-white"
         value={profile.role} onChange={(e) => onRoleChange(profile.id, e.target.value)}>
         <option value="employee">Employé</option>
         <option value="cashier">Caissier</option>
       </select>
-      <select className="text-xs border border-odoo-border rounded px-1.5 py-1 bg-white"
+      <select className="text-xs border border-brand-border rounded px-1.5 py-1 bg-white"
         value="" onChange={(e) => { if (e.target.value) onAssign(profile.id, e.target.value); }}>
         <option value="">Assigner…</option>
         {sections.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}

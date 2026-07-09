@@ -30,9 +30,9 @@ function newRef() {
 }
 
 const STATUS_META = {
-  draft:     { label: 'Brouillon',  color: 'bg-odoo-muted/15 text-odoo-muted' },
-  validated: { label: 'Validé',     color: 'bg-odoo-success/15 text-odoo-success' },
-  cancelled: { label: 'Annulé',     color: 'bg-odoo-danger/15 text-odoo-danger' },
+  draft:     { label: 'Brouillon',  color: 'bg-brand-muted/15 text-brand-muted' },
+  validated: { label: 'Validé',     color: 'bg-brand-success/15 text-brand-success' },
+  cancelled: { label: 'Annulé',     color: 'bg-brand-danger/15 text-brand-danger' },
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -212,9 +212,9 @@ export function AdminPurchases() {
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShoppingBasket className="w-6 h-6 text-odoo-primary" />Approvisionnements
+            <ShoppingBasket className="w-6 h-6 text-brand-primary" />Approvisionnements
           </h1>
-          <p className="text-sm text-odoo-muted mt-1">Achats fournisseurs — mise à jour automatique du stock à la validation</p>
+          <p className="text-sm text-brand-muted mt-1">Achats fournisseurs — mise à jour automatique du stock à la validation</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm">
@@ -229,25 +229,25 @@ export function AdminPurchases() {
       {/* KPI strip */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
         <div className="card p-4">
-          <p className="text-xs text-odoo-muted mb-1">Total approvisionnements validés</p>
-          <p className="text-xl font-bold text-odoo-primary">{formatPrice(totalValidated)}</p>
+          <p className="text-xs text-brand-muted mb-1">Total approvisionnements validés</p>
+          <p className="text-xl font-bold text-brand-primary">{formatPrice(totalValidated)}</p>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-odoo-muted mb-1">Brouillons en attente</p>
-          <p className="text-xl font-bold text-odoo-warning">{countDraft}</p>
+          <p className="text-xs text-brand-muted mb-1">Brouillons en attente</p>
+          <p className="text-xl font-bold text-brand-warning">{countDraft}</p>
         </div>
         <div className="card p-4 sm:col-span-1 col-span-2">
-          <p className="text-xs text-odoo-muted mb-1">Total approvisionnements</p>
+          <p className="text-xs text-brand-muted mb-1">Total approvisionnements</p>
           <p className="text-xl font-bold">{purchases.length}</p>
         </div>
       </div>
 
       {/* New purchase form */}
       {showForm && (
-        <div className="card mb-6 border-l-4 border-l-odoo-primary overflow-hidden">
-          <div className="p-4 border-b border-odoo-border bg-odoo-surface flex items-center justify-between">
-            <h2 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-odoo-primary" />Nouvel approvisionnement</h2>
-            <button onClick={() => { setShowForm(false); setFormError(null); }} className="text-odoo-muted hover:text-odoo-dark">
+        <div className="card mb-6 border-l-4 border-l-brand-primary overflow-hidden">
+          <div className="p-4 border-b border-brand-border bg-brand-surface flex items-center justify-between">
+            <h2 className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-brand-primary" />Nouvel approvisionnement</h2>
+            <button onClick={() => { setShowForm(false); setFormError(null); }} className="text-brand-muted hover:text-brand-dark">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -297,7 +297,7 @@ export function AdminPurchases() {
                 </button>
                 {invoiceFile && (
                   <button type="button" onClick={() => { setInvoiceFile(null); setInvoicePreview(null); if (fileRef.current) fileRef.current.value = ''; }}
-                    className="text-odoo-muted hover:text-odoo-danger">
+                    className="text-brand-muted hover:text-brand-danger">
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -305,10 +305,10 @@ export function AdminPurchases() {
                   className="hidden" onChange={onFilePick} />
               </div>
               {invoicePreview && (
-                <img src={invoicePreview} alt="Aperçu facture" className="mt-3 h-24 rounded-lg object-cover border border-odoo-border" />
+                <img src={invoicePreview} alt="Aperçu facture" className="mt-3 h-24 rounded-lg object-cover border border-brand-border" />
               )}
               {invoiceFile && invoiceFile.type === 'application/pdf' && (
-                <p className="mt-2 text-xs text-odoo-muted flex items-center gap-1"><FileText className="w-3.5 h-3.5" />{invoiceFile.name}</p>
+                <p className="mt-2 text-xs text-brand-muted flex items-center gap-1"><FileText className="w-3.5 h-3.5" />{invoiceFile.name}</p>
               )}
             </div>
 
@@ -321,9 +321,9 @@ export function AdminPurchases() {
                 </button>
               </div>
 
-              <div className="border border-odoo-border rounded-lg overflow-hidden">
+              <div className="border border-brand-border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-odoo-surface text-xs text-odoo-muted uppercase">
+                  <thead className="bg-brand-surface text-xs text-brand-muted uppercase">
                     <tr>
                       <th className="p-2 text-left">Produit</th>
                       <th className="p-2 text-right w-28">PU (FCFA)</th>
@@ -332,7 +332,7 @@ export function AdminPurchases() {
                       <th className="p-2 w-8" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-odoo-border">
+                  <tbody className="divide-y divide-brand-border">
                     {lines.map((l, idx) => (
                       <tr key={idx}>
                         <td className="p-2">
@@ -362,7 +362,7 @@ export function AdminPurchases() {
                         </td>
                         <td className="p-2">
                           {lines.length > 1 && (
-                            <button onClick={() => removeLine(idx)} className="text-odoo-muted hover:text-odoo-danger">
+                            <button onClick={() => removeLine(idx)} className="text-brand-muted hover:text-brand-danger">
                               <X className="w-3.5 h-3.5" />
                             </button>
                           )}
@@ -370,10 +370,10 @@ export function AdminPurchases() {
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-odoo-surface">
+                  <tfoot className="bg-brand-surface">
                     <tr>
-                      <td colSpan={3} className="p-2 text-right text-xs font-semibold text-odoo-muted uppercase">Total</td>
-                      <td className="p-2 text-right font-bold text-odoo-primary">{formatPrice(lineTotal)}</td>
+                      <td colSpan={3} className="p-2 text-right text-xs font-semibold text-brand-muted uppercase">Total</td>
+                      <td className="p-2 text-right font-bold text-brand-primary">{formatPrice(lineTotal)}</td>
                       <td />
                     </tr>
                   </tfoot>
@@ -382,7 +382,7 @@ export function AdminPurchases() {
             </div>
 
             {formError && (
-              <div className="flex items-center gap-2 text-odoo-danger text-sm bg-odoo-danger/5 border border-odoo-danger/20 rounded-lg px-3 py-2 mb-3">
+              <div className="flex items-center gap-2 text-brand-danger text-sm bg-brand-danger/5 border border-brand-danger/20 rounded-lg px-3 py-2 mb-3">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />{formError}
               </div>
             )}
@@ -401,13 +401,13 @@ export function AdminPurchases() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="relative flex-1 min-w-48 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-odoo-muted" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
           <input className="input pl-9 text-sm" placeholder="Rechercher…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-1">
           {(['all', 'draft', 'validated', 'cancelled'] as const).map((s) => (
             <button key={s} onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${filterStatus === s ? 'bg-odoo-primary border-odoo-primary text-white' : 'bg-white border-odoo-border hover:border-odoo-primary text-odoo-muted'}`}>
+              className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${filterStatus === s ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border hover:border-brand-primary text-brand-muted'}`}>
               {s === 'all' ? 'Tous' : STATUS_META[s].label}
             </button>
           ))}
@@ -416,12 +416,12 @@ export function AdminPurchases() {
 
       {/* Table */}
       {loading ? (
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-odoo-primary animate-spin" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>
       ) : (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-odoo-surface text-xs font-medium text-odoo-muted uppercase">
+              <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                 <tr>
                   <th className="p-3 text-left w-8" />
                   <th className="p-3 text-left">Date</th>
@@ -435,34 +435,34 @@ export function AdminPurchases() {
                   <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-odoo-border">
+              <tbody className="divide-y divide-brand-border">
                 {filtered.map((p) => (
                   <>
-                    <tr key={p.id} className={`hover:bg-odoo-surface/50 cursor-pointer ${expandedId === p.id ? 'bg-odoo-surface/30' : ''}`}>
+                    <tr key={p.id} className={`hover:bg-brand-surface/50 cursor-pointer ${expandedId === p.id ? 'bg-brand-surface/30' : ''}`}>
                       <td className="p-3">
                         <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
-                          className="text-odoo-muted hover:text-odoo-primary transition-colors">
+                          className="text-brand-muted hover:text-brand-primary transition-colors">
                           {expandedId === p.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
                       </td>
-                      <td className="p-3 text-odoo-muted text-xs whitespace-nowrap">{p.date}</td>
+                      <td className="p-3 text-brand-muted text-xs whitespace-nowrap">{p.date}</td>
                       <td className="p-3 font-mono text-xs font-medium">{p.reference}</td>
                       <td className="p-3 font-medium max-w-48 truncate">{p.label}</td>
-                      <td className="p-3 hidden md:table-cell text-odoo-muted text-xs">{p.supplier_name || '—'}</td>
-                      <td className="p-3 hidden lg:table-cell text-odoo-muted text-xs">{p.invoice_reference || '—'}</td>
+                      <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{p.supplier_name || '—'}</td>
+                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{p.invoice_reference || '—'}</td>
                       <td className="p-3 text-center hidden sm:table-cell">
                         <span className={`badge text-xs ${STATUS_META[p.status]?.color ?? ''}`}>
                           {STATUS_META[p.status]?.label ?? p.status}
                         </span>
                       </td>
-                      <td className="p-3 text-right font-bold text-odoo-primary">{formatPrice(Number(p.total_amount))}</td>
+                      <td className="p-3 text-right font-bold text-brand-primary">{formatPrice(Number(p.total_amount))}</td>
                       <td className="p-3 text-center hidden sm:table-cell">
                         {p.invoice_url ? (
                           <a href={p.invoice_url} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-odoo-info hover:underline">
+                            className="inline-flex items-center gap-1 text-xs text-brand-info hover:underline">
                             <ExternalLink className="w-3.5 h-3.5" />Voir
                           </a>
-                        ) : <span className="text-xs text-odoo-muted">—</span>}
+                        ) : <span className="text-xs text-brand-muted">—</span>}
                       </td>
                       <td className="p-3">
                         <div className="flex items-center justify-end gap-1.5">
@@ -472,14 +472,14 @@ export function AdminPurchases() {
                                 onClick={() => validatePurchase(p.id)}
                                 disabled={actionLoading === p.id + '-validate'}
                                 title="Valider et mettre à jour le stock"
-                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-odoo-success/10 text-odoo-success hover:bg-odoo-success/20 rounded-md transition disabled:opacity-50">
+                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-brand-success/10 text-brand-success hover:bg-brand-success/20 rounded-md transition disabled:opacity-50">
                                 {actionLoading === p.id + '-validate' ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
                                 Valider
                               </button>
                               <button
                                 onClick={() => deletePurchase(p.id)}
                                 title="Supprimer le brouillon"
-                                className="p-1.5 text-odoo-muted hover:text-odoo-danger hover:bg-odoo-danger/10 rounded-md transition">
+                                className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded-md transition">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </>
@@ -489,13 +489,13 @@ export function AdminPurchases() {
                               onClick={() => cancelPurchase(p.id, p.status)}
                               disabled={actionLoading === p.id + '-cancel'}
                               title="Annuler (le stock sera reversé)"
-                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-odoo-danger/10 text-odoo-danger hover:bg-odoo-danger/20 rounded-md transition disabled:opacity-50">
+                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 rounded-md transition disabled:opacity-50">
                               {actionLoading === p.id + '-cancel' ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                               Annuler
                             </button>
                           )}
                           {p.status === 'cancelled' && (
-                            <span className="text-xs text-odoo-muted italic">Annulé</span>
+                            <span className="text-xs text-brand-muted italic">Annulé</span>
                           )}
                         </div>
                       </td>
@@ -504,18 +504,18 @@ export function AdminPurchases() {
                     {/* Expanded detail row */}
                     {expandedId === p.id && (
                       <tr key={p.id + '-detail'}>
-                        <td colSpan={10} className="p-0 bg-odoo-surface/40">
-                          <div className="px-6 py-4 border-t border-odoo-border">
+                        <td colSpan={10} className="p-0 bg-brand-surface/40">
+                          <div className="px-6 py-4 border-t border-brand-border">
                             <div className="grid sm:grid-cols-3 gap-4 mb-4 text-sm">
                               {p.notes && (
-                                <div><span className="text-xs text-odoo-muted uppercase">Notes</span><p className="mt-0.5">{p.notes}</p></div>
+                                <div><span className="text-xs text-brand-muted uppercase">Notes</span><p className="mt-0.5">{p.notes}</p></div>
                               )}
-                              <div><span className="text-xs text-odoo-muted uppercase">Créé le</span><p className="mt-0.5">{formatDate(p.created_at)}</p></div>
+                              <div><span className="text-xs text-brand-muted uppercase">Créé le</span><p className="mt-0.5">{formatDate(p.created_at)}</p></div>
                               {p.invoice_url && (
                                 <div>
-                                  <span className="text-xs text-odoo-muted uppercase">Facture jointe</span>
+                                  <span className="text-xs text-brand-muted uppercase">Facture jointe</span>
                                   <a href={p.invoice_url} target="_blank" rel="noopener noreferrer"
-                                    className="mt-0.5 flex items-center gap-1 text-odoo-info hover:underline text-sm">
+                                    className="mt-0.5 flex items-center gap-1 text-brand-info hover:underline text-sm">
                                     <ExternalLink className="w-3.5 h-3.5" />Ouvrir la facture
                                   </a>
                                 </div>
@@ -523,8 +523,8 @@ export function AdminPurchases() {
                             </div>
 
                             {/* Lines detail */}
-                            <table className="w-full text-xs border border-odoo-border rounded-lg overflow-hidden">
-                              <thead className="bg-odoo-surface text-odoo-muted uppercase">
+                            <table className="w-full text-xs border border-brand-border rounded-lg overflow-hidden">
+                              <thead className="bg-brand-surface text-brand-muted uppercase">
                                 <tr>
                                   <th className="p-2 text-left">Produit</th>
                                   <th className="p-2 text-right">PU</th>
@@ -533,21 +533,21 @@ export function AdminPurchases() {
                                   <th className="p-2 text-right">Prix total</th>
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-odoo-border bg-white">
+                              <tbody className="divide-y divide-brand-border bg-white">
                                 {(p.purchase_items ?? []).map((item) => (
                                   <tr key={item.id}>
                                     <td className="p-2 font-medium">{item.product_name}</td>
                                     <td className="p-2 text-right">{formatPrice(Number(item.unit_price))}</td>
                                     <td className="p-2 text-right font-bold">{item.quantity}</td>
                                     <td className="p-2 text-right">{formatPrice(Number(item.unit_price) * item.quantity)}</td>
-                                    <td className="p-2 text-right font-bold text-odoo-primary">{formatPrice(Number(item.subtotal))}</td>
+                                    <td className="p-2 text-right font-bold text-brand-primary">{formatPrice(Number(item.subtotal))}</td>
                                   </tr>
                                 ))}
                               </tbody>
-                              <tfoot className="bg-odoo-surface">
+                              <tfoot className="bg-brand-surface">
                                 <tr>
-                                  <td colSpan={4} className="p-2 text-right font-semibold text-odoo-muted uppercase">Total général</td>
-                                  <td className="p-2 text-right font-bold text-odoo-primary text-sm">{formatPrice(Number(p.total_amount))}</td>
+                                  <td colSpan={4} className="p-2 text-right font-semibold text-brand-muted uppercase">Total général</td>
+                                  <td className="p-2 text-right font-bold text-brand-primary text-sm">{formatPrice(Number(p.total_amount))}</td>
                                 </tr>
                               </tfoot>
                             </table>
@@ -560,7 +560,7 @@ export function AdminPurchases() {
               </tbody>
             </table>
             {filtered.length === 0 && (
-              <p className="p-8 text-center text-odoo-muted text-sm">Aucun approvisionnement trouvé</p>
+              <p className="p-8 text-center text-brand-muted text-sm">Aucun approvisionnement trouvé</p>
             )}
           </div>
         </div>
