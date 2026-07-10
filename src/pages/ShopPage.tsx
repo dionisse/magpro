@@ -296,35 +296,35 @@ export function ProductCard({ product, onView, onAdd }: {
   }
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-transparent hover:border-brand-border">
+    <div className="group bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 border border-transparent hover:border-brand-border">
       {/* Image zone */}
-      <div className="relative overflow-hidden bg-brand-surface" style={{ aspectRatio: '1/1.1' }}>
+      <div className="relative overflow-hidden bg-brand-surface" style={{ aspectRatio: '1/1' }}>
         <button onClick={onView} className="block w-full h-full focus:outline-none">
           {firstImage ? (
             <img src={firstImage} alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-border to-brand-surface">
-              <Package2 className="w-14 h-14 text-brand-muted/40" />
+              <Package2 className="w-10 h-10 text-brand-muted/40" />
             </div>
           )}
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
             {isNew && !isOutOfStock && (
-              <span className="bg-brand-dark text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wider uppercase">
+              <span className="bg-brand-dark text-white text-[9px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase">
                 New
               </span>
             )}
             {hasBulk && (
-              <span className="bg-brand-success text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+              <span className="bg-brand-success text-white text-[9px] font-black px-2 py-0.5 rounded-full">
                 Lot
               </span>
             )}
           </div>
 
           {isLowStock && (
-            <span className="absolute top-3 right-3 bg-odoo-warning text-white text-[10px] font-bold px-2 py-1 rounded-full">
+            <span className="absolute top-2 right-2 bg-odoo-warning text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
               Stock: {product.stock}
             </span>
           )}
@@ -340,7 +340,7 @@ export function ProductCard({ product, onView, onAdd }: {
         {!isOutOfStock && (
           <button
             onClick={handleAdd}
-            className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 py-3.5 font-semibold text-sm
+            className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 py-2.5 font-semibold text-xs
               transition-all duration-300 ease-out
               translate-y-full group-hover:translate-y-0
               ${justAdded
@@ -349,25 +349,25 @@ export function ProductCard({ product, onView, onAdd }: {
               }`}
           >
             {justAdded
-              ? <><CheckCircle2 className="w-4 h-4" />Ajouté !</>
-              : <><ShoppingCart className="w-4 h-4" />Ajouter au panier</>}
+              ? <><CheckCircle2 className="w-3.5 h-3.5" />Ajouté !</>
+              : <><ShoppingCart className="w-3.5 h-3.5" />Ajouter</>}
           </button>
         )}
       </div>
 
       {/* Text zone */}
-      <button onClick={onView} className="w-full text-left p-4 focus:outline-none">
-        <h3 className="font-semibold text-sm text-brand-dark line-clamp-2 leading-snug mb-2 group-hover:text-brand-primary transition-colors duration-200">
+      <button onClick={onView} className="w-full text-left p-2.5 focus:outline-none">
+        <h3 className="font-semibold text-xs text-brand-dark line-clamp-2 leading-snug mb-1 group-hover:text-brand-primary transition-colors duration-200">
           {product.name}
         </h3>
-        <div className="flex items-baseline gap-2">
-          <span className="text-base font-black text-brand-primary">{formatPrice(product.price)}</span>
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-sm font-black text-brand-primary">{formatPrice(product.price)}</span>
           {hasBulk && (
-            <span className="text-xs text-brand-muted line-through">{formatPrice(product.price)}</span>
+            <span className="text-[11px] text-brand-muted line-through">{formatPrice(product.price)}</span>
           )}
         </div>
         {hasBulk && (
-          <p className="text-xs text-odoo-success font-semibold mt-0.5">
+          <p className="text-[11px] text-odoo-success font-semibold mt-0.5">
             Lot: {formatPrice(product.bulk_price)} / unité
           </p>
         )}
@@ -604,8 +604,8 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
           {/* Grid */}
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-              {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+              {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-24 animate-fade-in-scale">
@@ -620,7 +620,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {filtered.map((product, i) => (
                 <StaggerItem key={product.id} index={i % 8}>
                   <ProductCard

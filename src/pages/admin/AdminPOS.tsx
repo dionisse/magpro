@@ -208,7 +208,7 @@ export function AdminPOS() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 overflow-auto flex-1">
+          <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-1.5 overflow-auto flex-1">
             {filtered.map((p) => {
               const inCart = cart.filter((it) => it.product.id === p.id).reduce((a, it) => a + it.quantity, 0);
               const hasOptions = (optionsByProduct[p.id]?.length ?? 0) > 0;
@@ -216,20 +216,20 @@ export function AdminPOS() {
                 <button key={p.id} onClick={() => handleProductClick(p)} disabled={p.stock === 0}
                   className={`card overflow-hidden text-left hover:border-brand-primary hover:shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed group relative ${inCart > 0 ? 'ring-2 ring-brand-primary' : ''}`}>
                   {inCart > 0 && (
-                    <div className="absolute top-1 right-1 w-5 h-5 bg-brand-primary text-white text-xs font-bold rounded-full flex items-center justify-center z-10">
+                    <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-brand-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center z-10">
                       {inCart}
                     </div>
                   )}
                   <div className="aspect-square bg-brand-surface relative overflow-hidden">
-                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-8 h-8 text-brand-muted" /></div>}
-                    {p.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-xs font-semibold text-brand-danger">Rupture</span></div>}
-                    {p.bulk_quantity > 0 && <div className="absolute top-1 left-1"><Tag className="w-3.5 h-3.5 text-brand-success" /></div>}
-                    {hasOptions && <div className="absolute bottom-1 right-1 bg-brand-info text-white rounded-full p-0.5"><Layers className="w-3 h-3" /></div>}
+                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" /> : <div className="w-full h-full flex items-center justify-center"><Package2 className="w-6 h-6 text-brand-muted" /></div>}
+                    {p.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><span className="text-[10px] font-semibold text-brand-danger">Rupture</span></div>}
+                    {p.bulk_quantity > 0 && <div className="absolute top-0.5 left-0.5"><Tag className="w-3 h-3 text-brand-success" /></div>}
+                    {hasOptions && <div className="absolute bottom-0.5 right-0.5 bg-brand-info text-white rounded-full p-0.5"><Layers className="w-2.5 h-2.5" /></div>}
                   </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium line-clamp-1">{p.name}</p>
-                    <p className="text-sm font-bold text-brand-primary">{formatPrice(p.price)}</p>
-                    <p className="text-xs text-brand-muted">Stock: {p.stock}{hasOptions && ' · options'}</p>
+                  <div className="p-1.5">
+                    <p className="text-[11px] font-medium line-clamp-1 leading-tight">{p.name}</p>
+                    <p className="text-xs font-bold text-brand-primary leading-tight">{formatPrice(p.price)}</p>
+                    <p className="text-[10px] text-brand-muted leading-tight">Stock: {p.stock}{hasOptions && ' · opt.'}</p>
                   </div>
                 </button>
               );

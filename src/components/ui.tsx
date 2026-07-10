@@ -177,10 +177,10 @@ export function SkeletonCard() {
   return (
     <div className="card flex flex-col overflow-hidden">
       <div className="aspect-square w-full skeleton" />
-      <div className="p-3 space-y-2">
-        <div className="skeleton h-3.5 w-4/5 rounded" />
-        <div className="skeleton h-3 w-3/5 rounded" />
-        <div className="skeleton h-8 w-full rounded mt-3" />
+      <div className="p-2.5 space-y-1.5">
+        <div className="skeleton h-3 w-4/5 rounded" />
+        <div className="skeleton h-2.5 w-3/5 rounded" />
+        <div className="skeleton h-6 w-full rounded mt-1" />
       </div>
     </div>
   );
