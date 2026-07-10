@@ -243,78 +243,6 @@ export function AdminSettings() {
           </div>
         </section>
 
-        {/* Social media */}
-        <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
-            <Globe className="w-4 h-4 text-brand-primary" />Réseaux sociaux
-          </h2>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">Lien WhatsApp</label>
-              <input
-                value={val(form.whatsapp_url)}
-                onChange={(e) => set('whatsapp_url', e.target.value)}
-                className="input"
-                placeholder="https://wa.me/22997000000"
-                type="url"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Page Facebook</label>
-              <input
-                value={val(form.facebook_url)}
-                onChange={(e) => set('facebook_url', e.target.value)}
-                className="input"
-                placeholder="https://facebook.com/votrepage"
-                type="url"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Profil TikTok</label>
-              <input
-                value={val(form.tiktok_url)}
-                onChange={(e) => set('tiktok_url', e.target.value)}
-                className="input"
-                placeholder="https://tiktok.com/@votrepage"
-                type="url"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Legal pages */}
-        <section className="card p-5">
-          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
-            <FileText className="w-4 h-4 text-brand-primary" />Pages légales
-          </h2>
-          <p className="text-xs text-brand-muted mb-4">
-            Ces textes seront affichés sur des pages dédiées accessibles depuis le pied de page.
-            Vous pouvez utiliser des sauts de ligne pour structurer le contenu.
-          </p>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Mentions légales</label>
-              <textarea
-                value={val(form.legal_mentions)}
-                onChange={(e) => set('legal_mentions', e.target.value)}
-                className="input resize-y min-h-40"
-                rows={8}
-                placeholder="Conformément aux dispositions des articles 6-III et 19 de la Loi n° 2004-575 du 21 juin 2004...&#10;&#10;Éditeur du site : ...&#10;Hébergeur : ..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Conditions d'utilisation (CGU)</label>
-              <textarea
-                value={val(form.terms_of_use)}
-                onChange={(e) => set('terms_of_use', e.target.value)}
-                className="input resize-y min-h-40"
-                rows={8}
-                placeholder="Article 1 – Objet&#10;Les présentes conditions générales d'utilisation ont pour objet de définir les modalités et conditions d'utilisation des services proposés sur le site...&#10;&#10;Article 2 – Accès au service&#10;..."
-              />
-            </div>
-          </div>
-        </section>
-
         {/* WhatsApp Notifications */}
         <section className="card p-5">
           <h2 className="font-semibold mb-1 flex items-center gap-2 text-brand-dark">
@@ -390,6 +318,78 @@ export function AdminSettings() {
               Notifications actives — un message WhatsApp sera envoyé à chaque nouvelle commande.
             </div>
           )}
+        </section>
+
+        {/* Social media */}
+        <section className="card p-5">
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <Globe className="w-4 h-4 text-brand-primary" />Réseaux sociaux
+          </h2>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Lien WhatsApp</label>
+              <input
+                value={val(form.whatsapp_url)}
+                onChange={(e) => set('whatsapp_url', e.target.value)}
+                className="input"
+                placeholder="https://wa.me/22997000000"
+                type="url"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Page Facebook</label>
+              <input
+                value={val(form.facebook_url)}
+                onChange={(e) => set('facebook_url', e.target.value)}
+                className="input"
+                placeholder="https://facebook.com/votrepage"
+                type="url"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Profil TikTok</label>
+              <input
+                value={val(form.tiktok_url)}
+                onChange={(e) => set('tiktok_url', e.target.value)}
+                className="input"
+                placeholder="https://tiktok.com/@votrepage"
+                type="url"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Legal pages */}
+        <section className="card p-5">
+          <h2 className="font-semibold mb-4 flex items-center gap-2 text-brand-dark">
+            <FileText className="w-4 h-4 text-brand-primary" />Pages légales
+          </h2>
+          <p className="text-xs text-brand-muted mb-4">
+            Ces textes seront affichés sur des pages dédiées accessibles depuis le pied de page.
+            Vous pouvez utiliser des sauts de ligne pour structurer le contenu.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Mentions légales</label>
+              <textarea
+                value={val(form.legal_mentions)}
+                onChange={(e) => set('legal_mentions', e.target.value)}
+                className="input resize-y min-h-40"
+                rows={8}
+                placeholder="Conformément aux dispositions des articles 6-III et 19 de la Loi n° 2004-575 du 21 juin 2004...&#10;&#10;Éditeur du site : ...&#10;Hébergeur : ..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Conditions d'utilisation (CGU)</label>
+              <textarea
+                value={val(form.terms_of_use)}
+                onChange={(e) => set('terms_of_use', e.target.value)}
+                className="input resize-y min-h-40"
+                rows={8}
+                placeholder="Article 1 – Objet&#10;Les présentes conditions générales d'utilisation ont pour objet de définir les modalités et conditions d'utilisation des services proposés sur le site...&#10;&#10;Article 2 – Accès au service&#10;..."
+              />
+            </div>
+          </div>
         </section>
 
         {/* Save */}
