@@ -123,6 +123,7 @@ export interface Category {
   description: string;
   image_url: string;
   sort_order: number;
+  parent_id: string | null;
   created_at: string;
 }
 

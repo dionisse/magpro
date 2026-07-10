@@ -130,7 +130,10 @@ export function AdminProducts() {
 
   const filtered = products.filter((p) => {
     if (filterBrand && p.brand_id !== filterBrand) return false;
-    if (filterCat && p.category_id !== filterCat) return false;
+    if (filterCat) {
+      const childIds = categories.filter((c) => c.parent_id === filterCat).map((c) => c.id);
+      if (p.category_id !== filterCat && !childIds.includes(p.category_id)) return false;
+    }
     if (search) {
       const q = search.toLowerCase();
       return p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q);
@@ -179,9 +182,19 @@ export function AdminProducts() {
               <option value="">Toutes les marques</option>
               {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
-            <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} className="input sm:w-44">
+            <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} className="input sm:w-52">
               <option value="">Toutes les catégories</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {categories.filter((c) => !c.parent_id).map((parent) => (
+                <optgroup key={parent.id} label={parent.name}>
+                  <option value={parent.id}>{parent.name} (toutes)</option>
+                  {categories.filter((c) => c.parent_id === parent.id).map((sub) => (
+                    <option key={sub.id} value={sub.id}>  └ {sub.name}</option>
+                  ))}
+                </optgroup>
+              ))}
+              {categories.filter((c) => !c.parent_id && !categories.some((sub) => sub.parent_id === c.id)).map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
             </select>
           </div>
 
@@ -514,7 +527,17 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
                 <label className="block text-sm font-medium mb-1">Catégorie</label>
                 <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input">
                   <option value="">— Aucune —</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.filter((c) => !c.parent_id).map((parent) => (
+                    <optgroup key={parent.id} label={parent.name}>
+                      <option value={parent.id}>{parent.name}</option>
+                      {categories.filter((c) => c.parent_id === parent.id).map((sub) => (
+                        <option key={sub.id} value={sub.id}>  └ {sub.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  {categories.filter((c) => !c.parent_id && !categories.some((sub) => sub.parent_id === c.id)).map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
             </div>

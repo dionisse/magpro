@@ -3,7 +3,7 @@ import {
   Search, Tag, Package2, Plus, AlertCircle, CheckCircle2,
   ChevronLeft, ChevronRight, Clock, ArrowRight, Flame, Sparkles,
   Truck, RotateCcw, ShieldCheck, Headphones, ShoppingCart, SlidersHorizontal,
-  X,
+  X, ArrowLeft,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatPrice, parseImages } from '../lib/format';
@@ -387,6 +387,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'price-asc' | 'price-desc' | 'name'>('recent');
   const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
@@ -427,7 +428,12 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
   const filtered = useMemo(() => {
     let list = [...products];
-    if (activeCategory) list = list.filter((p) => p.category_id === activeCategory);
+    if (activeSubcategory) {
+      list = list.filter((p) => p.category_id === activeSubcategory);
+    } else if (activeCategory) {
+      const childIds = categories.filter((c) => c.parent_id === activeCategory).map((c) => c.id);
+      list = list.filter((p) => p.category_id === activeCategory || childIds.includes(p.category_id));
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q));
@@ -436,11 +442,17 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
     else if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price);
     else if (sortBy === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
     return list;
-  }, [products, activeCategory, search, sortBy]);
+  }, [products, categories, activeCategory, activeSubcategory, search, sortBy]);
 
   const activeCategoryName = activeCategory
     ? categories.find((c) => c.id === activeCategory)?.name
     : null;
+  const activeSubcategoryName = activeSubcategory
+    ? categories.find((c) => c.id === activeSubcategory)?.name
+    : null;
+  const subcategories = activeCategory
+    ? categories.filter((c) => c.parent_id === activeCategory)
+    : [];
 
   return (
     <div className="page-enter bg-white min-h-screen">
@@ -518,7 +530,12 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
           {/* Section heading */}
           <div className="flex items-end justify-between mb-6">
             <div>
-              {activeCategoryName ? (
+              {activeSubcategoryName ? (
+                <>
+                  <p className="text-xs font-semibold tracking-widest text-brand-primary uppercase mb-1">{activeCategoryName}</p>
+                  <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">{activeSubcategoryName}</h2>
+                </>
+              ) : activeCategoryName ? (
                 <>
                   <p className="text-xs font-semibold tracking-widest text-brand-primary uppercase mb-1">Catégorie</p>
                   <h2 className="text-2xl lg:text-3xl font-black text-brand-dark">{activeCategoryName}</h2>
@@ -537,12 +554,32 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
             </div>
             {(activeCategoryName || search) && (
               <button
-                onClick={() => { setActiveCategory(null); setSearch(''); }}
+                onClick={() => { setActiveCategory(null); setActiveSubcategory(null); setSearch(''); }}
                 className="flex items-center gap-1.5 text-sm text-brand-muted hover:text-odoo-danger transition-colors">
                 <X className="w-4 h-4" />Effacer
               </button>
             )}
           </div>
+
+          {/* Subcategory chips */}
+          {subcategories.length > 0 && !activeSubcategory && (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {subcategories.map((sub) => {
+                const count = products.filter((p) => p.category_id === sub.id).length;
+                return (
+                  <button key={sub.id} onClick={() => setActiveSubcategory(sub.id)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-brand-border hover:border-brand-primary hover:text-brand-primary transition">
+                    {sub.name} <span className="text-brand-muted">({count})</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {activeSubcategory && (
+            <button onClick={() => setActiveSubcategory(null)} className="flex items-center gap-1.5 text-sm text-brand-muted hover:text-brand-primary transition mb-5">
+              <ArrowLeft className="w-4 h-4" />Toutes les sous-catégories
+            </button>
+          )}
 
           {/* Search + filter bar */}
           <div className="flex gap-2 mb-6">
@@ -585,8 +622,8 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!activeCategory ? 'bg-brand-primary text-white' : 'bg-white border border-brand-border hover:border-odoo-primary'}`}>
                   Tout
                 </button>
-                {categories.map((cat) => (
-                  <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+                {categories.filter((c) => !c.parent_id).map((cat) => (
+                  <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setActiveSubcategory(null); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${activeCategory === cat.id ? 'bg-brand-primary text-white' : 'bg-white border border-brand-border hover:border-odoo-primary'}`}>
                     {cat.name}
                   </button>

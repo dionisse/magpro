@@ -6,7 +6,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { formatPrice, formatDate } from '../../lib/format';
 import { getEffectivePrice } from '../../contexts/CartContext';
-import type { CartItem, Product, PaymentMethod, ProductOptionGroup, ProductOption } from '../../lib/database.types';
+import type { CartItem, Product, PaymentMethod, ProductOptionGroup, ProductOption, Category } from '../../lib/database.types';
 
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   cash: 'Espèces',
@@ -41,24 +41,33 @@ export function AdminPOS() {
   const [submitting, setSubmitting] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
 
   // Option picker
   const [pickerProduct, setPickerProduct] = useState<Product | null>(null);
 
   const categories = useMemo(() => {
-    const catIds = [...new Set(products.map((p) => p.category_id).filter(Boolean))] as string[];
-    return catIds;
-  }, [products]);
+    const parents = allCategories.filter((c) => !c.parent_id);
+    return parents;
+  }, [allCategories]);
+
+  const subcategories = useMemo(() => {
+    if (!activeCategory) return [];
+    return allCategories.filter((c) => c.parent_id === activeCategory);
+  }, [allCategories, activeCategory]);
 
   useEffect(() => { loadAll(); }, []);
 
   async function loadAll() {
-    const [prodRes, ogRes] = await Promise.all([
+    const [prodRes, ogRes, catRes] = await Promise.all([
       supabase.from('products').select('*').eq('is_active', true).order('name'),
       supabase.from('product_option_groups').select('*, product_options(*)').order('sort_order'),
+      supabase.from('categories').select('*').order('sort_order'),
     ]);
     const prods = (prodRes.data as Product[]) ?? [];
     setProducts(prods);
+    setAllCategories((catRes.data as Category[]) ?? []);
 
     // Build map productId → groups[]
     const map: Record<string, ProductOptionGroup[]> = {};
@@ -72,13 +81,18 @@ export function AdminPOS() {
 
   const filtered = useMemo(() => {
     let list = products;
-    if (activeCategory) list = list.filter((p) => p.category_id === activeCategory);
+    if (activeSubcategory) {
+      list = list.filter((p) => p.category_id === activeSubcategory);
+    } else if (activeCategory) {
+      const childIds = allCategories.filter((c) => c.parent_id === activeCategory).map((c) => c.id);
+      list = list.filter((p) => p.category_id === activeCategory || childIds.includes(p.category_id));
+    }
     if (search) {
       const q = search.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
     }
     return list;
-  }, [products, search, activeCategory]);
+  }, [products, allCategories, activeCategory, activeSubcategory, search]);
 
   function handleProductClick(p: Product) {
     if (p.stock <= 0) return;
@@ -192,16 +206,35 @@ export function AdminPOS() {
 
           {categories.length > 0 && (
             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
-              <button onClick={() => setActiveCategory(null)}
+              <button onClick={() => { setActiveCategory(null); setActiveSubcategory(null); }}
                 className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${!activeCategory ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border'}`}>
                 Tout
               </button>
-              {categories.map((cid) => {
-                const count = products.filter((p) => p.category_id === cid).length;
+              {categories.map((cat) => {
+                const childIds = allCategories.filter((c) => c.parent_id === cat.id).map((c) => c.id);
+                const count = products.filter((p) => p.category_id === cat.id || childIds.includes(p.category_id)).length;
                 return (
-                  <button key={cid} onClick={() => setActiveCategory(cid)}
-                    className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${activeCategory === cid ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border'}`}>
-                    Cat. ({count})
+                  <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setActiveSubcategory(null); }}
+                    className={`flex-shrink-0 px-3 py-1 rounded text-xs font-medium border transition ${activeCategory === cat.id ? 'bg-brand-primary border-brand-primary text-white' : 'bg-white border-brand-border'}`}>
+                    {cat.name} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {subcategories.length > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+              <button onClick={() => setActiveSubcategory(null)}
+                className={`flex-shrink-0 px-2.5 py-0.5 rounded text-[11px] font-medium border transition ${!activeSubcategory ? 'bg-brand-dark border-brand-dark text-white' : 'bg-white border-brand-border'}`}>
+                Tout
+              </button>
+              {subcategories.map((sub) => {
+                const count = products.filter((p) => p.category_id === sub.id).length;
+                return (
+                  <button key={sub.id} onClick={() => setActiveSubcategory(sub.id)}
+                    className={`flex-shrink-0 px-2.5 py-0.5 rounded text-[11px] font-medium border transition ${activeSubcategory === sub.id ? 'bg-brand-dark border-brand-dark text-white' : 'bg-white border-brand-border'}`}>
+                    {sub.name} ({count})
                   </button>
                 );
               })}
