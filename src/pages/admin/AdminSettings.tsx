@@ -260,7 +260,7 @@ export function AdminSettings() {
                 Envoyez le message{' '}
                 <code className="bg-white border border-brand-border px-1.5 py-0.5 rounded text-brand-dark font-mono">I allow callmebot to send me messages</code>{' '}
                 au numéro WhatsApp{' '}
-                <strong className="text-brand-dark">+34 644 49 87 45</strong> (CallMeBot).
+                <strong className="text-brand-dark">+34 644 56 55 18</strong> (CallMeBot).
               </li>
               <li>Vous recevrez en retour votre <strong className="text-brand-dark">clé API personnelle</strong>.</li>
               <li>Renseignez ci-dessous votre numéro (format international) et la clé reçue, puis sauvegardez.</li>
