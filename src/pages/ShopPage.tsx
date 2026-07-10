@@ -396,7 +396,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
     let mounted = true;
     Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
-      supabase.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false }),
+      supabase.from('products').select('*').eq('is_active', true).order('name', { ascending: true }),
       supabase.from('banners').select('*').eq('is_active', true).order('sort_order').order('created_at'),
       supabase.from('promotions').select('*').eq('is_active', true)
         .or('ends_at.is.null,ends_at.gt.' + new Date().toISOString())
