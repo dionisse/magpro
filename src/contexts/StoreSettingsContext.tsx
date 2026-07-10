@@ -22,6 +22,9 @@ const DEFAULTS: StoreSettings = {
   whatsapp_url: null,
   legal_mentions: null,
   terms_of_use: null,
+  hero_style: 'auto',
+  whatsapp_notify_number: null,
+  callmebot_api_key: null,
   updated_at: '',
 };
 

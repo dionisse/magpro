@@ -233,6 +233,24 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
     const { error: itemsErr } = await supabase.from('order_items').insert(orderItems);
     if (itemsErr) { setError(itemsErr.message); setSubmitting(false); return; }
 
+    // ── Step 2b: WhatsApp notification (fire-and-forget) ──────────────────────
+    fetch(`${SUPABASE_URL}/functions/v1/notify-order`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        order_number: (order as { order_number: string }).order_number,
+        customer_name: name,
+        customer_phone: phone,
+        total: subtotal,
+        payment_method: payment,
+        delivery_address: address,
+        notes,
+      }),
+    }).catch(() => { /* ignore notification failures */ });
+
     // ── Step 3: Payment entry ─────────────────────────────────────────────────
     await supabase.from('payments').insert({
       order_id: (order as { id: string }).id,

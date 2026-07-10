@@ -56,6 +56,8 @@ export interface StoreSettings {
   legal_mentions: string | null;
   terms_of_use: string | null;
   hero_style: 'auto' | 'none';
+  whatsapp_notify_number: string | null;
+  callmebot_api_key: string | null;
   updated_at: string;
 }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Save, Loader2, Store, Building2, Phone, Globe,
-  Image, FileText, CheckCircle2, AlertCircle, Palette,
+  Image, FileText, CheckCircle2, AlertCircle, Palette, Bell, ExternalLink, Eye, EyeOff,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useStoreSettings } from '../../contexts/StoreSettingsContext';
@@ -23,6 +23,8 @@ const EMPTY: FormData = {
   legal_mentions: null,
   terms_of_use: null,
   hero_style: 'auto',
+  whatsapp_notify_number: null,
+  callmebot_api_key: null,
 };
 
 function val(v: string | null | undefined): string {
@@ -35,6 +37,7 @@ export function AdminSettings() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
 
   useEffect(() => {
     setForm({
@@ -50,6 +53,8 @@ export function AdminSettings() {
       whatsapp_url: settings.whatsapp_url,
       legal_mentions: settings.legal_mentions,
       terms_of_use: settings.terms_of_use,
+      whatsapp_notify_number: settings.whatsapp_notify_number,
+      callmebot_api_key: settings.callmebot_api_key,
       hero_style: settings.hero_style ?? 'auto',
     });
   }, [settings]);
@@ -308,6 +313,83 @@ export function AdminSettings() {
               />
             </div>
           </div>
+        </section>
+
+        {/* WhatsApp Notifications */}
+        <section className="card p-5">
+          <h2 className="font-semibold mb-1 flex items-center gap-2 text-brand-dark">
+            <Bell className="w-4 h-4 text-brand-primary" />Notifications WhatsApp
+          </h2>
+          <p className="text-xs text-brand-muted mb-4">
+            Recevez un message WhatsApp automatique à chaque nouvelle commande via le service gratuit CallMeBot.
+          </p>
+
+          {/* Setup guide */}
+          <div className="bg-brand-surface border border-brand-border rounded-xl p-4 mb-4 text-sm space-y-2">
+            <p className="font-medium text-brand-dark">Comment activer les notifications :</p>
+            <ol className="list-decimal list-inside space-y-1.5 text-brand-muted text-xs">
+              <li>
+                Envoyez le message{' '}
+                <code className="bg-white border border-brand-border px-1.5 py-0.5 rounded text-brand-dark font-mono">I allow callmebot to send me messages</code>{' '}
+                au numéro WhatsApp{' '}
+                <strong className="text-brand-dark">+34 644 49 87 45</strong> (CallMeBot).
+              </li>
+              <li>Vous recevrez en retour votre <strong className="text-brand-dark">clé API personnelle</strong>.</li>
+              <li>Renseignez ci-dessous votre numéro (format international) et la clé reçue, puis sauvegardez.</li>
+            </ol>
+            <a
+              href="https://www.callmebot.com/blog/free-api-whatsapp-messages/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-brand-primary text-xs hover:underline"
+            >
+              Documentation CallMeBot <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Numéro de notification WhatsApp
+              </label>
+              <input
+                value={val(form.whatsapp_notify_number)}
+                onChange={(e) => set('whatsapp_notify_number', e.target.value)}
+                className="input"
+                placeholder="+22997000000"
+                type="tel"
+              />
+              <p className="text-xs text-brand-muted mt-1">Format international, sans espaces (ex : +22997000000)</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Clé API CallMeBot</label>
+              <div className="relative">
+                <input
+                  value={val(form.callmebot_api_key)}
+                  onChange={(e) => set('callmebot_api_key', e.target.value)}
+                  className="input pr-10"
+                  placeholder="123456"
+                  type={showApiKey ? 'text' : 'password'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey((v) => !v)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-dark transition"
+                  tabIndex={-1}
+                >
+                  {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-brand-muted mt-1">Clé reçue par WhatsApp depuis CallMeBot</p>
+            </div>
+          </div>
+
+          {form.whatsapp_notify_number && form.callmebot_api_key && (
+            <div className="mt-3 flex items-center gap-2 text-xs text-brand-success bg-brand-success/5 border border-brand-success/20 rounded-lg px-3 py-2">
+              <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+              Notifications actives — un message WhatsApp sera envoyé à chaque nouvelle commande.
+            </div>
+          )}
         </section>
 
         {/* Save */}
