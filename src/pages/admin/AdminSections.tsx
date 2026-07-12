@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   ShieldCheck, Plus, Trash2, Edit2, Loader2, X, Check,
-  Users, LayoutDashboard, Boxes, Warehouse, ShoppingBasket,
+  LayoutDashboard, Boxes, Warehouse, ShoppingBasket,
   Package, ListOrdered, CreditCard, BarChart3, ScanBarcode,
   UserCog, RefreshCw, AlertTriangle, Search, ChevronDown, ChevronUp,
   UserPlus, Eye, EyeOff, Copy, CheckCircle2, KeyRound, Mail,
+  Megaphone, Settings, TicketPercent,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -30,6 +31,9 @@ const ALL_MODULES: ModuleDef[] = [
   { key: 'admin-purchases',  label: 'Approvisionnements',  icon: <ShoppingBasket className="w-4 h-4" />,   group: 'Stock' },
   { key: 'admin-reports',    label: 'Rapports & stats',    icon: <BarChart3 className="w-4 h-4" />,        group: 'Analyse' },
   { key: 'admin-sections',   label: 'Sections & accès',    icon: <ShieldCheck className="w-4 h-4" />,      group: 'Administration' },
+  { key: 'admin-banners',    label: 'Bannières & promos',   icon: <Megaphone className="w-4 h-4" />,        group: 'Administration' },
+  { key: 'admin-promos',     label: 'Codes promo partenaires', icon: <TicketPercent className="w-4 h-4" />,  group: 'Administration' },
+  { key: 'admin-settings',   label: 'Paramètres',          icon: <Settings className="w-4 h-4" />,         group: 'Administration' },
 ];
 
 const MODULE_GROUPS = [...new Set(ALL_MODULES.map((m) => m.group))];
@@ -108,7 +112,7 @@ export function AdminSections() {
   function toggleGroup(group: string) {
     const gm = ALL_MODULES.filter((m) => m.group === group).map((m) => m.key);
     const all = gm.every((m) => formModules.has(m));
-    setFormModules((prev) => { const n = new Set(prev); all ? gm.forEach((m) => n.delete(m)) : gm.forEach((m) => n.add(m)); return n; });
+    setFormModules((prev) => { const n = new Set(prev); if (all) { gm.forEach((m) => n.delete(m)); } else { gm.forEach((m) => n.add(m)); } return n; });
   }
 
   async function saveSection() {

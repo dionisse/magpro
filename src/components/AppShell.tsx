@@ -3,7 +3,7 @@ import {
   Store, ShoppingCart, Package, Menu, User, LogOut, LayoutDashboard,
   ScanBarcode, Boxes, ListOrdered, X, BarChart3, Settings, Warehouse,
   ShoppingBasket, CreditCard, ShieldCheck, Phone, MessageCircle, ExternalLink,
-  Scale, FileText, Megaphone,
+  Scale, FileText, Megaphone, TicketPercent,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -77,6 +77,7 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
     { kind: 'admin-pos' as const,        icon: <ScanBarcode className="w-4 h-4" />,      label: 'POS' },
     { kind: 'admin-sections' as const,  icon: <ShieldCheck className="w-4 h-4" />,      label: 'Sections' },
     { kind: 'admin-banners' as const,   icon: <Megaphone className="w-4 h-4" />,         label: 'Bannières' },
+    { kind: 'admin-promos' as const,    icon: <TicketPercent className="w-4 h-4" />,     label: 'Codes Promo' },
     { kind: 'admin-settings' as const,  icon: <Settings className="w-4 h-4" />,          label: 'Paramètres' },
   ];
 

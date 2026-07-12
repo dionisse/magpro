@@ -2,12 +2,14 @@ import { useState } from 'react';
 import {
   ArrowLeft, Loader2, CheckCircle2, MessageCircle,
   Banknote, Smartphone, Building2, Truck, CreditCard, ExternalLink, UserPlus, Copy, Check,
+  TicketPercent, X,
 } from 'lucide-react';
 import { useCart, getEffectivePrice } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { formatPrice } from '../lib/format';
 import type { PaymentMethod } from '../lib/database.types';
+import type { PromoCode } from '../lib/database.types';
 import type { View } from '../lib/views';
 
 // ─── Payment method definitions ───────────────────────────────────────────────
@@ -70,6 +72,78 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
   const [chariowUrl, setChariowUrl] = useState<string | null>(null);
   const [autoCredentials, setAutoCredentials] = useState<{ email: string; password: string } | null>(null);
   const [passwordCopied, setPasswordCopied] = useState(false);
+
+  // ── Promo code state ──
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [promoChecking, setPromoChecking] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoReward, setPromoReward] = useState(0);
+
+  const finalTotal = appliedPromo ? Math.max(0, subtotal - promoDiscount) : subtotal;
+
+  async function applyPromo() {
+    setPromoError(null);
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+
+    setPromoChecking(true);
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .select('*')
+      .eq('code', code)
+      .maybeSingle();
+    setPromoChecking(false);
+
+    if (error || !data) {
+      setAppliedPromo(null);
+      setPromoDiscount(0);
+      setPromoReward(0);
+      setPromoError('Code promo introuvable');
+      return;
+    }
+
+    const pc = data as PromoCode;
+
+    if (!pc.is_active) {
+      setAppliedPromo(null); setPromoDiscount(0); setPromoReward(0);
+      setPromoError('Ce code promo n\u2019est plus actif'); return;
+    }
+    if (pc.starts_at && new Date(pc.starts_at).getTime() > Date.now()) {
+      setAppliedPromo(null); setPromoDiscount(0); setPromoReward(0);
+      setPromoError('Ce code promo n\u2019est pas encore valide'); return;
+    }
+    if (pc.ends_at && new Date(pc.ends_at).getTime() < Date.now()) {
+      setAppliedPromo(null); setPromoDiscount(0); setPromoReward(0);
+      setPromoError('Ce code promo a expiré'); return;
+    }
+    if (pc.max_uses !== null && pc.used_count >= pc.max_uses) {
+      setAppliedPromo(null); setPromoDiscount(0); setPromoReward(0);
+      setPromoError('Ce code promo a atteint sa limite d\u2019utilisations'); return;
+    }
+    if (subtotal < pc.min_order_amount) {
+      setAppliedPromo(null); setPromoDiscount(0); setPromoReward(0);
+      setPromoError(`Montant minimum requis : ${formatPrice(pc.min_order_amount)}`); return;
+    }
+
+    const discount = pc.discount_type === 'percentage'
+      ? Math.round(subtotal * pc.discount_value) / 100
+      : Math.min(pc.discount_value, subtotal);
+    const reward = Math.round((subtotal - discount) * pc.commission_rate) / 100;
+
+    setAppliedPromo(pc);
+    setPromoDiscount(discount);
+    setPromoReward(reward);
+  }
+
+  function removePromo() {
+    setAppliedPromo(null);
+    setPromoInput('');
+    setPromoDiscount(0);
+    setPromoReward(0);
+    setPromoError(null);
+  }
 
   if (items.length === 0 && !orderNumber) { setView({ kind: 'shop' }); return null; }
 
@@ -207,7 +281,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
       notes,
       payment_method: payment,
       source: 'online',
-      total: subtotal,
+      total: finalTotal,
       status: 'pending',
       payment_status: 'pending',
     }).select().single();
@@ -233,7 +307,25 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
     const { error: itemsErr } = await supabase.from('order_items').insert(orderItems);
     if (itemsErr) { setError(itemsErr.message); setSubmitting(false); return; }
 
-    // ── Step 2b: WhatsApp notification (fire-and-forget) ──────────────────────
+    // ── Step 2b: Promo code usage ──────────────────────────────────────────────
+    if (appliedPromo) {
+      await Promise.all([
+        supabase.from('promo_usages').insert({
+          promo_code_id: appliedPromo.id,
+          order_id: (order as { id: string }).id,
+          code: appliedPromo.code,
+          partner_name: appliedPromo.partner_name,
+          order_total: finalTotal,
+          discount_amount: promoDiscount,
+          commission_rate: appliedPromo.commission_rate,
+          commission_amount: promoReward,
+          commission_status: 'pending',
+        }),
+        supabase.rpc('increment_promo_used_count', { promo_id: appliedPromo.id }),
+      ]).catch(() => { /* non-fatal */ });
+    }
+
+    // ── Step 2c: WhatsApp notification (fire-and-forget) ─────────────────────────
     fetch(`${SUPABASE_URL}/functions/v1/notify-order`, {
       method: 'POST',
       headers: {
@@ -244,7 +336,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
         order_number: (order as { order_number: string }).order_number,
         customer_name: name,
         customer_phone: phone,
-        total: subtotal,
+        total: finalTotal,
         payment_method: payment,
         delivery_address: address,
         notes,
@@ -256,7 +348,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
       order_id: (order as { id: string }).id,
       order_number: (order as { order_number: string }).order_number,
       method: payment,
-      amount: subtotal,
+      amount: finalTotal,
       status: 'pending',
       payer_name: name,
       payer_phone: phone,
@@ -273,7 +365,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: subtotal,
+            amount: finalTotal,
             description: `Commande ${(order as { order_number: string }).order_number}`,
             callback_url: `${window.location.origin}?order=${(order as { order_number: string }).order_number}`,
             customer: {
@@ -344,7 +436,7 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
             custom_metadata: {
               order_number: (order as { order_number: string }).order_number,
               order_id: (order as { id: string }).id,
-              order_amount: String(subtotal),
+              order_amount: String(finalTotal),
               customer_name: name,
             },
           }),
@@ -562,9 +654,68 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
                 <span className="font-medium text-brand-dark text-xs text-right max-w-32 truncate">{METHOD_LABELS[payment]}</span>
               </div>
             </div>
+
+            {/* Promo code input */}
+            <div className="py-3 border-b border-brand-border">
+              {appliedPromo ? (
+                <div className="flex items-center justify-between gap-2 bg-brand-success/5 border border-brand-success/20 rounded-lg p-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <TicketPercent className="w-4 h-4 text-brand-success flex-shrink-0" />
+                    <div className="min-w-0">
+                      <code className="font-mono text-sm font-semibold text-brand-success">{appliedPromo.code}</code>
+                      <p className="text-xs text-brand-muted truncate">
+                        {appliedPromo.discount_value > 0
+                          ? appliedPromo.discount_type === 'percentage'
+                            ? `-${appliedPromo.discount_value}% pour vous`
+                            : `-${formatPrice(appliedPromo.discount_value)} pour vous`
+                          : 'Code partenaire appliqué'}
+                      </p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={removePromo} className="p-1 rounded hover:bg-brand-danger/10 text-brand-danger transition flex-shrink-0">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <TicketPercent className="w-4 h-4 text-brand-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        value={promoInput}
+                        onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
+                        placeholder="Code promo"
+                        className="input !pl-9 uppercase text-sm font-mono"
+                        disabled={promoChecking}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={promoChecking || !promoInput.trim()}
+                      className="btn-secondary text-sm flex-shrink-0"
+                    >
+                      {promoChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Appliquer'}
+                    </button>
+                  </div>
+                  {promoError && (
+                    <p className="text-xs text-brand-danger mt-1.5">{promoError}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Discount line */}
+            {appliedPromo && promoDiscount > 0 && (
+              <div className="flex justify-between text-sm py-1">
+                <span className="text-brand-success">Remise promo</span>
+                <span className="font-medium text-brand-success">-{formatPrice(promoDiscount)}</span>
+              </div>
+            )}
+
             <div className="flex justify-between items-baseline pt-4 mb-4">
               <span className="font-semibold">Total</span>
-              <span className="text-2xl font-bold text-brand-primary">{formatPrice(subtotal)}</span>
+              <span className="text-2xl font-bold text-brand-primary">{formatPrice(finalTotal)}</span>
             </div>
             {error && <div className="bg-brand-danger/10 text-brand-danger text-sm p-2 rounded mb-3">{error}</div>}
             <button type="submit" disabled={submitting} className="btn-primary w-full">

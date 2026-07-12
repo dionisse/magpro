@@ -12,7 +12,8 @@ export type AdminModule =
   | 'admin-purchases'
   | 'admin-sections'
   | 'admin-settings'
-  | 'admin-banners';
+  | 'admin-banners'
+  | 'admin-promos';
 
 export interface Banner {
   id: string;
@@ -245,5 +246,44 @@ export interface PurchaseItem {
   unit_price: number;
   quantity: number;
   subtotal: number;
+  created_at: string;
+}
+
+export type PromoPartnerType = 'commercial' | 'apporteur';
+export type PromoDiscountType = 'percentage' | 'fixed';
+export type CommissionStatus = 'pending' | 'paid';
+
+export interface PromoCode {
+  id: string;
+  code: string;
+  partner_name: string;
+  partner_phone: string | null;
+  partner_email: string | null;
+  partner_type: PromoPartnerType;
+  commission_rate: number;
+  discount_type: PromoDiscountType;
+  discount_value: number;
+  min_order_amount: number;
+  max_uses: number | null;
+  used_count: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromoUsage {
+  id: string;
+  promo_code_id: string;
+  order_id: string;
+  code: string;
+  partner_name: string | null;
+  order_total: number;
+  discount_amount: number;
+  commission_rate: number;
+  commission_amount: number;
+  commission_status: CommissionStatus;
   created_at: string;
 }
