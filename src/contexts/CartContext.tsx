@@ -37,7 +37,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   function addToCart(product: Product, quantity = 1, options?: AddToCartOptions) {
     const key = options?.optionLabel ? `${product.id}__${options.optionLabel}` : product.id;
-    const maxQty = options?.optionStock !== undefined ? options.optionStock : product.stock;
+    const untracked = !product.track_stock;
+    const maxQty = untracked ? 9999 : (options?.optionStock !== undefined ? options.optionStock : product.stock);
 
     setItems((prev) => {
       const existing = prev.find((it) => (it.cartKey ?? it.product.id) === key);
@@ -65,7 +66,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (quantity <= 0) { removeFromCart(cartKey); return; }
     setItems((prev) => prev.map((it) => {
       if ((it.cartKey ?? it.product.id) !== cartKey) return it;
-      const maxQty = it.optionStock !== undefined ? it.optionStock : it.product.stock;
+      const untracked = !it.product.track_stock;
+      const maxQty = untracked ? 9999 : (it.optionStock !== undefined ? it.optionStock : it.product.stock);
       return { ...it, quantity: Math.min(quantity, maxQty) };
     }));
   }

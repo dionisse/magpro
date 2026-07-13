@@ -276,8 +276,8 @@ export function ProductCard({ product, onView, onAdd }: {
   onView: () => void;
   onAdd: () => void;
 }) {
-  const isOutOfStock = product.stock === 0;
-  const isLowStock = product.stock > 0 && product.stock <= product.low_stock_threshold;
+  const isOutOfStock = product.track_stock && product.stock === 0;
+  const isLowStock = product.track_stock && product.stock > 0 && product.stock <= product.low_stock_threshold;
   const isNew = Date.now() - new Date(product.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
   const hasBulk = product.bulk_quantity > 0 && product.bulk_price > 0;
   const [justAdded, setJustAdded] = useState(false);

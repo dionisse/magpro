@@ -85,6 +85,7 @@ interface BulkRow {
   bulk_quantity: string;
   bulk_price: string;
   is_active: boolean;
+  track_stock: boolean;
   _dirty: boolean;
   _error?: string;
 }
@@ -94,7 +95,7 @@ function emptyRow(): BulkRow {
     _key: crypto.randomUUID(),
     name: '', sku: '', brand_name: '', category_name: '',
     price: '0', stock: '0', bulk_quantity: '0', bulk_price: '0',
-    is_active: true, _dirty: true,
+    is_active: true, track_stock: true, _dirty: true,
   };
 }
 
@@ -209,6 +210,7 @@ export function AdminProducts() {
                     <th className="p-3 hidden md:table-cell">Catégorie</th>
                     <th className="p-3 text-right">Prix</th>
                     <th className="p-3 text-center">Stock</th>
+                    <th className="p-3 hidden lg:table-cell text-center">Suivi stock</th>
                     <th className="p-3 hidden lg:table-cell text-center">Options</th>
                     <th className="p-3 text-center hidden sm:table-cell">Actif</th>
                     <th className="p-3 text-right">Actions</th>
@@ -244,9 +246,16 @@ export function AdminProducts() {
                         <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{cat?.name || '—'}</td>
                         <td className="p-3 text-right font-semibold">{formatPrice(p.price)}</td>
                         <td className="p-3 text-center">
-                          <span className={`badge text-xs font-semibold ${p.stock === 0 ? 'bg-brand-danger/15 text-brand-danger' : isLow ? 'bg-brand-warning/15 text-brand-warning' : 'bg-brand-success/15 text-brand-success'}`}>
-                            {p.stock}
-                          </span>
+                          {p.track_stock ? (
+                            <span className={`badge text-xs font-semibold ${p.stock === 0 ? 'bg-brand-danger/15 text-brand-danger' : isLow ? 'bg-brand-warning/15 text-brand-warning' : 'bg-brand-success/15 text-brand-success'}`}>
+                              {p.stock}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-brand-muted" title="Suivi de stock désactivé">—</span>
+                          )}
+                        </td>
+                        <td className="p-3 hidden lg:table-cell text-center">
+                          <span className={`w-2 h-2 rounded-full inline-block ${p.track_stock ? 'bg-brand-success' : 'bg-brand-border'}`} title={p.track_stock ? 'Suivi activé' : 'Suivi désactivé'} />
                         </td>
                         <td className="p-3 hidden lg:table-cell text-center">
                           <OptionsBadge productId={p.id} />
@@ -346,6 +355,7 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
   const [threshold, setThreshold]     = useState(String(product?.low_stock_threshold ?? 5));
   const [imageUrl, setImageUrl]       = useState(product?.image_url ?? '');
   const [isActive, setIsActive]       = useState(product?.is_active ?? true);
+  const [trackStock, setTrackStock]   = useState(product?.track_stock ?? true);
   const [groups, setGroups]           = useState<LocalGroup[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(!!product);
   const [saving, setSaving]           = useState(false);
@@ -441,6 +451,7 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
       low_stock_threshold: Number(threshold),
       image_url: finalImageUrl,
       is_active: isActive,
+      track_stock: trackStock,
     };
 
     let productId = product?.id;
@@ -664,6 +675,13 @@ function ProductForm({ product, categories, brands, onBrandCreated, onClose, onS
                 </label>
               </div>
             </div>
+
+            {/* Stock tracking toggle */}
+            <label className="flex items-center gap-2 text-sm cursor-pointer mt-2">
+              <input type="checkbox" checked={trackStock} onChange={(e) => setTrackStock(e.target.checked)} className="w-4 h-4 rounded" />
+              Suivre le stock pour ce produit
+              <span className="text-xs text-brand-muted ml-1">— désactivez pour les produits illimités ou sur commande</span>
+            </label>
           </div>
         )}
 
@@ -907,6 +925,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
         bulk_quantity: cols[6] ?? '0',
         bulk_price: cols[7] ?? '0',
         is_active: true,
+        track_stock: true,
         _dirty: true,
       };
     });
@@ -934,6 +953,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
         bulk_quantity: Number(row.bulk_quantity) || 0,
         bulk_price: Number(row.bulk_price) || 0,
         is_active: row.is_active,
+        track_stock: row.track_stock,
         description: '',
         image_url: '',
         low_stock_threshold: 5,
@@ -1007,6 +1027,7 @@ function BulkEditor({ products, categories, brands, onSaved }: {
               <tr>
                 <th className="px-2 py-2 w-6"></th>
                 {BULK_COLUMNS.map((c) => <th key={c} className="px-2 py-2 text-left whitespace-nowrap">{c}</th>)}
+                <th className="px-2 py-2 text-center" title="Suivi de stock">Stock suivi</th>
                 <th className="px-2 py-2 text-center">Actif</th>
                 <th className="px-2 py-2"></th>
               </tr>
@@ -1049,6 +1070,9 @@ function BulkRow({ row, onChange, onRemove }: {
       <td className="px-1 py-1"><input type="number" min={0} value={row.stock} onChange={(e) => onChange('stock', e.target.value)} className={`${cellCls} w-20`} /></td>
       <td className="px-1 py-1"><input type="number" min={0} value={row.bulk_quantity} onChange={(e) => onChange('bulk_quantity', e.target.value)} className={`${cellCls} w-20`} /></td>
       <td className="px-1 py-1"><input type="number" min={0} value={row.bulk_price} onChange={(e) => onChange('bulk_price', e.target.value)} className={`${cellCls} w-24`} /></td>
+      <td className="px-1 py-1 text-center">
+        <input type="checkbox" checked={row.track_stock} onChange={(e) => onChange('track_stock', e.target.checked)} className="w-4 h-4" />
+      </td>
       <td className="px-1 py-1 text-center">
         <input type="checkbox" checked={row.is_active} onChange={(e) => onChange('is_active', e.target.checked)} className="w-4 h-4" />
       </td>

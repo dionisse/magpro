@@ -108,7 +108,7 @@ function OptionSelector({
           <div className="flex flex-wrap gap-2">
             {(group.product_options ?? []).map((opt) => {
               const isSelected = selected[group.id]?.id === opt.id;
-              const isOutOfStock = opt.stock === 0;
+              const isOutOfStock = !product.track_stock ? false : opt.stock === 0;
               return (
                 <button
                   key={opt.id}
@@ -229,13 +229,16 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
   const totalPriceModifier = Object.values(selected).reduce((acc, o) => acc + o.price_modifier, 0);
 
   // Determine effective stock: minimum of product stock and all selected option stocks
+  // When stock tracking is disabled, treat as unlimited
   const selectedOptionStocks = Object.values(selected).map((o) => o.stock);
-  const effectiveStock = selectedOptionStocks.length > 0
-    ? Math.min(product.stock, ...selectedOptionStocks)
-    : product.stock;
+  const effectiveStock = !product.track_stock
+    ? Infinity
+    : selectedOptionStocks.length > 0
+      ? Math.min(product.stock, ...selectedOptionStocks)
+      : product.stock;
 
   const hasBulk = product.bulk_quantity > 0 && product.bulk_price > 0;
-  const isOutOfStock = effectiveStock === 0;
+  const isOutOfStock = product.track_stock && effectiveStock === 0;
   const effectivePrice = getEffectivePrice(product, quantity, totalPriceModifier);
   const total = effectivePrice * quantity;
   const savings = hasBulk && quantity >= product.bulk_quantity ? (product.price - product.bulk_price) * quantity : 0;
@@ -336,7 +339,9 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
           {/* Stock status */}
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm font-semibold">Stock :</span>
-            {isOutOfStock ? (
+            {!product.track_stock ? (
+              <span className="badge bg-brand-info/15 text-brand-info">Disponible</span>
+            ) : isOutOfStock ? (
               <span className="badge bg-brand-danger/15 text-brand-danger">Rupture de stock</span>
             ) : effectiveStock <= product.low_stock_threshold ? (
               <span className="badge bg-brand-warning/15 text-brand-warning flex items-center gap-1">
@@ -359,9 +364,9 @@ export function ProductPage({ id, setView }: { id: string; setView: (v: View) =>
                     <Minus className="w-4 h-4" />
                   </button>
                   <input type="number" value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Math.min(effectiveStock, parseInt(e.target.value) || 1)))}
+                    onChange={(e) => setQuantity(Math.max(1, Math.min(effectiveStock === Infinity ? 9999 : effectiveStock, parseInt(e.target.value) || 1)))}
                     className="w-16 text-center font-bold border-x border-brand-border py-2 focus:outline-none bg-white" />
-                  <button onClick={() => setQuantity(Math.min(effectiveStock, quantity + 1))}
+                  <button onClick={() => setQuantity(Math.min(effectiveStock === Infinity ? 9999 : effectiveStock, quantity + 1))}
                     className="p-2.5 hover:bg-brand-surface active:bg-brand-border transition-colors duration-100">
                     <Plus className="w-4 h-4" />
                   </button>

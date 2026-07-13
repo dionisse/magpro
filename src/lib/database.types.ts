@@ -151,6 +151,7 @@ export interface ProductOption {
   label: string;
   price_modifier: number;
   stock: number;
+  track_stock: boolean;
   image_url: string | null;
   sort_order: number;
   created_at: string;
@@ -167,6 +168,7 @@ export interface Product {
   bulk_price: number;
   stock: number;
   low_stock_threshold: number;
+  track_stock: boolean;
   image_url: string;
   sku: string;
   is_active: boolean;

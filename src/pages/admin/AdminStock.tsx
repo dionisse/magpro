@@ -183,9 +183,10 @@ export function AdminStock() {
     return true;
   });
 
-  // ── Stock summary per product ──────────────────────────────────────────────
-  const lowStockProducts = products.filter((p) => p.stock <= p.low_stock_threshold && p.stock >= 0);
-  const outOfStock = products.filter((p) => p.stock === 0);
+  // ── Stock summary per product (only for products with stock tracking enabled) ──
+  const trackedProducts = products.filter((p) => p.track_stock);
+  const lowStockProducts = trackedProducts.filter((p) => p.stock <= p.low_stock_threshold && p.stock >= 0);
+  const outOfStock = trackedProducts.filter((p) => p.stock === 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
@@ -271,8 +272,8 @@ export function AdminStock() {
                   </thead>
                   <tbody className="divide-y divide-brand-border">
                     {products.map((p) => {
-                      const isOut = p.stock === 0;
-                      const isLow = p.stock > 0 && p.stock <= p.low_stock_threshold;
+                      const isOut = p.track_stock && p.stock === 0;
+                      const isLow = p.track_stock && p.stock > 0 && p.stock <= p.low_stock_threshold;
                       return (
                         <tr key={p.id} className={`hover:bg-brand-surface/50 ${isOut ? 'bg-brand-danger/3' : ''}`}>
                           <td className="p-3 font-medium">{p.name}</td>
@@ -284,12 +285,14 @@ export function AdminStock() {
                               </span>
                             ) : <span className="text-brand-muted text-xs">—</span>}
                           </td>
-                          <td className={`p-3 text-right font-bold text-lg ${isOut ? 'text-brand-danger' : isLow ? 'text-brand-warning' : 'text-brand-dark'}`}>
-                            {p.stock}
+                          <td className={`p-3 text-right font-bold text-lg ${!p.track_stock ? 'text-brand-muted' : isOut ? 'text-brand-danger' : isLow ? 'text-brand-warning' : 'text-brand-dark'}`}>
+                            {p.track_stock ? p.stock : '—'}
                           </td>
-                          <td className="p-3 text-right hidden md:table-cell text-brand-muted text-xs">{p.low_stock_threshold}</td>
+                          <td className="p-3 text-right hidden md:table-cell text-brand-muted text-xs">{p.track_stock ? p.low_stock_threshold : '—'}</td>
                           <td className="p-3 text-center">
-                            {isOut ? (
+                            {!p.track_stock ? (
+                              <span className="badge bg-brand-border/30 text-brand-muted text-xs">Non suivi</span>
+                            ) : isOut ? (
                               <span className="badge bg-brand-danger/15 text-brand-danger text-xs">Rupture</span>
                             ) : isLow ? (
                               <span className="badge bg-brand-warning/15 text-brand-warning text-xs">Faible</span>
@@ -298,7 +301,7 @@ export function AdminStock() {
                             )}
                           </td>
                           <td className="p-3 text-right hidden lg:table-cell text-brand-muted text-xs">{formatPrice(p.price)}</td>
-                          <td className="p-3 text-right hidden lg:table-cell font-medium">{formatPrice(p.price * p.stock)}</td>
+                          <td className="p-3 text-right hidden lg:table-cell font-medium">{p.track_stock ? formatPrice(p.price * p.stock) : '—'}</td>
                         </tr>
                       );
                     })}
@@ -310,7 +313,7 @@ export function AdminStock() {
               <div className="p-4 border-t border-brand-border bg-brand-surface flex flex-wrap gap-4 justify-end">
                 <div className="text-sm">
                   <span className="text-brand-muted">Valeur totale du stock : </span>
-                  <span className="font-bold text-brand-primary">{formatPrice(products.reduce((a, p) => a + p.price * p.stock, 0))}</span>
+                  <span className="font-bold text-brand-primary">{formatPrice(trackedProducts.reduce((a, p) => a + p.price * p.stock, 0))}</span>
                 </div>
               </div>
             </div>

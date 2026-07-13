@@ -31,7 +31,7 @@ export function CartPage({ setView }: { setView: (v: View) => void }) {
             const key = item.cartKey ?? item.product.id;
             const price = getEffectivePrice(item.product, item.quantity, item.priceModifier ?? 0);
             const bulkActive = item.product.bulk_quantity > 0 && item.quantity >= item.product.bulk_quantity && item.product.bulk_price > 0;
-            const maxQty = item.optionStock !== undefined ? item.optionStock : item.product.stock;
+            const maxQty = !item.product.track_stock ? 9999 : (item.optionStock !== undefined ? item.optionStock : item.product.stock);
             const firstImage = parseImages(item.product.image_url)[0] ?? null;
             return (
               <div key={key} className="card p-3 flex gap-3">
