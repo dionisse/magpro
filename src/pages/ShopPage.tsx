@@ -269,6 +269,77 @@ function PromotionCard({ promo, index, onAction }: { promo: Promotion; index: nu
   );
 }
 
+// ─── Category product section (horizontal scroll row) ────────────────────────
+
+function CategoryProductsSection({ category, products, onView, onAdd, onSeeAll }: {
+  category: Category;
+  products: Product[];
+  onView: (id: string) => void;
+  onAdd: (product: Product) => void;
+  onSeeAll: () => void;
+}) {
+  if (products.length === 0) return null;
+
+  return (
+    <section className="mb-14">
+      {/* Section header */}
+      <div className="flex items-end justify-between mb-4">
+        <div className="flex items-center gap-3">
+          {category.image_url && (
+            <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 shadow-sm border border-brand-border">
+              <img src={category.image_url} alt={category.name} className="w-full h-full object-cover" />
+            </div>
+          )}
+          <div>
+            <h2 className="text-lg font-black text-brand-dark leading-tight">{category.name}</h2>
+            <p className="text-xs text-brand-muted">{products.length} produit{products.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+        <button
+          onClick={onSeeAll}
+          className="flex items-center gap-1 text-xs font-semibold text-brand-primary hover:text-brand-primary/80 transition group"
+        >
+          Voir tout
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      </div>
+
+      {/* Horizontal scroll on mobile, grid on desktop */}
+      <div className="relative">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:overflow-visible sm:pb-0">
+          {products.slice(0, 6).map((product, i) => (
+            <div key={product.id} className="flex-shrink-0 w-[155px] sm:w-auto">
+              <StaggerItem index={i}>
+                <ProductCard
+                  product={product}
+                  onView={() => onView(product.id)}
+                  onAdd={() => onAdd(product)}
+                />
+              </StaggerItem>
+            </div>
+          ))}
+          {/* "See all" card when there are more than 6 products */}
+          {products.length > 6 && (
+            <div className="flex-shrink-0 w-[155px] sm:w-auto">
+              <button
+                onClick={onSeeAll}
+                className="w-full h-full min-h-[200px] rounded-xl border-2 border-dashed border-brand-border hover:border-brand-primary hover:bg-brand-primary/3 transition-all duration-200 flex flex-col items-center justify-center gap-2 group"
+              >
+                <div className="w-10 h-10 rounded-full bg-brand-primary/10 group-hover:bg-brand-primary/20 flex items-center justify-center transition-colors">
+                  <ArrowRight className="w-5 h-5 text-brand-primary" />
+                </div>
+                <span className="text-xs font-semibold text-brand-primary">
+                  +{products.length - 6} autres
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Product card ─────────────────────────────────────────────────────────────
 
 export function ProductCard({ product, onView, onAdd }: {
@@ -632,18 +703,85 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
             </div>
           )}
 
-          {/* Result count */}
-          {!loading && (
+          {/* Result count — only when filtering */}
+          {!loading && (activeCategory || search) && (
             <p className="text-sm text-brand-muted mb-4">
               <span className="font-bold text-brand-dark">{filtered.length}</span> produit{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
             </p>
           )}
 
-          {/* Grid */}
+          {/* ── Unfiltered: products split by category ─────────────────────── */}
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
+          ) : !activeCategory && !search ? (
+            (() => {
+              const rootCats = categories.filter((c) => !c.parent_id);
+              const allChildIds = new Set(categories.filter((c) => c.parent_id).map((c) => c.id));
+              const sectionsToShow = rootCats
+                .map((cat) => {
+                  const childIds = categories.filter((c) => c.parent_id === cat.id).map((c) => c.id);
+                  const catProducts = filtered.filter(
+                    (p) => p.category_id === cat.id || childIds.includes(p.category_id ?? ''),
+                  );
+                  return { cat, catProducts };
+                })
+                .filter(({ catProducts }) => catProducts.length > 0);
+              // Products not assigned to any root category
+              const uncategorised = filtered.filter(
+                (p) => !p.category_id || allChildIds.has(p.category_id)
+                  ? false
+                  : !rootCats.some((rc) => {
+                      const childIds = categories.filter((c) => c.parent_id === rc.id).map((c) => c.id);
+                      return p.category_id === rc.id || childIds.includes(p.category_id ?? '');
+                    }),
+              );
+              return (
+                <>
+                  {sectionsToShow.map(({ cat, catProducts }) => (
+                    <CategoryProductsSection
+                      key={cat.id}
+                      category={cat}
+                      products={catProducts}
+                      onView={(id) => setView({ kind: 'product', id })}
+                      onAdd={(product) => addToCart(product)}
+                      onSeeAll={() => { setActiveCategory(cat.id); setActiveSubcategory(null); productsSectionRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+                    />
+                  ))}
+                  {uncategorised.length > 0 && (
+                    <section className="mb-14">
+                      <div className="flex items-end justify-between mb-4">
+                        <div>
+                          <h2 className="text-lg font-black text-brand-dark">Autres produits</h2>
+                          <p className="text-xs text-brand-muted">{uncategorised.length} produit{uncategorised.length !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                        {uncategorised.map((product, i) => (
+                          <StaggerItem key={product.id} index={i % 8}>
+                            <ProductCard
+                              product={product}
+                              onView={() => setView({ kind: 'product', id: product.id })}
+                              onAdd={() => addToCart(product)}
+                            />
+                          </StaggerItem>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                  {sectionsToShow.length === 0 && uncategorised.length === 0 && (
+                    <div className="text-center py-24">
+                      <div className="w-20 h-20 bg-brand-surface rounded-full flex items-center justify-center mx-auto mb-5">
+                        <AlertCircle className="w-9 h-9 text-brand-muted" />
+                      </div>
+                      <p className="text-lg font-bold mb-2">Catalogue vide</p>
+                      <p className="text-sm text-brand-muted">Aucun produit disponible pour le moment</p>
+                    </div>
+                  )}
+                </>
+              );
+            })()
           ) : filtered.length === 0 ? (
             <div className="text-center py-24 animate-fade-in-scale">
               <div className="w-20 h-20 bg-brand-surface rounded-full flex items-center justify-center mx-auto mb-5">
