@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shield, ArrowLeft, Loader2, CheckCircle2, AlertTriangle, KeyRound } from 'lucide-react';
+import { Shield, ArrowLeft, Loader2, CheckCircle2, AlertTriangle, KeyRound, Lock, ScanBarcode, ShoppingBag, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { View } from '../lib/views';
@@ -39,84 +39,98 @@ export function AdminSetupPage({ setView }: { setView: (v: View) => void }) {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-10">
-      <button onClick={() => setView({ kind: 'shop' })} className="btn-ghost mb-6 -ml-2">
-        <ArrowLeft className="w-4 h-4" />Retour
-      </button>
+    <div className="bg-brand-surface min-h-screen">
+      <div className="shell py-8 lg:py-14">
+        <button onClick={() => setView({ kind: 'shop' })} className="btn-ghost mb-5 -ml-2">
+          <ArrowLeft className="w-4 h-4" />Retour à la boutique
+        </button>
 
-      <div className="card overflow-hidden">
-        <div className="bg-brand-primary p-6 text-white text-center">
-          <div className="w-14 h-14 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Shield className="w-7 h-7" />
+        <div className="max-w-lg mx-auto panel overflow-hidden">
+          <div className="relative bg-brand-primary text-white p-6 sm:p-7 text-center overflow-hidden">
+            <div className="absolute inset-0 bg-mesh-navy opacity-95" aria-hidden />
+            <div className="absolute -bottom-14 -right-10 w-48 h-48 rounded-full bg-brand-accent/15 blur-3xl" aria-hidden />
+            <div className="relative">
+              <span className="relative inline-grid place-items-center w-14 h-14 rounded-3xl bg-white/10 mx-auto mb-3">
+                <Shield className="w-7 h-7 text-brand-accent" />
+              </span>
+              <h1 className="font-display text-xl font-extrabold text-white">Espace administrateur</h1>
+              <p className="text-white/70 text-sm mt-1.5">Accès réservé aux gestionnaires du magasin</p>
+            </div>
           </div>
-          <h1 className="text-xl font-bold">Espace Administrateur</h1>
-          <p className="text-white/75 text-sm mt-1">Accès réservé aux gestionnaires du magasin</p>
-        </div>
 
-        <div className="p-6">
-          {success ? (
-            <div className="text-center py-4">
-              <CheckCircle2 className="w-12 h-12 text-brand-success mx-auto mb-3" />
-              <p className="font-semibold text-lg">Accès administrateur activé !</p>
-              <p className="text-sm text-brand-muted mt-1">Redirection en cours...</p>
-            </div>
-          ) : !user ? (
-            <div className="text-center py-4">
-              <AlertTriangle className="w-10 h-10 text-brand-warning mx-auto mb-3" />
-              <p className="font-medium mb-3">Connexion requise</p>
-              <button onClick={() => setView({ kind: 'auth' })} className="btn-primary">Se connecter</button>
-            </div>
-          ) : (
-            <>
-              <div className="bg-brand-surface rounded-lg p-4 mb-5 text-sm">
-                <p className="font-medium mb-2 flex items-center gap-2"><KeyRound className="w-4 h-4 text-brand-primary" />Code d'activation requis</p>
-                <p className="text-brand-muted">Entrez le code d'activation fourni par l'administrateur système pour débloquer l'accès.</p>
-                <div className="mt-3 p-2 bg-brand-primary/10 rounded text-xs text-brand-primary font-medium">
-                  Contactez l'administrateur système pour obtenir le code d'accès.
-                </div>
+          <div className="p-6 sm:p-7">
+            {success ? (
+              <div className="text-center py-6">
+                <CheckCircle2 className="w-14 h-14 text-brand-success mx-auto mb-4 animate-success-pop" />
+                <p className="font-display font-extrabold text-lg text-brand-ink">Accès administrateur activé !</p>
+                <p className="text-sm text-brand-muted mt-1.5">Redirection en cours…</p>
               </div>
-
-              <form onSubmit={grantAdmin} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1.5">Code d'accès administrateur</label>
-                  <input
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Entrez le code..."
-                    className="input font-mono text-base"
-                    maxLength={30}
-                    autoComplete="off"
-                    spellCheck={false}
-                  />
-                </div>
-                {error && (
-                  <div className="flex items-center gap-2 bg-brand-danger/10 text-brand-danger text-sm p-3 rounded">
-                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                    {error}
-                  </div>
-                )}
-                <button type="submit" disabled={loading || !code} className="btn-primary w-full">
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Activer l\'accès administrateur'}
+            ) : !user ? (
+              <div className="text-center py-6">
+                <AlertTriangle className="w-11 h-11 text-brand-warning mx-auto mb-3" />
+                <p className="font-bold text-brand-ink mb-1">Connexion requise</p>
+                <p className="text-sm text-brand-muted mb-5">Connectez-vous avec votre compte gestionnaire pour continuer.</p>
+                <button onClick={() => setView({ kind: 'auth' })} className="btn-primary">
+                  Se connecter
                 </button>
-              </form>
-
-              <div className="mt-5 pt-5 border-t border-brand-border">
-                <p className="text-xs text-brand-muted text-center font-medium mb-3">Rôles disponibles</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { role: 'Admin', desc: 'Accès complet', color: 'bg-brand-primary/10 text-brand-primary' },
-                    { role: 'Caissier', desc: 'POS + commandes', color: 'bg-brand-info/10 text-brand-info' },
-                    { role: 'Client', desc: 'Achat en ligne', color: 'bg-brand-success/10 text-brand-success' },
-                  ].map((r) => (
-                    <div key={r.role} className={`text-center p-2 rounded-lg text-xs ${r.color}`}>
-                      <p className="font-semibold">{r.role}</p>
-                      <p className="opacity-80 mt-0.5">{r.desc}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
-            </>
-          )}
+            ) : (
+              <>
+                <div className="rounded-2xl border border-brand-border bg-brand-surface p-4 mb-5">
+                  <p className="font-bold text-sm text-brand-ink mb-2 flex items-center gap-2">
+                    <KeyRound className="w-4 h-4 text-brand-primary" />Code d'activation requis
+                  </p>
+                  <p className="text-[13px] text-brand-muted leading-relaxed">
+                    Saisissez le code fourni par l'administrateur système pour débloquer l'espace de gestion.
+                  </p>
+                  <p className="mt-3 inline-flex items-center gap-2 rounded-xl bg-brand-primary/[0.08] text-brand-primary text-[12px] font-semibold px-3 py-2">
+                    <Lock className="w-3.5 h-3.5" />Contactez l'administrateur système pour obtenir le code.
+                  </p>
+                </div>
+
+                <form onSubmit={grantAdmin} className="space-y-4">
+                  <div>
+                    <label className="label">Code d'accès administrateur</label>
+                    <input
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      placeholder="Entrez le code…"
+                      className="input font-mono text-base tracking-widest"
+                      maxLength={30}
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                  </div>
+                  {error && (
+                    <div className="flex items-center gap-2.5 rounded-2xl border border-brand-danger/25 bg-brand-danger/[0.07] text-brand-danger text-[13px] font-medium p-3.5">
+                      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
+                  <button type="submit" disabled={loading || !code} className="btn-primary w-full py-3.5">
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Sparkles className="w-4 h-4" />Activer l'accès administrateur</>}
+                  </button>
+                </form>
+
+                <div className="mt-6 pt-6 border-t border-brand-border">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted text-center mb-3.5">Rôles disponibles</p>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { role: 'Admin', desc: 'Accès complet', icon: Shield, color: 'border-brand-primary/25 bg-brand-primary/[0.05] text-brand-primary' },
+                      { role: 'Caissier', desc: 'POS + commandes', icon: ScanBarcode, color: 'border-brand-info/25 bg-brand-info/[0.05] text-brand-info' },
+                      { role: 'Client', desc: 'Achat en ligne', icon: ShoppingBag, color: 'border-brand-success/25 bg-brand-success/[0.05] text-brand-success' },
+                    ].map((r) => (
+                      <div key={r.role} className={`rounded-2xl border px-3 py-3.5 text-center ${r.color}`}>
+                        <r.icon className="w-4 h-4 mx-auto mb-1.5" />
+                        <p className="text-[12.5px] font-bold">{r.role}</p>
+                        <p className="text-[10.5px] opacity-75 mt-0.5">{r.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

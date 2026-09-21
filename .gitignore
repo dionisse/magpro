@@ -21,3 +21,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.arena/
+
+# Aperçu local (données de démonstration) — ne pas versionner
+demo.html
+public/mock/
