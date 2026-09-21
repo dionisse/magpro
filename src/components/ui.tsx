@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, createContext, useContext, ReactNode } from 'react';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Info, ArrowRight, Sparkles } from 'lucide-react';
 
 // ─── LazyImage ────────────────────────────────────────────────────────────────
 // Intersection-observer lazy loading with shimmer skeleton + fade-in
@@ -22,7 +22,7 @@ export function LazyImage({ src, alt, className = '', fallback }: LazyImageProps
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
-      { rootMargin: '120px' }
+      { rootMargin: '160px' }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -31,7 +31,7 @@ export function LazyImage({ src, alt, className = '', fallback }: LazyImageProps
   return (
     <span ref={ref} className="relative block w-full h-full">
       {!loaded && !error && (
-        <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-brand-border via-white to-brand-border bg-[length:200%_100%]" />
+        <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-brand-surface-2 via-white to-brand-surface-2 bg-[length:200%_100%]" />
       )}
       {inView && !error && (
         <img
@@ -41,7 +41,7 @@ export function LazyImage({ src, alt, className = '', fallback }: LazyImageProps
           decoding="async"
           onLoad={() => setLoaded(true)}
           onError={() => setError(true)}
-          className={`${className} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className} transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
       {error && (fallback ?? <span className="absolute inset-0 flex items-center justify-center bg-brand-surface text-brand-muted text-xs">Image</span>)}
@@ -86,15 +86,100 @@ export function PageWrapper({ children, className = '' }: { children: ReactNode;
   );
 }
 
-// ─── StaggerItem ─────────────────────────────────────────────────────────────
+// ─── StaggerItem ──────────────────────────────────────────────────────────────
 
 export function StaggerItem({ children, index = 0, className = '' }: { children: ReactNode; index?: number; className?: string }) {
   return (
     <div
-      className={`animate-fade-in-up ${className}`}
-      style={{ animationDelay: `${index * 60}ms` }}
+      className={`animate-fade-in-up h-full ${className}`}
+      style={{ animationDelay: `${Math.min(index * 55, 420)}ms` }}
     >
       {children}
+    </div>
+  );
+}
+
+// ─── SectionHeader ────────────────────────────────────────────────────────────
+
+export function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  actionLabel,
+  onAction,
+  icon,
+  className = '',
+}: {
+  eyebrow?: string;
+  title: ReactNode;
+  description?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  icon?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`flex flex-wrap items-end justify-between gap-4 mb-6 ${className}`}>
+      <div className="min-w-0">
+        {eyebrow && (
+          <p className="eyebrow mb-2">
+            <span className="w-5 h-px bg-brand-accent" aria-hidden />
+            {eyebrow}
+          </p>
+        )}
+        <h2 className="section-title flex items-center gap-2.5">
+          {icon}
+          {title}
+        </h2>
+        {description && <p className="text-sm text-brand-muted mt-2 max-w-xl">{description}</p>}
+      </div>
+      {actionLabel && onAction && (
+        <button
+          onClick={onAction}
+          className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-brand-border
+                     text-[13px] font-bold text-brand-ink hover:border-brand-primary hover:text-brand-primary
+                     hover:shadow-soft transition-all duration-200 active:scale-95"
+        >
+          {actionLabel}
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── EmptyState ───────────────────────────────────────────────────────────────
+
+export function EmptyState({
+  icon,
+  title,
+  description,
+  actionLabel,
+  onAction,
+  className = '',
+}: {
+  icon?: ReactNode;
+  title: string;
+  description?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  className?: string;
+}) {
+  return (
+    <div className={`text-center py-16 sm:py-20 animate-fade-in-scale ${className}`}>
+      <div className="relative w-20 h-20 mx-auto mb-5">
+        <div className="absolute inset-0 rounded-3xl bg-brand-primary/[0.06] rotate-6" />
+        <div className="absolute inset-0 rounded-3xl bg-white border border-brand-border grid place-items-center">
+          {icon ?? <Sparkles className="w-8 h-8 text-brand-primary/60" />}
+        </div>
+      </div>
+      <p className="font-display text-lg font-bold text-brand-ink">{title}</p>
+      {description && <p className="text-sm text-brand-muted mt-1.5 max-w-sm mx-auto">{description}</p>}
+      {actionLabel && onAction && (
+        <button onClick={onAction} className="btn-primary mt-6">
+          {actionLabel}
+        </button>
+      )}
     </div>
   );
 }
@@ -153,13 +238,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastCtx.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 items-center pointer-events-none">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 items-center pointer-events-none px-4">
         {toasts.map((t) => (
           <div key={t.id}
-            className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-medium select-none ${colors[t.type]} ${t.leaving ? 'animate-toast-out' : ''}`}
+            className={`${colors[t.type]} inline-flex items-center gap-3 pl-2.5 pr-5 py-2.5 rounded-2xl shadow-[0_20px_45px_-15px_rgba(12,23,38,0.55)] text-white text-sm font-semibold select-none max-w-[92vw] ${t.leaving ? 'animate-toast-out' : ''}`}
             style={!t.leaving ? { animation: 'toastIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both' } : {}}>
-            {icons[t.type]}
-            {t.message}
+            <span className="w-8 h-8 rounded-xl bg-white/20 grid place-items-center flex-shrink-0">
+              {icons[t.type]}
+            </span>
+            <span className="leading-snug">{t.message}</span>
           </div>
         ))}
       </div>
@@ -175,12 +262,12 @@ export function useToast() {
 
 export function SkeletonCard() {
   return (
-    <div className="card flex flex-col overflow-hidden">
-      <div className="aspect-square w-full skeleton" />
-      <div className="p-2.5 space-y-1.5">
-        <div className="skeleton h-3 w-4/5 rounded" />
-        <div className="skeleton h-2.5 w-3/5 rounded" />
-        <div className="skeleton h-6 w-full rounded mt-1" />
+    <div className="group product-card">
+      <div className="aspect-square w-full skeleton rounded-none" />
+      <div className="p-3.5 space-y-2">
+        <div className="skeleton h-3 w-4/5" />
+        <div className="skeleton h-3 w-2/5" />
+        <div className="skeleton h-9 w-full mt-3" />
       </div>
     </div>
   );

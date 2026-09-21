@@ -300,7 +300,7 @@ export function AdminPOS() {
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{it.product.name}</p>
                           {it.optionLabel && (
-                            <span className="inline-flex items-center gap-1 text-xs text-brand-info bg-brand-info/8 px-1.5 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-xs text-brand-info bg-brand-info/[0.08] px-1.5 py-0.5 rounded">
                               <Layers className="w-2.5 h-2.5" />{it.optionLabel}
                             </span>
                           )}

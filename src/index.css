@@ -4,93 +4,299 @@
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
 @layer base {
+  :root {
+    --shell-x: 1rem;
+  }
   html {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-brand-surface text-brand-dark;
+    @apply bg-brand-surface text-brand-ink antialiased;
   }
-  h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
-  p { line-height: 1.5; }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+    line-height: 1.15;
+    color: #0C1726;
+  }
+  p { line-height: 1.6; }
+
+  /* Les sections ancrées ne passent pas sous le header sticky */
+  [id], section { scroll-margin-top: 92px; }
+
+  ::selection {
+    background: #FFC53D;
+    color: #071B31;
+  }
+
+  /* Slim, modern scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover { background: #94A3B8; background-clip: content-box; }
+
+  :focus-visible {
+    outline: 2px solid #17507F;
+    outline-offset: 2px;
+  }
+
+  input, textarea, select, button { font: inherit; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
 
 /* ─── Components ─────────────────────────────────────────────────────────── */
 @layer components {
+
+  /* — Layout — */
+  .shell {
+    @apply w-full max-w-shell mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .shell-wide {
+    @apply w-full max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* — Buttons — */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
-           bg-brand-accent hover:bg-brand-accent-dark active:scale-95
-           text-brand-dark font-semibold rounded-md
-           transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    @apply relative inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5
+           bg-brand-accent text-brand-ink font-bold text-sm rounded-xl
+           transition-all duration-200 ease-spring
+           shadow-[0_6px_18px_-8px_rgba(233,164,0,0.75)]
+           hover:bg-brand-accent-dark hover:shadow-[0_10px_26px_-8px_rgba(233,164,0,0.85)]
+           active:scale-[0.97]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 disabled:shadow-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
-           bg-white hover:bg-brand-surface active:scale-95
-           text-brand-dark border border-brand-border font-medium rounded-md
-           transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5
+           bg-white text-brand-ink border border-brand-border font-semibold text-sm rounded-xl
+           transition-all duration-200 ease-spring
+           hover:border-brand-primary/40 hover:bg-brand-surface hover:-translate-y-px
+           active:scale-[0.97]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2;
+  }
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:px-5
+           bg-brand-primary text-white font-semibold text-sm rounded-xl
+           transition-all duration-200 ease-spring
+           hover:bg-brand-primary-light hover:-translate-y-px hover:shadow-lift
+           active:scale-[0.97]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-3 py-2
-           text-brand-muted hover:text-brand-primary hover:bg-brand-surface active:scale-95
-           rounded-md transition-all duration-150;
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium
+           text-brand-muted rounded-xl transition-all duration-200
+           hover:text-brand-primary hover:bg-brand-primary/5 active:scale-[0.97];
   }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-brand-border
+           bg-white text-brand-ink/80 transition-all duration-200
+           hover:text-brand-primary hover:border-brand-primary/30 hover:shadow-soft active:scale-95;
+  }
+
+  /* — Forms — */
   .input {
-    @apply w-full px-3 py-2.5 border border-brand-border rounded-md text-sm
-           focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent
-           transition-all duration-150 bg-white;
+    @apply w-full px-3.5 py-2.5 border border-brand-border rounded-xl text-sm bg-white text-brand-ink
+           placeholder:text-brand-muted/70 shadow-[inset_0_1px_2px_rgba(12,23,38,0.03)]
+           transition-all duration-200
+           hover:border-brand-primary/30
+           focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10;
   }
+  .label {
+    @apply block text-[13px] font-semibold text-brand-ink/80 mb-1.5;
+  }
+  .select {
+    @apply input appearance-none bg-no-repeat pr-9 cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237B8AA0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+  }
+
+  /* — Surfaces — */
   .card {
-    @apply bg-white border border-brand-border rounded-lg overflow-hidden;
+    @apply bg-white border border-brand-border/90 rounded-2xl overflow-hidden shadow-soft;
   }
+  .card-hover {
+    @apply card transition-all duration-300 ease-spring hover:-translate-y-1 hover:shadow-lift hover:border-brand-primary/15;
+  }
+  .panel {
+    @apply bg-white border border-brand-border/90 rounded-3xl shadow-soft;
+  }
+  .glass {
+    @apply bg-white/85 backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  /* — Badges & chips — */
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-lg tracking-wide;
+  }
+  .badge-solid-dark { @apply badge bg-brand-primary text-white; }
+  .badge-solid-accent { @apply badge bg-brand-accent text-brand-ink; }
+  .badge-solid-success { @apply badge bg-brand-success text-white; }
+  .badge-solid-danger { @apply badge bg-brand-danger text-white; }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-semibold
+           bg-white text-brand-ink border border-brand-border whitespace-nowrap
+           transition-all duration-200
+           hover:border-brand-primary/40 hover:text-brand-primary hover:-translate-y-px
+           active:scale-95;
+  }
+  .chip-active {
+    @apply chip bg-brand-primary text-white border-brand-primary shadow-[0_8px_20px_-10px_rgba(11,44,77,0.8)];
   }
 
-  /* Product card with hover lift */
+  /* — Typography helpers — */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-eyebrow font-bold uppercase text-brand-primary/70;
+  }
+  .eyebrow-light {
+    @apply inline-flex items-center gap-2 text-eyebrow font-bold uppercase text-brand-accent;
+  }
+  .section-title {
+    @apply font-display text-2xl sm:text-3xl lg:text-[2rem] font-extrabold text-brand-ink tracking-tight;
+  }
+  .link-quiet {
+    @apply text-sm font-semibold text-brand-muted hover:text-brand-primary transition-colors;
+  }
+  .link-underline {
+    @apply relative font-semibold transition-colors;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -3px; height: 2px; width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after { transform: scaleX(1); }
+
+  /* — Decorative blocks — */
+  .icon-tile {
+    @apply inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-primary/[0.08] text-brand-primary
+           transition-transform duration-300 ease-spring;
+  }
+  .icon-tile-accent { @apply icon-tile bg-brand-accent/20 text-brand-accent-dark; }
+  .icon-tile-success { @apply icon-tile bg-brand-success/[0.12] text-brand-success; }
+  .icon-tile-info { @apply icon-tile bg-brand-info/[0.12] text-brand-info; }
+  .icon-tile-danger { @apply icon-tile bg-brand-danger/10 text-brand-danger; }
+
+  .tile {
+    @apply relative overflow-hidden rounded-2xl bg-brand-surface;
+  }
+  .media-zoom img { @apply transition-transform duration-[900ms] ease-spring; }
+  .media-zoom:hover img { @apply scale-[1.06]; }
+
+  /* — Product card base — */
   .product-card {
-    @apply card flex flex-col cursor-pointer
-           transition-all duration-300 ease-out
-           hover:-translate-y-1.5 hover:shadow-xl
-           hover:border-brand-accent/60;
+    @apply relative flex flex-col bg-white rounded-2xl overflow-hidden
+           border border-brand-border/80 shadow-[0_1px_2px_rgba(12,23,38,0.04)]
+           transition-all duration-300 ease-spring
+           hover:-translate-y-1 hover:shadow-lift hover:border-brand-primary/20;
   }
 
-  /* Shimmer skeleton */
+  /* — Skeletons — */
   .skeleton {
-    @apply rounded bg-gradient-to-r from-brand-border via-brand-surface to-brand-border
+    @apply rounded-lg bg-gradient-to-r from-brand-surface-2 via-white to-brand-surface-2
            bg-[length:200%_100%];
     animation: shimmer 1.5s infinite linear;
   }
 
-  /* Toast notification */
+  /* — Toast — */
   .toast {
-    @apply fixed bottom-6 left-1/2 z-[200]
-           flex items-center gap-2.5 px-5 py-3
-           text-white text-sm font-medium
-           rounded-2xl shadow-2xl pointer-events-none
-           select-none;
-    transform: translateX(-50%);
+    @apply inline-flex items-center gap-2.5 px-5 py-3
+           text-white text-sm font-semibold
+           rounded-2xl shadow-2xl pointer-events-none select-none;
     animation: toastIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  .toast-success { @apply bg-brand-success; }
-  .toast-error   { @apply bg-brand-danger; }
-  .toast-info    { @apply bg-brand-primary; }
+  .toast-success { @apply toast bg-brand-success; }
+  .toast-error   { @apply toast bg-brand-danger; }
+  .toast-info    { @apply toast bg-brand-primary; }
 
-  /* Page enter animation */
+  /* — Page transition — */
   .page-enter {
-    animation: pageEnter 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+
+  /* — Quantity stepper — */
+  .stepper {
+    @apply inline-flex items-center bg-white border border-brand-border rounded-xl overflow-hidden shadow-soft;
+  }
+  .stepper button {
+    @apply w-10 h-10 inline-flex items-center justify-center text-brand-ink
+           transition-colors duration-150 hover:bg-brand-surface hover:text-brand-primary
+           disabled:opacity-35 disabled:hover:bg-transparent disabled:cursor-not-allowed;
+  }
+  .stepper input, .stepper span.value {
+    @apply w-12 text-center font-bold text-sm bg-transparent border-0 focus:outline-none;
+  }
+
+  /* — Selectable option / payment card — */
+  .choice {
+    @apply relative flex items-center gap-3 p-3 rounded-2xl border border-brand-border bg-white text-left
+           transition-all duration-200
+           hover:border-brand-primary/35 hover:bg-brand-surface hover:-translate-y-px;
+  }
+  .choice-active {
+    @apply choice border-brand-primary bg-brand-primary/[0.04] ring-2 ring-brand-primary/25 shadow-soft;
+  }
+  .choice-dot {
+    @apply w-5 h-5 rounded-full border-2 border-brand-border flex items-center justify-center flex-shrink-0 transition-colors;
+  }
+  .choice-active .choice-dot { @apply border-brand-primary bg-brand-primary; }
+  .choice-dot-inner {
+    @apply w-1.5 h-1.5 rounded-full bg-white scale-0 transition-transform duration-150;
+  }
+  .choice-active .choice-dot-inner { @apply scale-100; }
+
+  /* — Steps (checkout) — */
+  .step {
+    @apply flex items-center gap-2 text-[13px] font-semibold text-brand-muted;
+  }
+  .step-dot {
+    @apply w-7 h-7 rounded-full grid place-items-center text-xs font-bold bg-white border border-brand-border text-brand-muted;
+  }
+  .step-active { @apply step text-brand-ink; }
+  .step-active .step-dot { @apply bg-brand-primary border-brand-primary text-white shadow-[0_6px_16px_-8px_rgba(11,44,77,0.9)]; }
+  .step-done .step-dot { @apply bg-brand-success border-brand-success text-white; }
+
+  /* — Section divider with sheen — */
+  .rule-sheen {
+    @apply relative h-px w-full bg-brand-border/80 overflow-hidden;
+  }
+  .rule-sheen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,197,61,0.9), transparent);
+    animation: sheen 3.6s ease-in-out infinite;
+  }
+
+  /* — Marquee track — */
+  .marquee-track {
+    @apply flex items-center gap-10 w-max animate-marquee;
+  }
+  .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
 }
 
 /* ─── Utilities ─────────────────────────────────────────────────────────── */
@@ -98,6 +304,14 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .will-transform { will-change: transform; }
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .no-scrollbar-gutter { scrollbar-gutter: stable; }
+  .tap-none { -webkit-tap-highlight-color: transparent; }
 }
 
 /* ─── Keyframes ─────────────────────────────────────────────────────────── */
@@ -118,13 +332,13 @@
 }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.9); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
+  from { opacity: 0; transform: translateY(24px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
 @keyframes toastOut {
-  from { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
-  to   { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.9); }
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(16px) scale(0.95); }
 }
 
 @keyframes shimmer {
@@ -148,10 +362,15 @@
   50%       { transform: translateY(-10px); }
 }
 
+@keyframes floatSlow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%       { transform: translate3d(0, -18px, 0) rotate(3deg); }
+}
+
 @keyframes pulseRing {
-  0%   { box-shadow: 0 0 0 0   rgba(40, 167, 69, 0.55); }
-  70%  { box-shadow: 0 0 0 12px rgba(40, 167, 69, 0); }
-  100% { box-shadow: 0 0 0 0   rgba(40, 167, 69, 0); }
+  0%   { box-shadow: 0 0 0 0   rgba(18, 161, 80, 0.55); }
+  70%  { box-shadow: 0 0 0 12px rgba(18, 161, 80, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(18, 161, 80, 0); }
 }
 
 @keyframes successPop {
@@ -170,29 +389,37 @@
   to   { stroke-dashoffset: 0;  opacity: 1; }
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.08); }
+}
+
+@keyframes sheen {
+  0%   { transform: translateX(-120%) skewX(-12deg); }
+  100% { transform: translateX(220%) skewX(-12deg); }
+}
+
+@keyframes progressBar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 /* ─── Animation utility classes ─────────────────────────────────────────── */
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-fade-in-scale {
-  animation: fadeInScale 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-float {
-  animation: float 3.8s ease-in-out infinite;
-}
-.animate-toast-out {
-  animation: toastOut 0.28s ease-in both;
-}
-.animate-badge-bounce {
-  animation: badgeBounce 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.animate-pulse-ring {
-  animation: pulseRing 0.75s ease-out;
-}
-.animate-success-pop {
-  animation: successPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.animate-count-up {
-  animation: countUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+.animate-fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in-scale { animation: fadeInScale 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-float { animation: float 3.8s ease-in-out infinite; }
+.animate-float-slow { animation: floatSlow 9s ease-in-out infinite; }
+.animate-toast-out { animation: toastOut 0.26s ease-in both; }
+.animate-badge-bounce { animation: badgeBounce 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.animate-pulse-ring { animation: pulseRing 0.75s ease-out; }
+.animate-success-pop { animation: successPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-count-up { animation: countUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-marquee { animation: marquee 32s linear infinite; }
+.animate-pulse-soft { animation: pulseSoft 2.6s ease-in-out infinite; }
+.animate-progress { animation: progressBar linear both; transform-origin: left center; }

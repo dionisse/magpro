@@ -3,7 +3,8 @@ import {
   Store, ShoppingCart, Package, Menu, User, LogOut, LayoutDashboard,
   ScanBarcode, Boxes, ListOrdered, X, BarChart3, Settings, Warehouse,
   ShoppingBasket, CreditCard, ShieldCheck, Phone, MessageCircle, ExternalLink,
-  Scale, FileText, Megaphone, TicketPercent,
+  Scale, FileText, Megaphone, TicketPercent, ChevronRight, Sparkles,
+  Truck, ShieldCheck as ShieldIcon, ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -62,6 +63,12 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
     prevCount.current = itemCount;
   }, [itemCount]);
 
+  // Lock body scroll while the mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   const isStaff = profile?.role === 'admin' || profile?.role === 'cashier' || profile?.role === 'employee';
   const isAdminView = view.kind.startsWith('admin-');
 
@@ -84,177 +91,344 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
   const adminNav = ALL_ADMIN_NAV.filter((item) => canAccess(item.kind));
   const storeName = settings.store_name || 'MagasinPro';
   const year = new Date().getFullYear();
+  const phone = settings.phone_number?.trim() || null;
+  const whatsappHref = settings.whatsapp_url?.trim()
+    || (settings.whatsapp_number ? `https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}` : null);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-brand-surface flex flex-col">
 
       {/* ── Announcement bar (shop only) ──────────────────────────────────── */}
       {!isAdminView && (
-        <div className="bg-brand-dark text-white text-xs py-2 text-center font-medium tracking-wide">
-          {settings.phone_number
-            ? `Commandez par téléphone : ${settings.phone_number} · Livraison rapide disponible`
-            : 'Livraison rapide disponible · Paiement Mobile Money accepté'}
+        <div className="relative overflow-hidden bg-brand-primary text-white">
+          <div className="absolute inset-0 bg-mesh-navy opacity-90" aria-hidden />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-accent/70 to-transparent" aria-hidden />
+          <div className="shell relative py-2.5 flex items-center justify-center gap-2.5 sm:gap-3 text-[11.5px] sm:text-[13px] font-medium">
+            <span className="flex items-center gap-1.5 text-brand-accent">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Boutique en ligne</span>
+              <span className="sm:hidden">MagasinPro</span>
+            </span>
+            <span className="w-px h-4 bg-white/20" aria-hidden />
+            {phone ? (
+              <a href={`tel:${phone}`} className="flex items-center gap-1.5 hover:text-brand-accent transition-colors">
+                <Phone className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Commandez au</span> {phone}
+              </a>
+            ) : (
+              <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" />Livraison rapide disponible</span>
+            )}
+            <span className="hidden md:flex items-center gap-3">
+              <span className="w-px h-4 bg-white/20" aria-hidden />
+              <span className="flex items-center gap-1.5 text-white/85"><ShieldIcon className="w-3.5 h-3.5 text-brand-accent" />Paiement Mobile Money & espèces</span>
+            </span>
+          </div>
         </div>
       )}
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <header className={`bg-brand-primary text-white sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'shadow-lg shadow-odoo-dark/20' : ''}`}>
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="h-14 flex items-center justify-between gap-4">
-            <button onClick={() => setView({ kind: 'shop' })} className="flex items-center gap-2 font-semibold text-lg hover:opacity-90 transition flex-shrink-0">
-              {settings.logo_url ? (
-                <img src={settings.logo_url} alt={storeName} className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              ) : (
-                <Store className="w-6 h-6" />
-              )}
-              <span className="hidden sm:inline">{storeName}</span>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'glass shadow-[0_10px_30px_-20px_rgba(11,44,77,0.6)]' : 'bg-white'}`}>
+        <div className="shell">
+          <div className={`flex items-center justify-between gap-3 transition-all duration-300 ${scrolled ? 'h-16' : 'h-[72px]'}`}>
+
+            {/* Brand */}
+            <button
+              onClick={() => setView({ kind: 'shop' })}
+              className="group flex items-center gap-2.5 flex-shrink-0 tap-none"
+            >
+              <span className="relative grid place-items-center w-10 h-10 rounded-2xl bg-brand-primary text-white shadow-[0_10px_24px_-14px_rgba(11,44,77,0.95)] overflow-hidden">
+                {settings.logo_url ? (
+                  <img
+                    src={settings.logo_url}
+                    alt={storeName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <Store className="w-5 h-5" />
+                )}
+                <span className="absolute inset-x-0 bottom-0 h-[3px] bg-brand-accent" aria-hidden />
+              </span>
+              <span className="text-left leading-none">
+                <span className="block font-display font-extrabold text-[17px] text-brand-ink group-hover:text-brand-primary transition-colors">
+                  {storeName}
+                </span>
+                <span className="hidden sm:block text-[11px] font-medium text-brand-muted mt-0.5">
+                  {isAdminView ? 'Espace de gestion' : 'Boutique en ligne'}
+                </span>
+              </span>
             </button>
 
-            {isAdminView ? (
-              <nav className="hidden md:flex items-center gap-1 text-sm overflow-x-auto">
-                {adminNav.map((item) => (
-                  <button key={item.kind} onClick={() => setView({ kind: item.kind })}
-                    className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 whitespace-nowrap transition ${view.kind === item.kind ? 'bg-white/20 font-medium' : 'hover:bg-white/10'}`}>
-                    {item.icon}{item.label}
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-1 text-sm ml-4">
+              {isAdminView ? (
+                <button
+                  onClick={() => setView({ kind: 'shop' })}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-surface text-brand-ink font-semibold hover:bg-brand-primary hover:text-white transition-all duration-200"
+                >
+                  <Store className="w-4 h-4" />Voir la boutique
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setView({ kind: 'shop' })}
+                    className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 ${
+                      view.kind === 'shop'
+                        ? 'bg-brand-primary text-white shadow-[0_10px_22px_-14px_rgba(11,44,77,0.9)]'
+                        : 'text-brand-ink/80 hover:bg-brand-surface hover:text-brand-primary'
+                    }`}
+                  >
+                    Boutique
                   </button>
-                ))}
-              </nav>
-            ) : (
-              <nav className="hidden md:flex items-center gap-1 text-sm">
-                <button onClick={() => setView({ kind: 'shop' })} className={`px-3 py-1.5 rounded-md transition ${view.kind === 'shop' ? 'bg-white/20 font-medium' : 'hover:bg-white/10'}`}>Boutique</button>
-                {user && <button onClick={() => setView({ kind: 'orders' })} className={`px-3 py-1.5 rounded-md transition ${view.kind === 'orders' ? 'bg-white/20 font-medium' : 'hover:bg-white/10'}`}>Mes commandes</button>}
-              </nav>
-            )}
+                  {user && (
+                    <button
+                      onClick={() => setView({ kind: 'orders' })}
+                      className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 ${
+                        view.kind === 'orders' || view.kind === 'order'
+                          ? 'bg-brand-primary text-white shadow-[0_10px_22px_-14px_rgba(11,44,77,0.9)]'
+                          : 'text-brand-ink/80 hover:bg-brand-surface hover:text-brand-primary'
+                      }`}
+                    >
+                      Mes commandes
+                    </button>
+                  )}
+                </>
+              )}
+            </nav>
 
-            <div className="flex items-center gap-2">
+            {/* Actions */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {!isAdminView && phone && (
+                <a
+                  href={`tel:${phone}`}
+                  className="hidden lg:inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-brand-border text-[13px] font-semibold text-brand-ink hover:border-brand-primary hover:text-brand-primary transition-all"
+                >
+                  <Phone className="w-3.5 h-3.5" />{phone}
+                </a>
+              )}
+
+              {isAdminView && (
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary/[0.08] text-brand-primary text-[11px] font-bold uppercase tracking-wider">
+                  <LayoutDashboard className="w-3.5 h-3.5" />Admin
+                </span>
+              )}
+
               {!isAdminView && (
-                <button onClick={() => setView({ kind: 'cart' })} className="relative p-2 hover:bg-white/10 active:scale-90 rounded-md transition-all duration-150">
-                  <ShoppingCart className="w-5 h-5" />
+                <button
+                  onClick={() => setView({ kind: 'cart' })}
+                  aria-label="Mon panier"
+                  className="relative inline-flex items-center justify-center w-11 h-11 rounded-2xl border border-brand-border bg-white text-brand-ink
+                             hover:border-brand-primary hover:text-brand-primary hover:shadow-soft transition-all duration-200 active:scale-95"
+                >
+                  <ShoppingCart className="w-[18px] h-[18px]" />
                   {itemCount > 0 && (
-                    <span className={`absolute -top-0.5 -right-0.5 bg-odoo-warning text-brand-dark text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center transition-transform ${badgeAnim ? 'animate-badge-bounce' : ''}`}>
+                    <span className={`absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 bg-brand-accent text-brand-ink text-[11px] font-extrabold rounded-full grid place-items-center shadow-accent ring-2 ring-white ${badgeAnim ? 'animate-badge-bounce' : ''}`}>
                       {itemCount > 9 ? '9+' : itemCount}
                     </span>
                   )}
                 </button>
               )}
 
-              {isAdminView ? (
-                <button onClick={() => setView({ kind: 'shop' })}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-md transition">
-                  <Store className="w-3.5 h-3.5" />Boutique
+              {isStaff && !isAdminView && (
+                <button
+                  onClick={() => setView({ kind: 'admin-dashboard' })}
+                  className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-brand-primary text-white text-[13px] font-semibold
+                             hover:bg-brand-primary-light hover:shadow-lift transition-all duration-200 active:scale-95"
+                >
+                  <Settings className="w-4 h-4" />Admin
                 </button>
-              ) : isStaff ? (
-                <button onClick={() => setView({ kind: 'admin-dashboard' })}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-md transition">
-                  <Settings className="w-3.5 h-3.5" />Admin
-                </button>
-              ) : null}
+              )}
 
               {user ? (
                 <div className="relative">
-                  <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 p-1.5 hover:bg-white/10 rounded-md transition">
-                    <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 p-1 pr-2 rounded-2xl hover:bg-brand-surface transition-colors"
+                    aria-label="Mon compte"
+                  >
+                    <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary-light text-white grid place-items-center text-sm font-bold shadow-[0_8px_18px_-10px_rgba(11,44,77,0.9)]">
                       {(profile?.full_name || user.email || '?').charAt(0).toUpperCase()}
-                    </div>
-                    <span className="hidden lg:block text-sm max-w-24 truncate">{profile?.full_name || user.email?.split('@')[0]}</span>
+                    </span>
+                    <span className="hidden lg:block text-sm font-semibold max-w-24 truncate text-brand-ink">
+                      {profile?.full_name || user.email?.split('@')[0]}
+                    </span>
                   </button>
                   {userMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-brand-border z-40 text-brand-dark overflow-hidden">
-                        <div className="p-3 border-b border-brand-border">
-                          <p className="font-medium text-sm truncate">{profile?.full_name || 'Utilisateur'}</p>
-                          <p className="text-xs text-brand-muted truncate">{user.email}</p>
-                          <span className={`inline-block mt-1.5 badge capitalize ${profile?.role === 'admin' ? 'bg-brand-primary/15 text-odoo-primary' : profile?.role === 'cashier' ? 'bg-odoo-info/15 text-odoo-info' : profile?.role === 'employee' ? 'bg-odoo-success/15 text-odoo-success' : 'bg-odoo-muted/15 text-brand-muted'}`}>
+                      <div className="absolute right-0 top-full mt-3 w-72 bg-white rounded-3xl shadow-[0_30px_70px_-25px_rgba(11,44,77,0.45)] border border-brand-border z-40 overflow-hidden animate-fade-in-scale">
+                        <div className="relative p-4 bg-brand-primary text-white overflow-hidden">
+                          <div className="absolute inset-0 bg-mesh-navy opacity-90" aria-hidden />
+                          <div className="relative flex items-center gap-3">
+                            <span className="w-11 h-11 rounded-2xl bg-white/15 grid place-items-center text-base font-bold">
+                              {(profile?.full_name || user.email || '?').charAt(0).toUpperCase()}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-sm truncate">{profile?.full_name || 'Utilisateur'}</p>
+                              <p className="text-xs text-white/70 truncate">{user.email}</p>
+                            </div>
+                          </div>
+                          <span className="relative inline-block mt-3 badge bg-brand-accent text-brand-ink capitalize">
                             {profile?.role || 'customer'}
                           </span>
                         </div>
-                        <button onClick={() => { setView({ kind: 'orders' }); setUserMenuOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2">
-                          <Package className="w-4 h-4 text-brand-muted" />Mes commandes
-                        </button>
-                        {isStaff && (
-                          <button onClick={() => { setView({ kind: 'admin-dashboard' }); setUserMenuOpen(false); }}
-                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2">
-                            <Settings className="w-4 h-4 text-brand-muted" />Espace administrateur
+                        <div className="p-2">
+                          <button onClick={() => { setView({ kind: 'orders' }); setUserMenuOpen(false); }}
+                            className="w-full text-left px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-brand-surface flex items-center gap-2.5 transition-colors">
+                            <Package className="w-4 h-4 text-brand-muted" />Mes commandes
                           </button>
-                        )}
-                        <button onClick={() => { signOut(); setUserMenuOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm hover:bg-brand-surface flex items-center gap-2 text-odoo-danger border-t border-brand-border">
-                          <LogOut className="w-4 h-4" />Déconnexion
-                        </button>
+                          {isStaff && (
+                            <button onClick={() => { setView({ kind: 'admin-dashboard' }); setUserMenuOpen(false); }}
+                              className="w-full text-left px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-brand-surface flex items-center gap-2.5 transition-colors">
+                              <Settings className="w-4 h-4 text-brand-muted" />Espace administrateur
+                            </button>
+                          )}
+                          <div className="my-1.5 h-px bg-brand-border" />
+                          <button onClick={() => { signOut(); setUserMenuOpen(false); }}
+                            className="w-full text-left px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-brand-danger/[0.08] text-brand-danger flex items-center gap-2.5 transition-colors">
+                            <LogOut className="w-4 h-4" />Déconnexion
+                          </button>
+                        </div>
                       </div>
                     </>
                   )}
                 </div>
               ) : (
-                <button onClick={() => setView({ kind: 'auth' })} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-white/10 hover:bg-white/20 rounded-md transition">
+                <button
+                  onClick={() => setView({ kind: 'auth' })}
+                  className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-2xl bg-brand-primary text-white text-[13px] font-semibold
+                             hover:bg-brand-primary-light hover:shadow-lift transition-all duration-200 active:scale-95"
+                >
                   <User className="w-4 h-4" /><span className="hidden sm:inline">Connexion</span>
                 </button>
               )}
 
-              <button className="md:hidden p-2 hover:bg-white/10 rounded-md transition" onClick={() => setMobileOpen(true)}>
+              <button
+                className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-2xl border border-brand-border bg-white text-brand-ink hover:border-brand-primary transition-colors"
+                onClick={() => setMobileOpen(true)}
+                aria-label="Ouvrir le menu"
+              >
                 <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>
         </div>
+
+        {/* Admin sub-navigation */}
+        {isAdminView && adminNav.length > 0 && (
+          <div className="hidden md:block border-t border-brand-border bg-white/70">
+            <div className="shell">
+              <nav className="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide">
+                {adminNav.map((item) => (
+                  <button
+                    key={item.kind}
+                    onClick={() => setView({ kind: item.kind })}
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                      view.kind === item.kind
+                        ? 'bg-brand-primary text-white shadow-[0_10px_22px_-14px_rgba(11,44,77,0.9)]'
+                        : 'text-brand-ink/75 hover:bg-brand-surface hover:text-brand-primary'
+                    }`}
+                  >
+                    {item.icon}{item.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+        )}
+        <div className="h-[2px] bg-gradient-to-r from-transparent via-brand-accent/60 to-transparent" aria-hidden />
       </header>
 
       {/* ── Mobile drawer ─────────────────────────────────────────────────── */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl flex flex-col">
-            <div className="p-4 border-b border-brand-border flex items-center justify-between">
-              <span className="font-semibold text-brand-dark">Menu</span>
-              <button onClick={() => setMobileOpen(false)} className="p-1 hover:bg-brand-surface rounded"><X className="w-5 h-5" /></button>
+          <div className="absolute inset-0 bg-brand-ink/50 backdrop-blur-[2px] animate-fade-in-scale" onClick={() => setMobileOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-[86%] max-w-sm bg-white shadow-2xl flex flex-col animate-fade-in-scale">
+            <div className="relative p-4 bg-brand-primary text-white overflow-hidden">
+              <div className="absolute inset-0 bg-mesh-navy opacity-90" aria-hidden />
+              <div className="relative flex items-center justify-between">
+                <span className="flex items-center gap-2.5">
+                  <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/15">
+                    <Store className="w-4 h-4" />
+                  </span>
+                  <span className="font-display font-bold">{storeName}</span>
+                </span>
+                <button onClick={() => setMobileOpen(false)} className="p-2 rounded-xl hover:bg-white/15 transition-colors" aria-label="Fermer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              {user && (
+                <div className="relative mt-3 flex items-center gap-2.5 text-sm">
+                  <span className="w-8 h-8 rounded-xl bg-white/15 grid place-items-center text-xs font-bold">
+                    {(profile?.full_name || user.email || '?').charAt(0).toUpperCase()}
+                  </span>
+                  <span className="truncate text-white/90">{profile?.full_name || user.email}</span>
+                </div>
+              )}
             </div>
-            <nav className="flex-1 p-2 overflow-auto">
+
+            <nav className="flex-1 p-3 overflow-auto">
               {isAdminView ? (
                 <>
                   {adminNav.map((item) => (
                     <button key={item.kind} onClick={() => { setView({ kind: item.kind }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-surface rounded-md text-left">
-                      <span className="text-brand-muted">{item.icon}</span>{item.label}
+                      className={`w-full flex items-center gap-3 px-3 py-3 text-sm font-semibold rounded-2xl text-left mb-1 transition-colors ${
+                        view.kind === item.kind ? 'bg-brand-primary text-white' : 'text-brand-ink hover:bg-brand-surface'
+                      }`}>
+                      <span className={view.kind === item.kind ? 'text-brand-accent' : 'text-brand-muted'}>{item.icon}</span>{item.label}
                     </button>
                   ))}
-                  <div className="my-2 border-t border-brand-border" />
+                  <div className="my-3 h-px bg-brand-border" />
                   <button onClick={() => { setView({ kind: 'shop' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
+                    className="w-full flex items-center gap-3 px-3 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-surface rounded-2xl text-left">
                     <span className="text-brand-muted"><Store className="w-4 h-4" /></span>Voir la boutique
                   </button>
                 </>
               ) : (
                 <>
                   <button onClick={() => { setView({ kind: 'shop' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
-                    <span className="text-brand-muted"><Store className="w-4 h-4" /></span>Boutique
+                    className="w-full flex items-center justify-between gap-3 px-3 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-surface rounded-2xl transition-colors">
+                    <span className="flex items-center gap-3"><span className="text-brand-muted"><Store className="w-4 h-4" /></span>Boutique</span>
+                    <ChevronRight className="w-4 h-4 text-brand-muted" />
                   </button>
                   <button onClick={() => { setView({ kind: 'cart' }); setMobileOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
-                    <span className="text-brand-muted"><ShoppingCart className="w-4 h-4" /></span>Panier ({itemCount})
+                    className="w-full flex items-center justify-between gap-3 px-3 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-surface rounded-2xl transition-colors">
+                    <span className="flex items-center gap-3"><span className="text-brand-muted"><ShoppingCart className="w-4 h-4" /></span>Mon panier</span>
+                    <span className="badge bg-brand-accent text-brand-ink">{itemCount}</span>
                   </button>
                   {user && (
                     <button onClick={() => { setView({ kind: 'orders' }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
-                      <span className="text-brand-muted"><Package className="w-4 h-4" /></span>Mes commandes
+                      className="w-full flex items-center justify-between gap-3 px-3 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-surface rounded-2xl transition-colors">
+                      <span className="flex items-center gap-3"><span className="text-brand-muted"><Package className="w-4 h-4" /></span>Mes commandes</span>
+                      <ChevronRight className="w-4 h-4 text-brand-muted" />
                     </button>
                   )}
-                  <div className="my-2 border-t border-brand-border" />
                   {isStaff && (
-                    <button onClick={() => { setView({ kind: 'admin-dashboard' }); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-brand-dark hover:bg-brand-surface rounded-md text-left">
-                      <span className="text-brand-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
-                    </button>
+                    <>
+                      <div className="my-3 h-px bg-brand-border" />
+                      <button onClick={() => { setView({ kind: 'admin-dashboard' }); setMobileOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-surface rounded-2xl text-left">
+                        <span className="text-brand-muted"><LayoutDashboard className="w-4 h-4" /></span>Espace Admin
+                      </button>
+                    </>
+                  )}
+                  {whatsappHref && (
+                    <>
+                      <div className="my-3 h-px bg-brand-border" />
+                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer"
+                        className="w-full flex items-center gap-3 px-3 py-3 text-sm font-semibold text-[#128C7E] hover:bg-[#25D366]/10 rounded-2xl">
+                        <IconWhatsapp className="w-4 h-4" />Commander sur WhatsApp
+                      </a>
+                    </>
                   )}
                 </>
               )}
             </nav>
+
             {user && (
               <div className="p-3 border-t border-brand-border">
                 <button onClick={() => { signOut(); setMobileOpen(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-odoo-danger hover:bg-brand-surface rounded-md">
+                  className="w-full flex items-center gap-2.5 px-3 py-3 text-sm font-semibold text-brand-danger hover:bg-brand-danger/[0.08] rounded-2xl transition-colors">
                   <LogOut className="w-4 h-4" />Déconnexion
                 </button>
               </div>
@@ -265,123 +439,196 @@ export function AppShell({ view, setView, children }: { view: View; setView: (v:
 
       <main className="flex-1 page-enter" key={view.kind}>{children}</main>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer className="bg-brand-dark text-white/70 mt-12">
-        {/* Main footer grid */}
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-10 pb-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-8 border-b border-white/10">
+      {/* ── Footer (boutique uniquement) ──────────────────────────────────── */}
+      {!isAdminView && (
+      <footer className="relative mt-16 bg-brand-primary text-white/75 overflow-hidden">
+        <div className="absolute inset-0 bg-mesh-navy opacity-95" aria-hidden />
+        <div className="absolute -top-24 -right-16 w-80 h-80 rounded-full bg-brand-accent/10 blur-3xl" aria-hidden />
 
-            {/* Col 1: Brand + legal info */}
-            <div>
-              <div className="flex items-center gap-2.5 mb-3">
-                {settings.logo_url ? (
-                  <img src={settings.logo_url} alt={storeName} className="h-8 w-auto object-contain brightness-0 invert" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                ) : (
-                  <Store className="w-5 h-5 text-white" />
-                )}
-                <span className="font-semibold text-white text-base">{storeName}</span>
+        <div className="shell relative pt-14 pb-8">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 pb-10 border-b border-white/10">
+
+            {/* Brand */}
+            <div className="lg:pr-6">
+              <div className="flex items-center gap-2.5 mb-4">
+                <span className="relative grid place-items-center w-11 h-11 rounded-2xl bg-white/10 overflow-hidden">
+                  {settings.logo_url ? (
+                    <img src={settings.logo_url} alt={storeName} className="w-full h-full object-cover brightness-0 invert" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  ) : (
+                    <Store className="w-5 h-5 text-white" />
+                  )}
+                  <span className="absolute inset-x-0 bottom-0 h-[3px] bg-brand-accent" aria-hidden />
+                </span>
+                <span className="font-display font-extrabold text-white text-lg">{storeName}</span>
               </div>
-              {settings.company_name && (
-                <p className="text-sm text-white/60 mb-1">{settings.company_name}</p>
-              )}
-              {settings.rccm && (
-                <p className="text-xs text-white/50">RCCM : {settings.rccm}</p>
-              )}
-              {settings.ifu && (
-                <p className="text-xs text-white/50">IFU : {settings.ifu}</p>
-              )}
-              {!settings.company_name && !settings.rccm && !settings.ifu && (
-                <p className="text-xs text-white/40 italic">Informations légales à compléter</p>
+              <p className="text-sm text-white/65 leading-relaxed">
+                Des produits de qualité, des prix justes et une livraison rapide. Commandez en ligne ou passez au magasin.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-5">
+                {[['Livraison rapide', Truck], ['Paiement sécurisé', ShieldIcon]].map(([label, Icon]) => {
+                  const Ico = Icon as typeof Truck;
+                  return (
+                    <span key={label as string} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/8 text-[11px] font-semibold text-white/85">
+                      <Ico className="w-3.5 h-3.5 text-brand-accent" />{label as string}
+                    </span>
+                  );
+                })}
+              </div>
+              {(settings.company_name || settings.rccm || settings.ifu) && (
+                <div className="mt-5 space-y-0.5">
+                  {settings.company_name && <p className="text-xs text-white/55">{settings.company_name}</p>}
+                  {settings.rccm && <p className="text-[11px] text-white/40">RCCM : {settings.rccm}</p>}
+                  {settings.ifu && <p className="text-[11px] text-white/40">IFU : {settings.ifu}</p>}
+                </div>
               )}
             </div>
 
-            {/* Col 2: Contact */}
+            {/* Boutique links */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Contact</p>
-              <div className="space-y-2">
-                {settings.phone_number && (
-                  <a href={`tel:${settings.phone_number}`}
-                    className="flex items-center gap-2 text-sm hover:text-white transition">
-                    <Phone className="w-4 h-4 flex-shrink-0 text-white/40" />
-                    {settings.phone_number}
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent mb-4">Boutique</p>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <button onClick={() => setView({ kind: 'shop' })} className="group inline-flex items-center gap-2 hover:text-white transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-brand-accent/70 group-hover:translate-x-0.5 transition-transform" />Tous les produits
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => setView({ kind: 'cart' })} className="group inline-flex items-center gap-2 hover:text-white transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-brand-accent/70 group-hover:translate-x-0.5 transition-transform" />Mon panier
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => setView({ kind: 'orders' })} className="group inline-flex items-center gap-2 hover:text-white transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-brand-accent/70 group-hover:translate-x-0.5 transition-transform" />Mes commandes
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => setView({ kind: 'legal' })} className="group inline-flex items-center gap-2 hover:text-white transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-brand-accent/70 group-hover:translate-x-0.5 transition-transform" />Mentions légales
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => setView({ kind: 'terms' })} className="group inline-flex items-center gap-2 hover:text-white transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-brand-accent/70 group-hover:translate-x-0.5 transition-transform" />Conditions d'utilisation
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent mb-4">Contact</p>
+              <div className="space-y-3 text-sm">
+                {phone && (
+                  <a href={`tel:${phone}`} className="flex items-center gap-3 hover:text-white transition-colors">
+                    <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/8"><Phone className="w-4 h-4 text-brand-accent" /></span>
+                    {phone}
                   </a>
                 )}
                 {settings.whatsapp_number && (
-                  <a href={`https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm hover:text-white transition">
-                    <MessageCircle className="w-4 h-4 flex-shrink-0 text-white/40" />
-                    WhatsApp : {settings.whatsapp_number}
+                  <a href={`https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-3 hover:text-white transition-colors">
+                    <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/8"><MessageCircle className="w-4 h-4 text-brand-accent" /></span>
+                    {settings.whatsapp_number}
                   </a>
                 )}
-                {!settings.phone_number && !settings.whatsapp_number && (
-                  <p className="text-xs text-white/40 italic">Contact à compléter</p>
+                {!phone && !settings.whatsapp_number && (
+                  <p className="text-xs text-white/45 italic">Coordonnées à compléter dans les paramètres.</p>
                 )}
+              </div>
+
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent mt-7 mb-3">Moyens de paiement</p>
+              <div className="flex flex-wrap gap-1.5">
+                {['Espèces', 'MTN MoMo', 'Moov Money', 'Celtiis Pay', 'Carte bancaire', 'FedaPay'].map((m) => (
+                  <span key={m} className="px-2.5 py-1.5 rounded-lg bg-white/8 text-[11px] font-semibold text-white/80">{m}</span>
+                ))}
               </div>
             </div>
 
-            {/* Col 3: Social media */}
+            {/* Social */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Suivez-nous</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {settings.whatsapp_url && (
-                  <a href={settings.whatsapp_url} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#25D366] flex items-center justify-center transition-colors"
-                    title="WhatsApp">
-                    <IconWhatsapp className="w-4 h-4 text-white" />
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent mb-4">Restons en contact</p>
+              <p className="text-sm text-white/65 mb-4">
+                Suivez nos nouveautés, promos et arrivages sur nos réseaux.
+              </p>
+              <div className="flex flex-wrap items-center gap-2.5">
+                {whatsappHref && (
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" title="WhatsApp"
+                    className="w-11 h-11 rounded-2xl bg-white/8 hover:bg-[#25D366] grid place-items-center transition-all duration-200 hover:-translate-y-0.5">
+                    <IconWhatsapp className="w-5 h-5 text-white" />
                   </a>
                 )}
                 {settings.facebook_url && (
-                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#1877F2] flex items-center justify-center transition-colors"
-                    title="Facebook">
-                    <IconFacebook className="w-4 h-4 text-white" />
+                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" title="Facebook"
+                    className="w-11 h-11 rounded-2xl bg-white/8 hover:bg-[#1877F2] grid place-items-center transition-all duration-200 hover:-translate-y-0.5">
+                    <IconFacebook className="w-5 h-5 text-white" />
                   </a>
                 )}
                 {settings.tiktok_url && (
-                  <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#010101] hover:ring-1 hover:ring-white/20 flex items-center justify-center transition-colors"
-                    title="TikTok">
-                    <IconTiktok className="w-4 h-4 text-white" />
+                  <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" title="TikTok"
+                    className="w-11 h-11 rounded-2xl bg-white/8 hover:bg-black grid place-items-center transition-all duration-200 hover:-translate-y-0.5">
+                    <IconTiktok className="w-5 h-5 text-white" />
                   </a>
                 )}
-                {!settings.whatsapp_url && !settings.facebook_url && !settings.tiktok_url && (
-                  <p className="text-xs text-white/40 italic">Réseaux sociaux à configurer</p>
+                {!whatsappHref && !settings.facebook_url && !settings.tiktok_url && (
+                  <p className="text-xs text-white/45 italic">Réseaux sociaux à configurer.</p>
                 )}
               </div>
+
+              {whatsappHref && (
+                <a href={whatsappHref} target="_blank" rel="noopener noreferrer"
+                  className="mt-6 inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-sm font-bold text-white transition-all duration-200 hover:-translate-y-0.5">
+                  <IconWhatsapp className="w-4 h-4" />Commander sur WhatsApp
+                </a>
+              )}
             </div>
           </div>
 
           {/* Bottom bar */}
-          <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
             <span>© {year} {settings.company_name || storeName}. Tous droits réservés.</span>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setView({ kind: 'legal' })}
-                className="hover:text-white transition flex items-center gap-1">
-                <Scale className="w-3 h-3" />Mentions légales
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+              <button onClick={() => setView({ kind: 'legal' })} className="hover:text-white transition flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5" />Mentions légales
               </button>
               <span className="text-white/20">·</span>
-              <button onClick={() => setView({ kind: 'terms' })}
-                className="hover:text-white transition flex items-center gap-1">
-                <FileText className="w-3 h-3" />CGU
+              <button onClick={() => setView({ kind: 'terms' })} className="hover:text-white transition flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5" />CGU
               </button>
               {isStaff && (
                 <>
                   <span className="text-white/20">·</span>
-                  <button onClick={() => setView({ kind: 'admin-dashboard' })}
-                    className="hover:text-white transition flex items-center gap-1">
-                    <Settings className="w-3 h-3" />Administration
+                  <button onClick={() => setView({ kind: 'admin-dashboard' })} className="hover:text-white transition flex items-center gap-1.5">
+                    <Settings className="w-3.5 h-3.5" />Administration
                   </button>
                 </>
               )}
               <span className="text-white/20">·</span>
-              <span className="flex items-center gap-1">
-                <ExternalLink className="w-3 h-3" />PWA
-              </span>
+              <span className="flex items-center gap-1.5"><ExternalLink className="w-3.5 h-3.5" />PWA installable</span>
             </div>
           </div>
         </div>
       </footer>
+      )}
+
+      {/* ── Floating WhatsApp (shop only, hidden on product page where a sticky bar lives) */}
+      {!isAdminView && whatsappHref && view.kind !== 'product' && (
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Discuter sur WhatsApp"
+          className="group fixed bottom-5 right-4 sm:bottom-7 sm:right-6 z-30 inline-flex items-center gap-2.5 pl-3 pr-4 py-3 rounded-full
+                     bg-[#25D366] text-white font-bold text-sm shadow-[0_18px_40px_-12px_rgba(37,211,102,0.75)]
+                     hover:bg-[#1EBE5A] hover:-translate-y-0.5 transition-all duration-200 active:scale-95"
+        >
+          <span className="relative grid place-items-center w-7 h-7">
+            <span className="absolute inset-0 rounded-full bg-white/25 animate-pulse-soft" aria-hidden />
+            <IconWhatsapp className="relative w-5 h-5" />
+          </span>
+          <span className="hidden sm:inline">Besoin d'aide ?</span>
+        </a>
+      )}
     </div>
   );
 }

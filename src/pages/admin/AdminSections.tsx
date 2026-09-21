@@ -241,7 +241,7 @@ export function AdminSections() {
                   return (
                     <div key={group} className="border border-brand-border rounded-xl overflow-hidden">
                       <button type="button" onClick={() => toggleGroup(group)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition ${allSel ? 'bg-brand-primary/8 text-brand-primary' : someSel ? 'bg-brand-warning/5' : 'bg-brand-surface'}`}>
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold transition ${allSel ? 'bg-brand-primary/[0.08] text-brand-primary' : someSel ? 'bg-brand-warning/5' : 'bg-brand-surface'}`}>
                         <span>{group}</span>
                         <div className="flex items-center gap-2">
                           {allSel && <span className="text-xs bg-brand-primary text-white px-2 py-0.5 rounded-full">Tout</span>}
@@ -602,7 +602,7 @@ function CredentialsModal({ creds, onClose }: { creds: CreatedCredentials; onClo
             </div>
           </div>
 
-          <div className="bg-brand-warning/8 border border-brand-warning/25 rounded-xl p-3 flex items-start gap-2.5">
+          <div className="bg-brand-warning/[0.08] border border-brand-warning/25 rounded-xl p-3 flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-brand-warning mt-0.5 flex-shrink-0" />
             <p className="text-xs text-brand-dark">
               Notez et transmettez ce mot de passe maintenant. Il ne sera plus affiché après fermeture de cette fenêtre.

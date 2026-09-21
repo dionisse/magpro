@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   ArrowLeft, Loader2, CheckCircle2, MessageCircle,
   Banknote, Smartphone, Building2, Truck, CreditCard, ExternalLink, UserPlus, Copy, Check,
-  TicketPercent, X,
+  TicketPercent, X, Lock, ShieldCheck, Package, MapPin, ClipboardList, Sparkles,
 } from 'lucide-react';
 import { useCart, getEffectivePrice } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { formatPrice } from '../lib/format';
 import type { PaymentMethod } from '../lib/database.types';
 import type { PromoCode } from '../lib/database.types';
+import { SuccessCheck } from '../components/ui';
 import type { View } from '../lib/views';
 
 // ─── Payment method definitions ───────────────────────────────────────────────
@@ -53,6 +54,57 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 function generatePassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
   return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+// ─── Steps indicator ──────────────────────────────────────────────────────────
+
+function CheckoutSteps({ current }: { current: number }) {
+  const steps = ['Panier', 'Coordonnées & paiement', 'Confirmation'];
+  return (
+    <div className="flex items-center gap-2 sm:gap-3 mb-7 overflow-x-auto scrollbar-hide">
+      {steps.map((label, i) => {
+        const state = i < current ? 'done' : i === current ? 'active' : 'todo';
+        return (
+          <div key={label} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <span className={`step ${state === 'done' ? 'step-done' : state === 'active' ? 'step-active' : ''}`}>
+              <span className="step-dot">
+                {state === 'done' ? <Check className="w-3.5 h-3.5" /> : i + 1}
+              </span>
+              <span className={state === 'todo' ? 'hidden sm:inline' : ''}>{label}</span>
+            </span>
+            {i < steps.length - 1 && <span className="w-6 sm:w-10 h-px bg-brand-border" aria-hidden />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Section card ─────────────────────────────────────────────────────────────
+
+function FormSection({ step, title, icon, children, hint }: {
+  step: number;
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <section className="panel p-5 sm:p-6">
+      <div className="flex items-center gap-3 mb-5">
+        <span className="grid place-items-center w-10 h-10 rounded-2xl bg-brand-primary text-white font-display font-extrabold text-sm flex-shrink-0">
+          {step}
+        </span>
+        <div className="min-w-0">
+          <h2 className="font-display text-[17px] font-extrabold text-brand-ink flex items-center gap-2">
+            {icon}{title}
+          </h2>
+          {hint && <p className="text-xs text-brand-muted mt-0.5">{hint}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -150,80 +202,99 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
   if (orderNumber) {
     const msg = encodeURIComponent(`Bonjour, ma commande ${orderNumber} d'un montant de ${formatPrice(subtotal)}. Merci de la confirmer.`);
     return (
-      <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <div className="w-16 h-16 bg-brand-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-brand-success" />
-        </div>
-        <h1 className="text-2xl font-bold mb-2">Commande confirmée !</h1>
-        <p className="text-brand-muted mb-2">Numéro de commande :</p>
-        <p className="text-lg font-mono font-semibold text-brand-primary mb-2">{orderNumber}</p>
-        <p className="text-sm text-brand-muted mb-6">
-          Mode de paiement : <span className="font-medium">{METHOD_LABELS[payment]}</span>
-        </p>
-
-        {/* Auto-created credentials */}
-        {autoCredentials && (
-          <div className="bg-brand-success/5 border border-brand-success/20 rounded-xl p-5 mb-6 text-left">
-            <p className="font-semibold text-brand-success mb-3 flex items-center gap-2">
-              <UserPlus className="w-4 h-4" />Votre compte a été créé !
-            </p>
-            <p className="text-sm text-brand-muted mb-3">
-              Notez ces identifiants pour suivre vos commandes :
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium w-28 flex-shrink-0 text-brand-dark">Email :</span>
-                <code className="bg-white border border-brand-border rounded-md px-2 py-1 text-xs flex-1 truncate">
-                  {autoCredentials.email}
-                </code>
+      <div className="bg-brand-surface min-h-screen">
+        <div className="shell py-8 lg:py-14">
+          <CheckoutSteps current={2} />
+          <div className="max-w-2xl mx-auto">
+            <div className="panel p-6 sm:p-9 text-center">
+              <div className="relative w-24 h-24 mx-auto mb-5">
+                <div className="absolute inset-0 rounded-full bg-brand-success/10 animate-pulse-soft" aria-hidden />
+                <SuccessCheck className="relative w-24 h-24 text-brand-success" />
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium w-28 flex-shrink-0 text-brand-dark">Mot de passe :</span>
-                <code className="bg-white border border-brand-border rounded-md px-2 py-1 text-xs flex-1 font-mono tracking-widest">
-                  {autoCredentials.password}
-                </code>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(autoCredentials.password);
-                    setPasswordCopied(true);
-                    setTimeout(() => setPasswordCopied(false), 2000);
-                  }}
-                  className="p-1.5 rounded hover:bg-brand-success/10 text-brand-success transition flex-shrink-0"
-                  title="Copier le mot de passe"
-                >
-                  {passwordCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
+
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Merci, commande envoyée !</h1>
+              <p className="text-sm text-brand-muted mt-2">
+                Votre commande est enregistrée. Nous vous contactons rapidement pour la confirmer.
+              </p>
+
+              <div className="mt-7 grid sm:grid-cols-2 gap-3 text-left">
+                <div className="rounded-2xl border border-brand-border bg-brand-surface p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">N° de commande</p>
+                  <p className="font-mono text-base font-bold text-brand-primary mt-1 break-all">{orderNumber}</p>
+                </div>
+                <div className="rounded-2xl border border-brand-border bg-brand-surface p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">Mode de paiement</p>
+                  <p className="text-sm font-bold text-brand-ink mt-1">{METHOD_LABELS[payment]}</p>
+                </div>
+              </div>
+
+              {/* Auto-created credentials */}
+              {autoCredentials && (
+                <div className="mt-4 rounded-2xl border border-brand-success/30 bg-brand-success/[0.06] p-5 text-left">
+                  <p className="font-bold text-brand-success mb-1.5 flex items-center gap-2">
+                    <UserPlus className="w-4 h-4" />Votre compte client a été créé
+                  </p>
+                  <p className="text-[13px] text-brand-muted mb-4">
+                    Notez ces identifiants pour suivre vos commandes à tout moment.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold w-28 flex-shrink-0 text-brand-ink text-[13px]">Email</span>
+                      <code className="bg-white border border-brand-border rounded-xl px-3 py-2 text-xs flex-1 truncate">{autoCredentials.email}</code>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold w-28 flex-shrink-0 text-brand-ink text-[13px]">Mot de passe</span>
+                      <code className="bg-white border border-brand-border rounded-xl px-3 py-2 text-xs flex-1 font-mono tracking-widest">{autoCredentials.password}</code>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(autoCredentials.password);
+                          setPasswordCopied(true);
+                          setTimeout(() => setPasswordCopied(false), 2000);
+                        }}
+                        className="p-2 rounded-xl border border-brand-border bg-white text-brand-success hover:bg-brand-success/10 transition-colors flex-shrink-0"
+                        title="Copier le mot de passe"
+                      >
+                        {passwordCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-brand-muted mt-3">
+                    Vous pouvez modifier ce mot de passe depuis votre profil après connexion.
+                  </p>
+                </div>
+              )}
+
+              {/* Chariow payment link */}
+              {chariowUrl && (
+                <div className="mt-4 rounded-2xl border border-brand-primary/25 bg-brand-primary/[0.04] p-5 text-left">
+                  <p className="font-bold text-brand-primary mb-2 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4" />Finaliser le paiement en ligne
+                  </p>
+                  <p className="text-[13px] text-brand-muted mb-4">
+                    Cliquez sur le bouton ci-dessous pour être redirigé vers la page de paiement sécurisée Chariow.
+                  </p>
+                  <a href={chariowUrl} target="_blank" rel="noopener noreferrer" className="btn-primary w-full justify-center py-3.5">
+                    <ExternalLink className="w-4 h-4" />Payer maintenant
+                  </a>
+                </div>
+              )}
+
+              <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+                {user ? (
+                  <button onClick={() => setView({ kind: 'orders' })} className="btn-dark">
+                    <Package className="w-4 h-4" />Voir mes commandes
+                  </button>
+                ) : (
+                  <button onClick={() => setView({ kind: 'auth' })} className="btn-dark">
+                    Se connecter
+                  </button>
+                )}
+                <a href={`https://wa.me/?text=${msg}`} target="_blank" rel="noopener noreferrer" className="btn-secondary justify-center">
+                  <MessageCircle className="w-4 h-4" />Confirmer sur WhatsApp
+                </a>
               </div>
             </div>
-            <p className="text-xs text-brand-muted mt-3">
-              Vous pouvez modifier ce mot de passe depuis votre profil après connexion.
-            </p>
           </div>
-        )}
-
-        {/* Chariow payment link */}
-        {chariowUrl && (
-          <div className="bg-brand-primary/5 border border-brand-primary/20 rounded-xl p-5 mb-6 text-left">
-            <p className="font-semibold text-brand-primary mb-2 flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />Finaliser le paiement en ligne
-            </p>
-            <p className="text-sm text-brand-muted mb-3">Cliquez sur le bouton ci-dessous pour être redirigé vers la page de paiement sécurisée Chariow.</p>
-            <a href={chariowUrl} target="_blank" rel="noopener noreferrer"
-              className="btn-primary w-full justify-center gap-2">
-              <ExternalLink className="w-4 h-4" />Payer maintenant
-            </a>
-          </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-2 justify-center">
-          {user ? (
-            <button onClick={() => setView({ kind: 'orders' })} className="btn-primary">Voir mes commandes</button>
-          ) : (
-            <button onClick={() => setView({ kind: 'auth' })} className="btn-primary">Se connecter</button>
-          )}
-          <a href={`https://wa.me/?text=${msg}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">
-            <MessageCircle className="w-4 h-4" />Confirmer sur WhatsApp
-          </a>
         </div>
       </div>
     );
@@ -495,244 +566,303 @@ export function CheckoutPage({ setView }: { setView: (v: View) => void }) {
   const manualOptions = PAYMENT_OPTIONS.filter((o) => o.group === 'manual');
   const onlineOptions = PAYMENT_OPTIONS.filter((o) => o.group === 'online');
 
+  const methodHint: Record<string, { tone: string; icon: React.ReactNode; text: string }> = {
+    fedapay_online: {
+      tone: 'border-brand-success/25 bg-brand-success/[0.06] text-brand-success',
+      icon: <CreditCard className="w-4 h-4" />,
+      text: 'Vous serez automatiquement redirigé vers FedaPay pour payer par Mobile Money (MTN, Moov), carte bancaire ou Wave.',
+    },
+    chariow_online: {
+      tone: 'border-brand-info/25 bg-brand-info/[0.06] text-brand-info',
+      icon: <CreditCard className="w-4 h-4" />,
+      text: 'Vous serez redirigé vers la page de paiement sécurisée Chariow après validation de votre commande.',
+    },
+    mobile_money: {
+      tone: 'border-brand-warning/30 bg-brand-warning/[0.07] text-brand-warning',
+      icon: <Smartphone className="w-4 h-4" />,
+      text: 'Après validation, vous recevrez les instructions de paiement par SMS ou WhatsApp.',
+    },
+    bank_transfer: {
+      tone: 'border-brand-border bg-brand-surface text-brand-ink/70',
+      icon: <Building2 className="w-4 h-4" />,
+      text: 'Les coordonnées bancaires vous seront communiquées après validation de la commande.',
+    },
+  };
+  const activeHintKey = payment === 'fedapay_online' || payment === 'chariow_online' || payment === 'bank_transfer'
+    ? payment
+    : (payment === 'mobile_money_mtn' || payment === 'mobile_money_moov' || payment === 'mobile_money_celtis')
+      ? 'mobile_money'
+      : null;
+  const activeHint = activeHintKey ? methodHint[activeHintKey] : null;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 lg:px-6 py-6">
-      <button onClick={() => setView({ kind: 'cart' })} className="btn-ghost mb-4 -ml-2">
-        <ArrowLeft className="w-4 h-4" />Retour au panier
-      </button>
-      <h1 className="text-2xl font-bold mb-6">Finaliser la commande</h1>
-      <form onSubmit={submit} className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+    <div className="bg-brand-surface min-h-screen">
+      <div className="shell py-6 lg:py-10">
+        <CheckoutSteps current={1} />
 
-          {/* Contact */}
-          <div className="card p-5">
-            <h2 className="font-semibold mb-4">Coordonnées</h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium mb-1">Nom complet</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} required className="input" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Téléphone</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="input" placeholder="Ex: 97000000" />
-              </div>
-              {!user && (
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Email <span className="text-brand-muted font-normal">(pour recevoir vos commandes)</span>
-                  </label>
-                  <input
-                    value={guestEmail}
-                    onChange={(e) => setGuestEmail(e.target.value)}
-                    required
-                    type="email"
-                    className="input"
-                    placeholder="votre@email.com"
-                    autoComplete="email"
-                  />
-                  <p className="text-xs text-brand-muted mt-1 flex items-center gap-1">
-                    <UserPlus className="w-3 h-3" />
-                    Un compte sera créé automatiquement pour suivre vos commandes.
-                  </p>
-                </div>
-              )}
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-7">
+          <div>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Finaliser la commande</h1>
+            <p className="text-sm text-brand-muted mt-1">Renseignez vos coordonnées puis choisissez votre mode de paiement.</p>
           </div>
-
-          {/* Delivery */}
-          <div className="card p-5">
-            <h2 className="font-semibold mb-4">Adresse de livraison</h2>
-            <textarea value={address} onChange={(e) => setAddress(e.target.value)} required rows={3} placeholder="Adresse complète, quartier, ville…" className="input resize-none" />
-          </div>
-
-          {/* Payment methods */}
-          <div className="card p-5">
-            <h2 className="font-semibold mb-4">Mode de paiement</h2>
-
-            <p className="text-xs font-semibold text-brand-muted uppercase tracking-wide mb-2">Paiement manuel</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-              {manualOptions.map((opt) => (
-                <button key={opt.method} type="button" onClick={() => setPayment(opt.method)}
-                  className={`flex items-center gap-3 p-3 border rounded-xl text-left transition-all ${
-                    payment === opt.method
-                      ? 'border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary'
-                      : 'border-brand-border hover:border-brand-primary/50 hover:bg-brand-surface'
-                  }`}>
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    payment === opt.method ? 'bg-brand-primary text-white' : 'bg-brand-surface text-brand-muted'
-                  }`}>
-                    {opt.icon}
-                  </div>
-                  <div className="min-w-0">
-                    <p className={`text-sm font-medium truncate ${payment === opt.method ? 'text-brand-primary' : ''}`}>{opt.label}</p>
-                    {opt.sublabel && <p className="text-xs text-brand-muted truncate">{opt.sublabel}</p>}
-                  </div>
-                  {payment === opt.method && (
-                    <div className="ml-auto w-4 h-4 rounded-full bg-brand-primary flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <p className="text-xs font-semibold text-brand-muted uppercase tracking-wide mb-2">Paiement en ligne</p>
-            <div className="grid grid-cols-1 gap-2">
-              {onlineOptions.map((opt) => (
-                <button key={opt.method} type="button" onClick={() => setPayment(opt.method)}
-                  className={`flex items-center gap-3 p-3 border rounded-xl text-left transition-all ${
-                    payment === opt.method
-                      ? 'border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary'
-                      : 'border-brand-border hover:border-brand-primary/50 hover:bg-brand-surface'
-                  }`}>
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    payment === opt.method ? 'bg-brand-primary text-white' : 'bg-brand-surface text-brand-muted'
-                  }`}>
-                    {opt.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium ${payment === opt.method ? 'text-brand-primary' : ''}`}>{opt.label}</p>
-                    {opt.sublabel && <p className="text-xs text-brand-muted">{opt.sublabel}</p>}
-                  </div>
-                  <span className="text-xs bg-brand-primary/10 text-brand-primary px-2 py-0.5 rounded-full font-medium flex-shrink-0">Sécurisé</span>
-                  {payment === opt.method && (
-                    <div className="w-4 h-4 rounded-full bg-brand-primary flex items-center justify-center flex-shrink-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {payment === 'fedapay_online' && (
-              <div className="mt-3 p-3 bg-brand-success/5 border border-brand-success/20 rounded-lg text-xs text-brand-success">
-                Vous serez automatiquement redirigé vers FedaPay pour payer par Mobile Money (MTN, Moov), carte bancaire ou Wave.
-              </div>
-            )}
-            {payment === 'chariow_online' && (
-              <div className="mt-3 p-3 bg-brand-info/5 border border-brand-info/20 rounded-lg text-xs text-brand-info">
-                Vous serez redirigé vers la page de paiement sécurisée Chariow après validation de votre commande.
-              </div>
-            )}
-            {(payment === 'mobile_money_mtn' || payment === 'mobile_money_moov' || payment === 'mobile_money_celtis') && (
-              <div className="mt-3 p-3 bg-brand-warning/5 border border-brand-warning/20 rounded-lg text-xs text-brand-warning">
-                Après validation, vous recevrez les instructions de paiement par SMS ou WhatsApp.
-              </div>
-            )}
-            {payment === 'bank_transfer' && (
-              <div className="mt-3 p-3 bg-brand-surface border border-brand-border rounded-lg text-xs text-brand-muted">
-                Les coordonnées bancaires vous seront communiquées après validation de la commande.
-              </div>
-            )}
-          </div>
-
-          {/* Notes */}
-          <div className="card p-5">
-            <h2 className="font-semibold mb-4">Notes (optionnel)</h2>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Instructions particulières…" className="input resize-none" />
-          </div>
+          <button onClick={() => setView({ kind: 'cart' })} className="btn-secondary">
+            <ArrowLeft className="w-4 h-4" />Retour au panier
+          </button>
         </div>
 
-        {/* Summary sidebar */}
-        <div className="lg:sticky lg:top-20 h-fit">
-          <div className="card p-5">
-            <h2 className="font-semibold mb-4">Récapitulatif</h2>
-            <div className="space-y-2 text-sm max-h-60 overflow-auto pb-3 border-b border-brand-border">
-              {items.map((it) => {
-                const price = getEffectivePrice(it.product, it.quantity);
-                return (
-                  <div key={it.product.id} className="flex justify-between gap-2">
-                    <span className="line-clamp-1 text-brand-muted">{it.quantity} × {it.product.name}</span>
-                    <span className="font-medium flex-shrink-0">{formatPrice(price * it.quantity)}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="py-3 border-b border-brand-border">
-              <div className="flex justify-between text-sm text-brand-muted mb-1">
-                <span>Mode de paiement</span>
-                <span className="font-medium text-brand-dark text-xs text-right max-w-32 truncate">{METHOD_LABELS[payment]}</span>
-              </div>
-            </div>
+        <form onSubmit={submit} className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+          <div className="lg:col-span-2 space-y-4">
 
-            {/* Promo code input */}
-            <div className="py-3 border-b border-brand-border">
-              {appliedPromo ? (
-                <div className="flex items-center justify-between gap-2 bg-brand-success/5 border border-brand-success/20 rounded-lg p-2.5">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <TicketPercent className="w-4 h-4 text-brand-success flex-shrink-0" />
-                    <div className="min-w-0">
-                      <code className="font-mono text-sm font-semibold text-brand-success">{appliedPromo.code}</code>
-                      <p className="text-xs text-brand-muted truncate">
-                        {appliedPromo.discount_value > 0
-                          ? appliedPromo.discount_type === 'percentage'
-                            ? `-${appliedPromo.discount_value}% pour vous`
-                            : `-${formatPrice(appliedPromo.discount_value)} pour vous`
-                          : 'Code partenaire appliqué'}
-                      </p>
-                    </div>
-                  </div>
-                  <button type="button" onClick={removePromo} className="p-1 rounded hover:bg-brand-danger/10 text-brand-danger transition flex-shrink-0">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
+            {/* Contact */}
+            <FormSection step={1} title="Coordonnées" icon={<UserPlus className="w-4 h-4 text-brand-primary/70" />}>
+              <div className="grid sm:grid-cols-2 gap-3.5">
                 <div>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <TicketPercent className="w-4 h-4 text-brand-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <label className="label">Nom complet</label>
+                  <input value={name} onChange={(e) => setName(e.target.value)} required className="input" placeholder="Ex : Awa Diallo" />
+                </div>
+                <div>
+                  <label className="label">Téléphone</label>
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="input" placeholder="Ex : 97000000" />
+                </div>
+                {!user && (
+                  <div className="sm:col-span-2">
+                    <label className="label">
+                      Email <span className="text-brand-muted font-normal">(pour recevoir vos commandes)</span>
+                    </label>
+                    <input
+                      value={guestEmail}
+                      onChange={(e) => setGuestEmail(e.target.value)}
+                      required
+                      type="email"
+                      className="input"
+                      placeholder="votre@email.com"
+                      autoComplete="email"
+                    />
+                    <p className="text-xs text-brand-muted mt-2 flex items-center gap-1.5">
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Un compte sera créé automatiquement pour suivre vos commandes.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </FormSection>
+
+            {/* Delivery */}
+            <FormSection step={2} title="Adresse de livraison" icon={<MapPin className="w-4 h-4 text-brand-primary/70" />}>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+                rows={3}
+                placeholder="Adresse complète, quartier, ville…"
+                className="input resize-none"
+              />
+            </FormSection>
+
+            {/* Payment methods */}
+            <FormSection step={3} title="Mode de paiement" icon={<CreditCard className="w-4 h-4 text-brand-primary/70" />} hint="Choisissez le moyen qui vous arrange le plus.">
+
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted mb-2.5">Paiement manuel</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {manualOptions.map((opt) => (
+                  <button key={opt.method} type="button" onClick={() => setPayment(opt.method)}
+                    className={`relative flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all duration-200 ${
+                      payment === opt.method
+                        ? 'border-brand-primary bg-brand-primary/[0.05] ring-2 ring-brand-primary/25 shadow-soft'
+                        : 'border-brand-border bg-white hover:border-brand-primary/40 hover:-translate-y-px hover:shadow-soft'
+                    }`}>
+                    <span className={`grid place-items-center w-10 h-10 rounded-xl flex-shrink-0 transition-colors ${
+                      payment === opt.method ? 'bg-brand-primary text-white' : 'bg-brand-surface text-brand-muted'
+                    }`}>
+                      {opt.icon}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className={`block text-[13.5px] font-bold truncate ${payment === opt.method ? 'text-brand-primary' : 'text-brand-ink'}`}>{opt.label}</span>
+                      {opt.sublabel && <span className="block text-[11px] text-brand-muted truncate">{opt.sublabel}</span>}
+                    </span>
+                    <span className="choice-dot"><span className="choice-dot-inner" /></span>
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted mt-6 mb-2.5">Paiement en ligne</p>
+              <div className="grid grid-cols-1 gap-2.5">
+                {onlineOptions.map((opt) => (
+                  <button key={opt.method} type="button" onClick={() => setPayment(opt.method)}
+                    className={`relative flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all duration-200 ${
+                      payment === opt.method
+                        ? 'border-brand-primary bg-brand-primary/[0.05] ring-2 ring-brand-primary/25 shadow-soft'
+                        : 'border-brand-border bg-white hover:border-brand-primary/40 hover:-translate-y-px hover:shadow-soft'
+                    }`}>
+                    <span className={`grid place-items-center w-10 h-10 rounded-xl flex-shrink-0 transition-colors ${
+                      payment === opt.method ? 'bg-brand-primary text-white' : 'bg-brand-surface text-brand-muted'
+                    }`}>
+                      {opt.icon}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className={`block text-[13.5px] font-bold ${payment === opt.method ? 'text-brand-primary' : 'text-brand-ink'}`}>{opt.label}</span>
+                      {opt.sublabel && <span className="block text-[11px] text-brand-muted">{opt.sublabel}</span>}
+                    </span>
+                    <span className="badge bg-brand-success/[0.12] text-brand-success hidden sm:inline-flex"><ShieldCheck className="w-3 h-3" />Sécurisé</span>
+                    <span className="choice-dot"><span className="choice-dot-inner" /></span>
+                  </button>
+                ))}
+              </div>
+
+              {activeHint && (
+                <div className={`mt-4 p-3.5 rounded-2xl border text-[13px] flex items-start gap-2.5 ${activeHint.tone}`}>
+                  <span className="mt-px flex-shrink-0">{activeHint.icon}</span>
+                  <span>{activeHint.text}</span>
+                </div>
+              )}
+            </FormSection>
+
+            {/* Notes */}
+            <FormSection step={4} title="Notes (optionnel)" icon={<ClipboardList className="w-4 h-4 text-brand-primary/70" />}>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+                placeholder="Instructions particulières, repère de livraison…"
+                className="input resize-none"
+              />
+            </FormSection>
+          </div>
+
+          {/* Summary */}
+          <div className="lg:sticky lg:top-24">
+            <div className="panel p-5 sm:p-6">
+              <h2 className="font-display text-lg font-extrabold text-brand-ink mb-4 flex items-center gap-2">
+                <Package className="w-4 h-4 text-brand-primary/70" />Récapitulatif
+              </h2>
+
+              <div className="space-y-2.5 text-sm max-h-60 overflow-auto pr-1 pb-4 border-b border-brand-border">
+                {items.map((it) => {
+                  const price = getEffectivePrice(it.product, it.quantity);
+                  return (
+                    <div key={it.product.id} className="flex justify-between gap-3">
+                      <span className="line-clamp-2 text-brand-muted">
+                        <span className="font-semibold text-brand-ink">{it.quantity} ×</span> {it.product.name}
+                      </span>
+                      <span className="font-semibold flex-shrink-0">{formatPrice(price * it.quantity)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center justify-between text-sm py-3.5 border-b border-brand-border">
+                <span className="text-brand-muted">Mode de paiement</span>
+                <span className="font-bold text-brand-ink text-[13px] text-right max-w-40 truncate">{METHOD_LABELS[payment]}</span>
+              </div>
+
+              {/* Promo code */}
+              <div className="py-4 border-b border-brand-border">
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between gap-2 rounded-2xl border border-brand-success/30 bg-brand-success/[0.06] p-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="grid place-items-center w-9 h-9 rounded-xl bg-brand-success text-white flex-shrink-0">
+                        <TicketPercent className="w-4 h-4" />
+                      </span>
+                      <div className="min-w-0">
+                        <code className="font-mono text-sm font-bold text-brand-success">{appliedPromo.code}</code>
+                        <p className="text-[11px] text-brand-muted truncate">
+                          {appliedPromo.discount_value > 0
+                            ? appliedPromo.discount_type === 'percentage'
+                              ? `−${appliedPromo.discount_value}% appliqués`
+                              : `−${formatPrice(appliedPromo.discount_value)} appliqués`
+                            : 'Code partenaire appliqué'}
+                        </p>
+                      </div>
+                    </div>
+                    <button type="button" onClick={removePromo} aria-label="Retirer le code promo"
+                      className="p-1.5 rounded-xl hover:bg-brand-danger/10 text-brand-danger transition-colors flex-shrink-0">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="label flex items-center gap-1.5"><TicketPercent className="w-3.5 h-3.5" />Code promo</label>
+                    <div className="flex gap-2">
                       <input
                         value={promoInput}
                         onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
-                        placeholder="Code promo"
-                        className="input !pl-9 uppercase text-sm font-mono"
+                        placeholder="Ex : PROMO10"
+                        className="input uppercase font-mono text-sm"
                         disabled={promoChecking}
                       />
+                      <button
+                        type="button"
+                        onClick={applyPromo}
+                        disabled={promoChecking || !promoInput.trim()}
+                        className="btn-dark flex-shrink-0 px-4"
+                      >
+                        {promoChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Appliquer'}
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={applyPromo}
-                      disabled={promoChecking || !promoInput.trim()}
-                      className="btn-secondary text-sm flex-shrink-0"
-                    >
-                      {promoChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Appliquer'}
-                    </button>
+                    {promoError && <p className="text-xs font-semibold text-brand-danger mt-2">{promoError}</p>}
                   </div>
-                  {promoError && (
-                    <p className="text-xs text-brand-danger mt-1.5">{promoError}</p>
-                  )}
+                )}
+              </div>
+
+              {/* Totals */}
+              <div className="pt-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-brand-muted">Sous-total</span>
+                  <span className="font-semibold">{formatPrice(subtotal)}</span>
+                </div>
+                {appliedPromo && promoDiscount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-brand-success font-semibold">Remise promo</span>
+                    <span className="font-bold text-brand-success">−{formatPrice(promoDiscount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-brand-muted">Livraison</span>
+                  <span className="text-xs text-brand-muted">Calculée à la commande</span>
+                </div>
+              </div>
+
+              <div className="flex items-baseline justify-between pt-4 pb-5">
+                <span className="font-bold text-brand-ink">Total à payer</span>
+                <span className="font-display text-2xl font-extrabold text-brand-primary">{formatPrice(finalTotal)}</span>
+              </div>
+
+              {error && (
+                <div className="mb-4 rounded-2xl border border-brand-danger/25 bg-brand-danger/[0.07] text-brand-danger text-[13px] font-medium p-3.5">
+                  {error}
                 </div>
               )}
-            </div>
 
-            {/* Discount line */}
-            {appliedPromo && promoDiscount > 0 && (
-              <div className="flex justify-between text-sm py-1">
-                <span className="text-brand-success">Remise promo</span>
-                <span className="font-medium text-brand-success">-{formatPrice(promoDiscount)}</span>
+              <button type="submit" disabled={submitting} className="btn-primary w-full py-3.5 text-[15px]">
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                  (payment === 'fedapay_online' || payment === 'chariow_online')
+                    ? <><Lock className="w-4 h-4" />Commander & payer en ligne</>
+                    : <><CheckCircle2 className="w-4 h-4" />Confirmer la commande</>}
+              </button>
+
+              {!user && (
+                <p className="text-center text-xs text-brand-muted mt-3">
+                  Déjà client ?{' '}
+                  <button type="button" onClick={() => setView({ kind: 'auth' })} className="text-brand-primary font-semibold hover:underline">
+                    Se connecter
+                  </button>
+                </p>
+              )}
+
+              <div className="mt-5 pt-5 border-t border-brand-border space-y-2.5">
+                <p className="text-[12.5px] text-brand-ink flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-brand-success mt-0.5 flex-shrink-0" />
+                  <span>Vos informations restent confidentielles et servent uniquement à traiter la commande.</span>
+                </p>
+                <p className="text-[12.5px] text-brand-ink flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-brand-accent-dark mt-0.5 flex-shrink-0" />
+                  <span>Un conseiller vous contacte pour confirmer le paiement et l'heure de livraison.</span>
+                </p>
               </div>
-            )}
-
-            <div className="flex justify-between items-baseline pt-4 mb-4">
-              <span className="font-semibold">Total</span>
-              <span className="text-2xl font-bold text-brand-primary">{formatPrice(finalTotal)}</span>
             </div>
-            {error && <div className="bg-brand-danger/10 text-brand-danger text-sm p-2 rounded mb-3">{error}</div>}
-            <button type="submit" disabled={submitting} className="btn-primary w-full">
-              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> :
-                (payment === 'fedapay_online' || payment === 'chariow_online') ? 'Commander & Payer en ligne' : 'Confirmer la commande'}
-            </button>
-            {!user && (
-              <p className="text-center text-xs text-brand-muted mt-3">
-                Déjà client ?{' '}
-                <button type="button" onClick={() => setView({ kind: 'auth' })} className="text-brand-primary hover:underline">
-                  Se connecter
-                </button>
-              </p>
-            )}
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

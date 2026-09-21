@@ -275,12 +275,12 @@ export function AdminStock() {
                       const isOut = p.track_stock && p.stock === 0;
                       const isLow = p.track_stock && p.stock > 0 && p.stock <= p.low_stock_threshold;
                       return (
-                        <tr key={p.id} className={`hover:bg-brand-surface/50 ${isOut ? 'bg-brand-danger/3' : ''}`}>
+                        <tr key={p.id} className={`hover:bg-brand-surface/50 ${isOut ? 'bg-brand-danger/[0.03]' : ''}`}>
                           <td className="p-3 font-medium">{p.name}</td>
                           <td className="p-3 hidden sm:table-cell text-brand-muted font-mono text-xs">{p.sku || '—'}</td>
                           <td className="p-3 hidden lg:table-cell">
                             {brands.find(b => b.id === p.brand_id) ? (
-                              <span className="inline-flex items-center gap-1 text-xs bg-brand-primary/8 text-brand-primary px-2 py-0.5 rounded-full">
+                              <span className="inline-flex items-center gap-1 text-xs bg-brand-primary/[0.08] text-brand-primary px-2 py-0.5 rounded-full">
                                 <Tag className="w-3 h-3" />{brands.find(b => b.id === p.brand_id)!.name}
                               </span>
                             ) : <span className="text-brand-muted text-xs">—</span>}
