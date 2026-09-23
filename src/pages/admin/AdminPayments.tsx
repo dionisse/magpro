@@ -132,14 +132,16 @@ export function AdminPayments() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+    <div className="shell py-6 lg:py-8">
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-brand-primary" />Gestion des paiements
-          </h1>
-          <p className="text-sm text-brand-muted mt-1">Suivi de tous les paiements manuels et en ligne</p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><CreditCard className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Finances</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Gestion des paiements</h1>
+            <p className="text-sm text-brand-muted mt-1.5">Suivi de tous les paiements manuels et en ligne</p>
+          </div>
         </div>
         <button onClick={load} className="btn-secondary gap-1.5 text-sm">
           <RefreshCw className="w-3.5 h-3.5" />Actualiser
@@ -234,52 +236,52 @@ export function AdminPayments() {
             <table className="w-full text-sm">
               <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                 <tr>
-                  <th className="p-3 w-8" />
-                  <th className="p-3 text-left">Date</th>
-                  <th className="p-3 text-left">N° Commande</th>
-                  <th className="p-3 text-left hidden md:table-cell">Client</th>
-                  <th className="p-3 text-center">Mode</th>
-                  <th className="p-3 text-center">Statut</th>
-                  <th className="p-3 text-right">Montant</th>
-                  <th className="p-3 text-left hidden lg:table-cell">Réf. transaction</th>
-                  <th className="p-3 text-center">Actions</th>
+                  <th className="px-4 py-3 w-8" />
+                  <th className="px-4 py-3 text-left">Date</th>
+                  <th className="px-4 py-3 text-left">N° Commande</th>
+                  <th className="px-4 py-3 text-left hidden md:table-cell">Client</th>
+                  <th className="px-4 py-3 text-center">Mode</th>
+                  <th className="px-4 py-3 text-center">Statut</th>
+                  <th className="px-4 py-3 text-right">Montant</th>
+                  <th className="px-4 py-3 text-left hidden lg:table-cell">Réf. transaction</th>
+                  <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-border">
                 {filtered.map((p) => (
                   <>
-                    <tr key={p.id} className={`hover:bg-brand-surface/50 ${expandedId === p.id ? 'bg-brand-surface/30' : ''}`}>
-                      <td className="p-3">
+                    <tr key={p.id} className={`hover:bg-brand-surface/60 transition-colors ${expandedId === p.id ? 'bg-brand-surface/30' : ''}`}>
+                      <td className="px-4 py-3">
                         <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
                           className="text-brand-muted hover:text-brand-primary transition-colors">
                           <ChevronDown className={`w-4 h-4 transition-transform ${expandedId === p.id ? 'rotate-180' : ''}`} />
                         </button>
                       </td>
-                      <td className="p-3 text-brand-muted text-xs whitespace-nowrap">{formatDate(p.created_at)}</td>
-                      <td className="p-3 font-mono text-xs font-medium text-brand-primary">{p.order_number}</td>
-                      <td className="p-3 hidden md:table-cell">
+                      <td className="px-4 py-3 text-brand-muted text-xs whitespace-nowrap">{formatDate(p.created_at)}</td>
+                      <td className="px-4 py-3 font-mono text-xs font-medium text-brand-primary">{p.order_number}</td>
+                      <td className="px-4 py-3 hidden md:table-cell">
                         <div>
                           <p className="font-medium text-xs">{p.payer_name || '—'}</p>
                           <p className="text-brand-muted text-xs">{p.payer_phone}</p>
                         </div>
                       </td>
-                      <td className="p-3 text-center">
+                      <td className="px-4 py-3 text-center">
                         <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-brand-surface text-brand-muted text-xs">
                           {METHOD_ICONS[p.method]}
                           <span className="hidden sm:inline whitespace-nowrap">{METHOD_LABELS[p.method]}</span>
                         </div>
                       </td>
-                      <td className="p-3 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className={`inline-flex items-center gap-1 badge text-xs ${STATUS_META[p.status]?.color ?? ''}`}>
                           {STATUS_META[p.status]?.icon}
                           {STATUS_META[p.status]?.label}
                         </span>
                       </td>
-                      <td className="p-3 text-right font-bold text-brand-primary">{formatPrice(Number(p.amount))}</td>
-                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs font-mono truncate max-w-32">
+                      <td className="px-4 py-3 text-right font-bold text-brand-primary">{formatPrice(Number(p.amount))}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-brand-muted text-xs font-mono truncate max-w-32">
                         {p.transaction_id || '—'}
                       </td>
-                      <td className="p-3 text-center">
+                      <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button onClick={() => openEdit(p)} title="Modifier le statut"
                             className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded-md transition">

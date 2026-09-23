@@ -281,8 +281,11 @@
   .toast-info    { @apply toast bg-brand-primary; }
 
   /* — Page transition — */
+  /* `backwards` (et non `both`) : sans cela l'élément conserve la
+     transformation de fin d'animation, ce qui crée un contexte d'empilement et
+     fait passer les fenêtres modales sous l'en-tête collant. */
   .page-enter {
-    animation: pageEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
   /* — Quantity stepper — */

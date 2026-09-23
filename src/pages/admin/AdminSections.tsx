@@ -167,14 +167,16 @@ export function AdminSections() {
   const unassigned = allProfiles.filter((p) => !p.section_id && p.role !== 'admin');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 page-enter">
+    <div className="shell py-6 lg:py-8 page-enter">
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-brand-primary" />Sections & Accès
-          </h1>
-          <p className="text-sm text-brand-muted mt-1">Gérez les profils d'accès et créez des comptes pour vos collaborateurs</p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><ShieldCheck className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Équipe</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Sections & Accès</h1>
+            <p className="text-sm text-brand-muted mt-1.5">Gérez les profils d'accès et créez des comptes pour vos collaborateurs</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm"><RefreshCw className="w-3.5 h-3.5" />Actualiser</button>

@@ -1,7 +1,7 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   Loader2, Plus, Search, Edit2, Trash2, Package2, X, AlertTriangle,
-  Tag, Layers, ChevronDown, ChevronUp, RefreshCw, TableProperties,
+  Tag, Layers, RefreshCw, TableProperties,
   List, Check, Download, Upload, GripVertical, Sparkles, CheckCircle2,
   Cloud, AlertCircle,
 } from 'lucide-react';
@@ -145,11 +145,12 @@ export function AdminProducts() {
   if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 page-enter">
+    <div className="shell py-6 lg:py-8 page-enter">
       {/* Header */}
       <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Produits</h1>
+          <p className="eyebrow mb-2"><span className="w-5 h-px bg-brand-accent" aria-hidden />Catalogue</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Produits</h1>
           <p className="text-sm text-brand-muted">{products.length} produit{products.length !== 1 ? 's' : ''} · {brands.length} marque{brands.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -203,17 +204,17 @@ export function AdminProducts() {
           <div className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-brand-surface text-left text-xs font-medium text-brand-muted uppercase tracking-wide">
+                <thead className="bg-brand-surface text-left text-[11px] font-bold uppercase tracking-wider text-brand-muted tracking-wide">
                   <tr>
-                    <th className="p-3">Produit / SKU</th>
-                    <th className="p-3 hidden md:table-cell">Marque</th>
-                    <th className="p-3 hidden md:table-cell">Catégorie</th>
-                    <th className="p-3 text-right">Prix</th>
-                    <th className="p-3 text-center">Stock</th>
-                    <th className="p-3 hidden lg:table-cell text-center">Suivi stock</th>
-                    <th className="p-3 hidden lg:table-cell text-center">Options</th>
-                    <th className="p-3 text-center hidden sm:table-cell">Actif</th>
-                    <th className="p-3 text-right">Actions</th>
+                    <th className="px-4 py-3">Produit / SKU</th>
+                    <th className="px-4 py-3 hidden md:table-cell">Marque</th>
+                    <th className="px-4 py-3 hidden md:table-cell">Catégorie</th>
+                    <th className="px-4 py-3 text-right">Prix</th>
+                    <th className="px-4 py-3 text-center">Stock</th>
+                    <th className="px-4 py-3 hidden lg:table-cell text-center">Suivi stock</th>
+                    <th className="px-4 py-3 hidden lg:table-cell text-center">Options</th>
+                    <th className="px-4 py-3 text-center hidden sm:table-cell">Actif</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border">
@@ -223,7 +224,7 @@ export function AdminProducts() {
                     const isLow = p.stock > 0 && p.stock <= p.low_stock_threshold;
                     return (
                       <tr key={p.id} className="hover:bg-brand-surface/40 transition-colors">
-                        <td className="p-3">
+                        <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 bg-brand-surface rounded-lg flex-shrink-0 overflow-hidden border border-brand-border">
                               {p.image_url
@@ -236,16 +237,16 @@ export function AdminProducts() {
                             </div>
                           </div>
                         </td>
-                        <td className="p-3 hidden md:table-cell">
+                        <td className="px-4 py-3 hidden md:table-cell">
                           {brand ? (
                             <span className="inline-flex items-center gap-1 text-xs bg-brand-primary/[0.08] text-brand-primary px-2 py-0.5 rounded-full border border-brand-primary/20">
                               <Tag className="w-3 h-3" />{brand.name}
                             </span>
                           ) : <span className="text-brand-muted text-xs">—</span>}
                         </td>
-                        <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{cat?.name || '—'}</td>
-                        <td className="p-3 text-right font-semibold">{formatPrice(p.price)}</td>
-                        <td className="p-3 text-center">
+                        <td className="px-4 py-3 hidden md:table-cell text-brand-muted text-xs">{cat?.name || '—'}</td>
+                        <td className="px-4 py-3 text-right font-semibold">{formatPrice(p.price)}</td>
+                        <td className="px-4 py-3 text-center">
                           {p.track_stock ? (
                             <span className={`badge text-xs font-semibold ${p.stock === 0 ? 'bg-brand-danger/15 text-brand-danger' : isLow ? 'bg-brand-warning/15 text-brand-warning' : 'bg-brand-success/15 text-brand-success'}`}>
                               {p.stock}
@@ -254,16 +255,16 @@ export function AdminProducts() {
                             <span className="text-xs text-brand-muted" title="Suivi de stock désactivé">—</span>
                           )}
                         </td>
-                        <td className="p-3 hidden lg:table-cell text-center">
+                        <td className="px-4 py-3 hidden lg:table-cell text-center">
                           <span className={`w-2 h-2 rounded-full inline-block ${p.track_stock ? 'bg-brand-success' : 'bg-brand-border'}`} title={p.track_stock ? 'Suivi activé' : 'Suivi désactivé'} />
                         </td>
-                        <td className="p-3 hidden lg:table-cell text-center">
+                        <td className="px-4 py-3 hidden lg:table-cell text-center">
                           <OptionsBadge productId={p.id} />
                         </td>
-                        <td className="p-3 text-center hidden sm:table-cell">
+                        <td className="px-4 py-3 text-center hidden sm:table-cell">
                           <span className={`w-2 h-2 rounded-full inline-block ${p.is_active ? 'bg-brand-success' : 'bg-brand-border'}`} />
                         </td>
-                        <td className="p-3">
+                        <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
                             <button onClick={() => setEditing(p)} className="p-1.5 text-brand-muted hover:text-brand-primary hover:bg-brand-primary/10 rounded transition"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => setDeletingId(p.id)} className="p-1.5 text-brand-muted hover:text-brand-danger hover:bg-brand-danger/10 rounded transition"><Trash2 className="w-4 h-4" /></button>
@@ -1089,9 +1090,9 @@ export function Modal({ children, title, onClose }: { children: ReactNode; title
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-auto">
-        <div className="sticky top-0 bg-white border-b border-brand-border px-5 py-4 flex items-center justify-between z-10">
-          <h2 className="font-semibold text-lg">{title}</h2>
+      <div className="relative bg-white rounded-3xl shadow-lift w-full max-w-2xl max-h-[92vh] overflow-auto animate-fade-in-scale">
+        <div className="sticky top-0 glass border-b border-brand-border px-5 sm:px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="font-display font-extrabold text-lg text-brand-ink">{title}</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-brand-surface rounded-lg transition"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-5">{children}</div>
@@ -1108,7 +1109,7 @@ export function ConfirmDialog({ title, message, onCancel, onConfirm }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-5">
+      <div className="relative bg-white rounded-3xl shadow-lift w-full max-w-md p-6 animate-fade-in-scale">
         <div className="flex items-start gap-3 mb-4">
           <div className="w-10 h-10 bg-brand-danger/10 rounded-full flex items-center justify-center flex-shrink-0"><AlertTriangle className="w-5 h-5 text-brand-danger" /></div>
           <div><h3 className="font-semibold">{title}</h3><p className="text-sm text-brand-muted mt-1">{message}</p></div>

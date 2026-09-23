@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   ShoppingBasket, Plus, Loader2, X, CheckCircle, XCircle,
-  Eye, Trash2, RefreshCw, FileText, Upload, ExternalLink,
+  Trash2, RefreshCw, FileText, Upload, ExternalLink,
   ChevronDown, ChevronUp, AlertTriangle, Search,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -177,7 +177,7 @@ export function AdminPurchases() {
   }
 
   // ── Cancel purchase ───────────────────────────────────────────────────────
-  async function cancelPurchase(id: string, currentStatus: string) {
+  async function cancelPurchase(id: string) {
     if (!confirm('Confirmer l\'annulation ? Le stock sera reversé si l\'approvisionnement était validé.')) return;
     setActionLoading(id + '-cancel');
     await supabase.from('purchases').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', id);
@@ -207,14 +207,16 @@ export function AdminPurchases() {
   const countDraft = purchases.filter((p) => p.status === 'draft').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+    <div className="shell py-6 lg:py-8">
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShoppingBasket className="w-6 h-6 text-brand-primary" />Approvisionnements
-          </h1>
-          <p className="text-sm text-brand-muted mt-1">Achats fournisseurs — mise à jour automatique du stock à la validation</p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><ShoppingBasket className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Achats</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Approvisionnements</h1>
+            <p className="text-sm text-brand-muted mt-1.5">Achats fournisseurs — mise à jour automatique du stock à la validation</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm">
@@ -423,40 +425,40 @@ export function AdminPurchases() {
             <table className="w-full text-sm">
               <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                 <tr>
-                  <th className="p-3 text-left w-8" />
-                  <th className="p-3 text-left">Date</th>
-                  <th className="p-3 text-left">Référence</th>
-                  <th className="p-3 text-left">Libellé</th>
-                  <th className="p-3 text-left hidden md:table-cell">Fournisseur</th>
-                  <th className="p-3 text-left hidden lg:table-cell">Réf. facture</th>
-                  <th className="p-3 text-center hidden sm:table-cell">Statut</th>
-                  <th className="p-3 text-right">Total</th>
-                  <th className="p-3 text-center hidden sm:table-cell">Facture</th>
-                  <th className="p-3 text-right">Actions</th>
+                  <th className="px-4 py-3 text-left w-8" />
+                  <th className="px-4 py-3 text-left">Date</th>
+                  <th className="px-4 py-3 text-left">Référence</th>
+                  <th className="px-4 py-3 text-left">Libellé</th>
+                  <th className="px-4 py-3 text-left hidden md:table-cell">Fournisseur</th>
+                  <th className="px-4 py-3 text-left hidden lg:table-cell">Réf. facture</th>
+                  <th className="px-4 py-3 text-center hidden sm:table-cell">Statut</th>
+                  <th className="px-4 py-3 text-right">Total</th>
+                  <th className="px-4 py-3 text-center hidden sm:table-cell">Facture</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-border">
                 {filtered.map((p) => (
                   <>
-                    <tr key={p.id} className={`hover:bg-brand-surface/50 cursor-pointer ${expandedId === p.id ? 'bg-brand-surface/30' : ''}`}>
-                      <td className="p-3">
+                    <tr key={p.id} className={`hover:bg-brand-surface/60 transition-colors cursor-pointer ${expandedId === p.id ? 'bg-brand-surface/30' : ''}`}>
+                      <td className="px-4 py-3">
                         <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
                           className="text-brand-muted hover:text-brand-primary transition-colors">
                           {expandedId === p.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
                       </td>
-                      <td className="p-3 text-brand-muted text-xs whitespace-nowrap">{p.date}</td>
-                      <td className="p-3 font-mono text-xs font-medium">{p.reference}</td>
-                      <td className="p-3 font-medium max-w-48 truncate">{p.label}</td>
-                      <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{p.supplier_name || '—'}</td>
-                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{p.invoice_reference || '—'}</td>
-                      <td className="p-3 text-center hidden sm:table-cell">
+                      <td className="px-4 py-3 text-brand-muted text-xs whitespace-nowrap">{p.date}</td>
+                      <td className="px-4 py-3 font-mono text-xs font-medium">{p.reference}</td>
+                      <td className="px-4 py-3 font-medium max-w-48 truncate">{p.label}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-brand-muted text-xs">{p.supplier_name || '—'}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-brand-muted text-xs">{p.invoice_reference || '—'}</td>
+                      <td className="px-4 py-3 text-center hidden sm:table-cell">
                         <span className={`badge text-xs ${STATUS_META[p.status]?.color ?? ''}`}>
                           {STATUS_META[p.status]?.label ?? p.status}
                         </span>
                       </td>
-                      <td className="p-3 text-right font-bold text-brand-primary">{formatPrice(Number(p.total_amount))}</td>
-                      <td className="p-3 text-center hidden sm:table-cell">
+                      <td className="px-4 py-3 text-right font-bold text-brand-primary">{formatPrice(Number(p.total_amount))}</td>
+                      <td className="px-4 py-3 text-center hidden sm:table-cell">
                         {p.invoice_url ? (
                           <a href={p.invoice_url} target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs text-brand-info hover:underline">
@@ -464,7 +466,7 @@ export function AdminPurchases() {
                           </a>
                         ) : <span className="text-xs text-brand-muted">—</span>}
                       </td>
-                      <td className="p-3">
+                      <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1.5">
                           {p.status === 'draft' && (
                             <>
@@ -486,7 +488,7 @@ export function AdminPurchases() {
                           )}
                           {p.status === 'validated' && (
                             <button
-                              onClick={() => cancelPurchase(p.id, p.status)}
+                              onClick={() => cancelPurchase(p.id)}
                               disabled={actionLoading === p.id + '-cancel'}
                               title="Annuler (le stock sera reversé)"
                               className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/20 rounded-md transition disabled:opacity-50">

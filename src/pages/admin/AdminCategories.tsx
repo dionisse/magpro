@@ -29,7 +29,7 @@ export function AdminCategories() {
   if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 lg:px-6 py-6">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
       <div className="flex items-center justify-between mb-4">
         <div>
           {selectedParent ? (
@@ -38,13 +38,15 @@ export function AdminCategories() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold">{selectedParent.name}</h1>
-                <p className="text-sm text-brand-muted">{subCategories.length} sous-catégorie{subCategories.length !== 1 ? 's' : ''}</p>
+                <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Catalogue</p>
+                <h1 className="font-display text-2xl font-extrabold text-brand-ink">{selectedParent.name}</h1>
+                <p className="text-sm text-brand-muted mt-1">{subCategories.length} sous-catégorie{subCategories.length !== 1 ? 's' : ''}</p>
               </div>
             </div>
           ) : (
             <div>
-              <h1 className="text-2xl font-bold">Catégories</h1>
+              <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Catalogue</p>
+              <h1 className="font-display text-2xl font-extrabold text-brand-ink">Catégories</h1>
               <p className="text-sm text-brand-muted">{parentCategories.length} catégorie{parentCategories.length !== 1 ? 's' : ''} parente{parentCategories.length !== 1 ? 's' : ''}</p>
             </div>
           )}

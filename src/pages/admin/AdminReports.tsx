@@ -125,11 +125,15 @@ export function AdminReports() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+    <div className="shell py-6 lg:py-8">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><BarChart3 className="w-6 h-6 text-brand-primary" />Rapports financiers</h1>
-          <p className="text-sm text-brand-muted mt-1">{orders.length} commandes sur la période</p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><BarChart3 className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Finances</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Rapports financiers</h1>
+            <p className="text-sm text-brand-muted mt-1.5">{orders.length} commandes sur la période</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {(['today', 'week', 'month', 'year'] as Period[]).map((p) => (
@@ -389,25 +393,25 @@ export function AdminReports() {
               <table className="w-full text-sm">
                 <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                   <tr>
-                    <th className="p-3 text-left">Libellé</th>
-                    <th className="p-3 text-left hidden sm:table-cell">Catégorie</th>
-                    <th className="p-3 text-left hidden md:table-cell">Date</th>
-                    <th className="p-3 text-left hidden lg:table-cell">Notes</th>
-                    <th className="p-3 text-right">Montant</th>
-                    <th className="p-3 w-10" />
+                    <th className="px-4 py-3 text-left">Libellé</th>
+                    <th className="px-4 py-3 text-left hidden sm:table-cell">Catégorie</th>
+                    <th className="px-4 py-3 text-left hidden md:table-cell">Date</th>
+                    <th className="px-4 py-3 text-left hidden lg:table-cell">Notes</th>
+                    <th className="px-4 py-3 text-right">Montant</th>
+                    <th className="px-4 py-3 w-10" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border">
                   {expenses.map((e) => (
-                    <tr key={e.id} className="hover:bg-brand-surface/50">
-                      <td className="p-3 font-medium">{e.label}</td>
-                      <td className="p-3 hidden sm:table-cell">
+                    <tr key={e.id} className="hover:bg-brand-surface/60 transition-colors">
+                      <td className="px-4 py-3 font-medium">{e.label}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell">
                         <span className="badge bg-brand-danger/10 text-brand-danger text-xs">{CAT_LABELS[e.category] || e.category}</span>
                       </td>
-                      <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{e.date}</td>
-                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{e.notes || '—'}</td>
-                      <td className="p-3 text-right font-bold text-brand-danger">{formatPrice(Number(e.amount))}</td>
-                      <td className="p-3">
+                      <td className="px-4 py-3 hidden md:table-cell text-brand-muted text-xs">{e.date}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-brand-muted text-xs">{e.notes || '—'}</td>
+                      <td className="px-4 py-3 text-right font-bold text-brand-danger">{formatPrice(Number(e.amount))}</td>
+                      <td className="px-4 py-3">
                         <button onClick={() => deleteExpense(e.id)} className="text-brand-muted hover:text-brand-danger transition-colors">
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -434,27 +438,27 @@ export function AdminReports() {
               <table className="w-full text-sm">
                 <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                   <tr>
-                    <th className="p-3 text-left">Commande</th>
-                    <th className="p-3 text-left hidden md:table-cell">Client</th>
-                    <th className="p-3 text-left hidden lg:table-cell">Date</th>
-                    <th className="p-3 text-center hidden sm:table-cell">Source</th>
-                    <th className="p-3 text-center hidden md:table-cell">Paiement</th>
-                    <th className="p-3 text-right">Total</th>
+                    <th className="px-4 py-3 text-left">Commande</th>
+                    <th className="px-4 py-3 text-left hidden md:table-cell">Client</th>
+                    <th className="px-4 py-3 text-left hidden lg:table-cell">Date</th>
+                    <th className="px-4 py-3 text-center hidden sm:table-cell">Source</th>
+                    <th className="px-4 py-3 text-center hidden md:table-cell">Paiement</th>
+                    <th className="px-4 py-3 text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border">
                   {orders.slice(0, 50).map((o) => (
-                    <tr key={o.id} className="hover:bg-brand-surface/50">
-                      <td className="p-3 font-mono font-medium text-xs">{o.order_number}</td>
-                      <td className="p-3 hidden md:table-cell">{o.customer_name || '—'}</td>
-                      <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{formatDate(o.created_at)}</td>
-                      <td className="p-3 text-center hidden sm:table-cell">
+                    <tr key={o.id} className="hover:bg-brand-surface/60 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-xs">{o.order_number}</td>
+                      <td className="px-4 py-3 hidden md:table-cell">{o.customer_name || '—'}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-brand-muted text-xs">{formatDate(o.created_at)}</td>
+                      <td className="px-4 py-3 text-center hidden sm:table-cell">
                         <span className={`badge text-xs ${o.source === 'pos' ? 'bg-brand-info/15 text-brand-info' : 'bg-brand-primary/10 text-brand-primary'}`}>
                           {o.source === 'pos' ? 'POS' : 'Web'}
                         </span>
                       </td>
-                      <td className="p-3 text-center hidden md:table-cell text-xs text-brand-muted capitalize">{o.payment_method.replace('_', ' ')}</td>
-                      <td className="p-3 text-right font-bold text-brand-primary">{formatPrice(o.total)}</td>
+                      <td className="px-4 py-3 text-center hidden md:table-cell text-xs text-brand-muted capitalize">{o.payment_method.replace('_', ' ')}</td>
+                      <td className="px-4 py-3 text-right font-bold text-brand-primary">{formatPrice(o.total)}</td>
                     </tr>
                   ))}
                 </tbody>

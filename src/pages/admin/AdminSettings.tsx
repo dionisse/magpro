@@ -91,11 +91,12 @@ export function AdminSettings() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 lg:px-6 py-6">
+    <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-brand-dark">Paramètres de la boutique</h1>
-          <p className="text-sm text-brand-muted mt-0.5">Personnalisez l'identité et les informations de votre boutique</p>
+          <p className="eyebrow mb-2"><span className="w-5 h-px bg-brand-accent" aria-hidden />Réglages</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Paramètres de la boutique</h1>
+          <p className="text-sm text-brand-muted mt-1.5">Personnalisez l'identité et les informations de votre boutique</p>
         </div>
         {status === 'success' && (
           <div className="flex items-center gap-1.5 text-sm text-brand-success font-medium">

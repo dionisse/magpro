@@ -35,10 +35,11 @@ export function AdminOrders() {
   if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">Commandes</h1>
-        <p className="text-sm text-brand-muted">{orders.length} commandes</p>
+    <div className="shell py-6 lg:py-8">
+      <div className="mb-6">
+        <p className="eyebrow mb-2"><span className="w-5 h-px bg-brand-accent" aria-hidden />Ventes</p>
+        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Commandes</h1>
+        <p className="text-sm text-brand-muted mt-1.5">{orders.length} commandes</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative flex-1">
@@ -53,27 +54,27 @@ export function AdminOrders() {
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-brand-surface text-left text-xs font-medium text-brand-muted uppercase">
+            <thead className="bg-brand-surface text-left text-[11px] font-bold uppercase tracking-wider text-brand-muted">
               <tr>
-                <th className="p-3">N° / Date</th>
-                <th className="p-3 hidden md:table-cell">Client</th>
-                <th className="p-3 hidden lg:table-cell">Source</th>
-                <th className="p-3 text-right">Total</th>
-                <th className="p-3">Statut</th>
-                <th className="p-3"></th>
+                <th className="px-4 py-3">N° / Date</th>
+                <th className="px-4 py-3 hidden md:table-cell">Client</th>
+                <th className="px-4 py-3 hidden lg:table-cell">Source</th>
+                <th className="px-4 py-3 text-right">Total</th>
+                <th className="px-4 py-3">Statut</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-border">
               {filtered.map((o) => (
-                <tr key={o.id} className="hover:bg-brand-surface/50">
-                  <td className="p-3"><p className="font-mono font-medium">{o.order_number}</p><p className="text-xs text-brand-muted">{formatDate(o.created_at)}</p></td>
-                  <td className="p-3 hidden md:table-cell"><p className="font-medium">{o.customer_name || '—'}</p><p className="text-xs text-brand-muted">{o.customer_phone}</p></td>
-                  <td className="p-3 hidden lg:table-cell">
+                <tr key={o.id} className="hover:bg-brand-surface/60 transition-colors">
+                  <td className="px-4 py-3"><p className="font-mono font-medium">{o.order_number}</p><p className="text-xs text-brand-muted">{formatDate(o.created_at)}</p></td>
+                  <td className="px-4 py-3 hidden md:table-cell"><p className="font-medium">{o.customer_name || '—'}</p><p className="text-xs text-brand-muted">{o.customer_phone}</p></td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
                     <span className={`badge ${o.source === 'pos' ? 'bg-brand-info/15 text-brand-info' : 'bg-brand-primary/10 text-brand-primary'}`}>{o.source === 'pos' ? 'POS' : 'En ligne'}</span>
                   </td>
-                  <td className="p-3 text-right font-bold">{formatPrice(o.total)}</td>
-                  <td className="p-3"><StatusBadge status={o.status} /></td>
-                  <td className="p-3 text-right"><button onClick={() => setSelected(o)} className="btn-ghost p-1.5"><Eye className="w-4 h-4" /></button></td>
+                  <td className="px-4 py-3 text-right font-bold">{formatPrice(o.total)}</td>
+                  <td className="px-4 py-3"><StatusBadge status={o.status} /></td>
+                  <td className="px-4 py-3 text-right"><button onClick={() => setSelected(o)} className="btn-ghost p-1.5"><Eye className="w-4 h-4" /></button></td>
                 </tr>
               ))}
             </tbody>
@@ -108,7 +109,7 @@ function OrderDrawer({ order, onClose, onUpdated }: { order: Order; onClose: () 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-md h-full overflow-auto shadow-xl">
+      <div className="relative bg-white w-full max-w-md h-full overflow-auto shadow-lift">
         <div className="sticky top-0 bg-white border-b border-brand-border p-4 flex items-center justify-between">
           <div><p className="text-xs text-brand-muted">Commande</p><h2 className="font-bold font-mono">{order.order_number}</h2></div>
           <button onClick={onClose} className="p-1 hover:bg-brand-surface rounded"><X className="w-5 h-5" /></button>
