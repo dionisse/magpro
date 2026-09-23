@@ -316,10 +316,13 @@ function CategoryProductsSection({ category, products, onView, onAdd, onSeeAll }
   onAdd: (product: Product) => void;
   onSeeAll: () => void;
 }) {
+  const scroller = useRef<HTMLDivElement>(null);
+
   if (products.length === 0) return null;
 
-  const visible = products.slice(0, 10);
-  const hasMore = products.length > 10;
+  function scrollBy(dir: 1 | -1) {
+    scroller.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
+  }
 
   return (
     <section className="mb-14">
@@ -340,32 +343,45 @@ function CategoryProductsSection({ category, products, onView, onAdd, onSeeAll }
           </div>
         </div>
 
-        <button onClick={onSeeAll}
-          className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-brand-border text-[13px] font-bold text-brand-ink hover:border-brand-primary hover:text-brand-primary hover:shadow-soft transition-all flex-shrink-0">
-          Voir tout
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button onClick={() => scrollBy(-1)} aria-label="Précédent"
+            className="hidden lg:grid place-items-center w-10 h-10 rounded-full bg-white border border-brand-border text-brand-ink hover:border-brand-primary hover:text-brand-primary transition-all">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button onClick={() => scrollBy(1)} aria-label="Suivant"
+            className="hidden lg:grid place-items-center w-10 h-10 rounded-full bg-white border border-brand-border text-brand-ink hover:border-brand-primary hover:text-brand-primary transition-all">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button onClick={onSeeAll}
+            className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-brand-border text-[13px] font-bold text-brand-ink hover:border-brand-primary hover:text-brand-primary hover:shadow-soft transition-all">
+            Voir tout
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
-        {visible.map((product, i) => (
-          <StaggerItem key={product.id} index={i} className="h-full">
-            <ProductCard
-              product={product}
-              onView={() => onView(product.id)}
-              onAdd={() => onAdd(product)}
-            />
-          </StaggerItem>
+      <div ref={scroller}
+        className="flex gap-3 sm:gap-5 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:overflow-visible sm:pb-0">
+        {products.slice(0, 5).map((product, i) => (
+          <div key={product.id} className="flex-shrink-0 w-[180px] sm:w-auto">
+            <StaggerItem index={i} className="h-full">
+              <ProductCard
+                product={product}
+                onView={() => onView(product.id)}
+                onAdd={() => onAdd(product)}
+              />
+            </StaggerItem>
+          </div>
         ))}
-        {hasMore && (
+        {products.length > 5 && (
           <button onClick={onSeeAll}
-            className="min-h-[220px] rounded-2xl border-2 border-dashed border-brand-border
+            className="flex-shrink-0 w-[180px] sm:w-auto min-h-[220px] rounded-2xl border-2 border-dashed border-brand-border
                        hover:border-brand-primary hover:bg-white transition-all duration-200 grid place-items-center group">
             <span className="text-center">
               <span className="mx-auto grid place-items-center w-12 h-12 rounded-full bg-brand-primary/[0.08] group-hover:bg-brand-primary group-hover:text-white text-brand-primary transition-colors mb-3">
                 <ArrowRight className="w-5 h-5" />
               </span>
-              <span className="block text-[13px] font-bold text-brand-primary">+{products.length - 10} autres</span>
+              <span className="block text-[13px] font-bold text-brand-primary">+{products.length - 5} autres</span>
               <span className="block text-[11px] text-brand-muted mt-0.5">Voir le rayon</span>
             </span>
           </button>
