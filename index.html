@@ -7,13 +7,6 @@
     <meta name="theme-color" content="#0B2C4D" />
     <meta name="description" content="MagasinPro — boutique en ligne : catalogue, promotions, livraison rapide et paiement Mobile Money." />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
-      rel="stylesheet"
-    />
     <!-- Preconnect to Supabase CDN -->
     <link rel="preconnect" href="https://wqgpfbuaigizbhtmqamx.supabase.co" />
     <title>MagasinPro — Boutique en ligne</title>
@@ -27,9 +20,26 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      /* Service worker : on ne l'enregistre que si /sw.js existe réellement.
+         Sinon on désinscrit tout worker déjà installé, afin qu'un ancien cache
+         ne serve pas une version obsolète du site. */
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+          fetch('/sw.js', { cache: 'no-store' })
+            .then((res) => {
+              const type = res.headers.get('content-type') || '';
+              // Un serveur de dev renvoie souvent index.html en 200 pour /sw.js :
+              // on vérifie donc aussi le type MIME avant d'enregistrer le worker.
+              if (res.ok && type.indexOf('javascript') !== -1) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+                return;
+              }
+              if (!navigator.serviceWorker.getRegistrations) return;
+              navigator.serviceWorker.getRegistrations()
+                .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+                .catch(() => {});
+            })
+            .catch(() => {});
         });
       }
     </script>

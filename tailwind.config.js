@@ -40,8 +40,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter Variable', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Plus Jakarta Sans Variable"', '"Plus Jakarta Sans"', 'Inter Variable', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'eyebrow': ['0.7rem', { lineHeight: '1rem', letterSpacing: '0.14em' }],

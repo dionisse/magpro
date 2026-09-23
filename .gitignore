@@ -26,3 +26,6 @@ dist-ssr
 # Aperçu local (données de démonstration) — ne pas versionner
 demo.html
 public/mock/
+
+# Artefacts temporaires de Vite (commités par erreur deux fois)
+vite.config.ts.timestamp-*.mjs

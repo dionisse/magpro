@@ -25,10 +25,23 @@ export default defineConfig({
     // Enable minification
     minify: 'esbuild',
   },
-  // Better caching in dev
+  // Dev server: reachable derrière un proxy/tunnel et toujours à jour.
+  // Important : ne JAMAIS mettre en cache les réponses du serveur de dev.
+  // Avec `public, max-age=31536000, immutable`, le navigateur réutilise
+  // l'index.html / le JS / le CSS pendant un an : après une modification,
+  // l'aperçu continue d'afficher l'ancienne version du site.
   server: {
+    host: true,
+    allowedHosts: true,
     headers: {
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'no-store',
+    },
+  },
+  preview: {
+    host: true,
+    allowedHosts: true,
+    headers: {
+      'Cache-Control': 'no-store',
     },
   },
 });
