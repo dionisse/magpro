@@ -50,9 +50,14 @@ function Countdown({ endsAt }: { endsAt: string }) {
 
 // ─── Banner carousel ──────────────────────────────────────────────────────────
 
-function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a: string | null) => void }) {
+function BannerCarousel({ banners, onAction, storeName }: {
+  banners: Banner[];
+  onAction: (a: string | null) => void;
+  storeName?: string;
+}) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [ratio, setRatio] = useState<number | null>(null);
 
   useEffect(() => {
     if (banners.length <= 1 || paused) return;
@@ -62,6 +67,133 @@ function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a
 
   if (banners.length === 0) return null;
   const b = banners[active];
+  const go = (i: number) => { setActive(((i % banners.length) + banners.length) % banners.length); setPaused(true); };
+
+  /* Certaines boutiques téléversent des affiches publicitaires : image carrée ou
+     verticale, texte déjà incrusté dans le visuel. Affichée en fond plein cadre,
+     une affiche est rognée et son texte entre en collision avec celui de
+     l'interface. Ces visuels sont donc présentés à côté du texte, dans un cadre
+     qui respecte leur format ; les bannières panoramiques gardent la mise en
+     page plein cadre. */
+  const poster = ratio !== null && ratio < 1.5;
+  const posterAspect = Math.min(Math.max(ratio ?? 1.3, 0.7), 1.9);
+
+  /* Mesure le format de la première bannière (sans l'afficher) pour choisir la mise en page. */
+  const measure = (
+    <img src={banners[0].image_url} alt="" aria-hidden className="hidden"
+      onLoad={(e) => {
+        const el = e.currentTarget;
+        if (el.naturalWidth && el.naturalHeight) setRatio(el.naturalWidth / el.naturalHeight);
+      }} />
+  );
+
+  const badge = (
+    <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold uppercase tracking-[0.14em] animate-fade-in-up">
+      <Sparkles className="w-3.5 h-3.5 text-brand-accent" />
+      {b.title ? 'En vedette' : (b.subtitle ? 'Nouveauté' : 'Boutique')}
+    </span>
+  );
+
+  const actions = (
+    <div className="mt-7 flex flex-wrap items-center gap-3 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+      {b.cta_text && (
+        <button onClick={() => onAction(b.cta_action)}
+          className="group inline-flex items-center gap-2.5 bg-brand-accent text-brand-ink font-bold px-6 sm:px-7 py-3.5 rounded-full text-sm
+                     shadow-[0_18px_40px_-16px_rgba(233,164,0,0.9)] hover:bg-white hover:-translate-y-0.5
+                     transition-all duration-300 active:scale-95">
+          {b.cta_text}
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
+      )}
+      <button onClick={() => onAction(null)}
+        className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white
+                   border border-white/25 bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300">
+        Voir le catalogue
+      </button>
+    </div>
+  );
+
+  const guarantees = (
+    <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-semibold text-white/70 animate-fade-in-up"
+      style={{ animationDelay: '260ms' }}>
+      <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-brand-accent" />Livraison rapide</span>
+      <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-brand-accent" />Paiement sécurisé</span>
+      <span className="inline-flex items-center gap-1.5"><RotateCcw className="w-4 h-4 text-brand-accent" />Retour 7 jours</span>
+    </div>
+  );
+
+  const dots = banners.length > 1 && (
+    <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-black/25 backdrop-blur-md border border-white/10">
+      {banners.map((_, i) => (
+        <button key={i} onClick={() => go(i)} aria-label={`Aller à la bannière ${i + 1}`}
+          className={`rounded-full transition-all duration-500 ${i === active ? 'bg-brand-accent w-8 h-2' : 'bg-white/40 w-2 h-2 hover:bg-white/70'}`} />
+      ))}
+    </div>
+  );
+
+  const progress = (
+    <div className="absolute bottom-0 inset-x-0 z-30 h-1 bg-white/10 overflow-hidden">
+      {!paused && (
+        <span key={active} className="block h-full bg-brand-accent animate-progress" style={{ animationDuration: '5500ms' }} />
+      )}
+    </div>
+  );
+
+  if (poster) {
+    return (
+      <section className="relative isolate overflow-hidden bg-brand-primary"
+        onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <div className="absolute inset-0 bg-mesh-navy" aria-hidden />
+        <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-brand-accent/10 blur-3xl" aria-hidden />
+        {measure}
+
+        <div className="relative shell py-10 lg:py-14 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="min-w-0">
+            {badge}
+            <h1 className="mt-5 text-[2.1rem] sm:text-5xl lg:text-[3.4rem] font-extrabold text-white leading-[1.05] tracking-tight text-balance animate-fade-in-up"
+              style={{ animationDelay: '70ms' }}>
+              {b.title || storeName || 'Notre sélection'}
+            </h1>
+            {b.subtitle && (
+              <p className="mt-4 text-base sm:text-lg text-white/75 max-w-lg leading-relaxed animate-fade-in-up"
+                style={{ animationDelay: '140ms' }}>
+                {b.subtitle}
+              </p>
+            )}
+            {actions}
+            {guarantees}
+            {dots && <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '300ms' }}>{dots}</div>}
+          </div>
+
+          <div className="relative">
+            <div className="relative rounded-[28px] overflow-hidden shadow-lift ring-1 ring-white/15 bg-brand-primary-dark"
+              style={{ aspectRatio: String(posterAspect) }}>
+              {banners.map((banner, i) => (
+                <div key={banner.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === active ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+                  <img src={banner.image_url} alt={banner.title ?? ''} loading={i === 0 ? 'eager' : 'lazy'}
+                    className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+              ))}
+              {banners.length > 1 && (
+                <>
+                  <button onClick={() => go(active - 1)} aria-label="Bannière précédente"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 grid place-items-center w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 backdrop-blur-md text-white border border-white/20 transition-all hover:scale-105">
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => go(active + 1)} aria-label="Bannière suivante"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 grid place-items-center w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 backdrop-blur-md text-white border border-white/20 transition-all hover:scale-105">
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        {progress}
+      </section>
+    );
+  }
 
   return (
     <section
@@ -70,6 +202,7 @@ function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
+      {measure}
       {banners.map((banner, i) => (
         <div key={banner.id}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === active ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
@@ -87,11 +220,7 @@ function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a
       <div className="absolute inset-0 z-20 flex items-center">
         <div className="shell w-full">
           <div className="max-w-2xl" key={active}>
-            <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold uppercase tracking-[0.14em] animate-fade-in-up">
-              <Sparkles className="w-3.5 h-3.5 text-brand-accent" />
-              {b.title ? 'En vedette' : (b.subtitle ? 'Nouveauté' : 'Boutique')}
-            </span>
-
+            {badge}
             {b.title && (
               <h1 className="mt-5 text-[2.4rem] sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.02] tracking-tight text-balance animate-fade-in-up"
                 style={{ animationDelay: '70ms' }}>
@@ -104,61 +233,31 @@ function BannerCarousel({ banners, onAction }: { banners: Banner[]; onAction: (a
                 {b.subtitle}
               </p>
             )}
-
-            <div className="mt-7 flex flex-wrap items-center gap-3 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              {b.cta_text && (
-                <button onClick={() => onAction(b.cta_action)}
-                  className="group inline-flex items-center gap-2.5 bg-brand-accent text-brand-ink font-bold px-6 sm:px-7 py-3.5 rounded-full text-sm
-                             shadow-[0_18px_40px_-16px_rgba(233,164,0,0.9)] hover:bg-white hover:-translate-y-0.5
-                             transition-all duration-300 active:scale-95">
-                  {b.cta_text}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              )}
-              <button onClick={() => onAction(null)}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white
-                           border border-white/25 bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300">
-                Voir le catalogue
-              </button>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-semibold text-white/70 animate-fade-in-up"
-              style={{ animationDelay: '260ms' }}>
-              <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-brand-accent" />Livraison rapide</span>
-              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-brand-accent" />Paiement sécurisé</span>
-              <span className="inline-flex items-center gap-1.5"><RotateCcw className="w-4 h-4 text-brand-accent" />Retour 7 jours</span>
-            </div>
+            {actions}
+            {guarantees}
           </div>
         </div>
       </div>
 
       {banners.length > 1 && (
         <>
-          <button onClick={() => { setActive((i) => (i === 0 ? banners.length - 1 : i - 1)); setPaused(true); }}
+          <button onClick={() => go(active - 1)}
             aria-label="Bannière précédente"
             className="hidden sm:grid absolute left-3 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white border border-white/20 place-items-center transition-all hover:scale-110">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button onClick={() => { setActive((i) => (i + 1) % banners.length); setPaused(true); }}
+          <button onClick={() => go(active + 1)}
             aria-label="Bannière suivante"
             className="hidden sm:grid absolute right-3 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white border border-white/20 place-items-center transition-all hover:scale-110">
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-2 rounded-full bg-black/25 backdrop-blur-md border border-white/10">
-            {banners.map((_, i) => (
-              <button key={i} onClick={() => { setActive(i); setPaused(true); }} aria-label={`Aller à la bannière ${i + 1}`}
-                className={`rounded-full transition-all duration-500 ${i === active ? 'bg-brand-accent w-8 h-2' : 'bg-white/40 w-2 h-2 hover:bg-white/70'}`} />
-            ))}
-          </div>
-
-          <div className="absolute bottom-0 inset-x-0 z-30 h-1 bg-white/10 overflow-hidden">
-            {!paused && (
-              <span key={active} className="block h-full bg-brand-accent animate-progress" style={{ animationDuration: '5500ms' }} />
-            )}
+          <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-30">
+            {dots}
           </div>
         </>
       )}
+      {progress}
     </section>
   );
 }
@@ -621,7 +720,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
           </div>
         </div>
       ) : banners.length > 0 ? (
-        <BannerCarousel banners={banners} onAction={handleCTA} />
+        <BannerCarousel banners={banners} onAction={handleCTA} storeName={settings.store_name} />
       ) : settings.hero_style === 'none' ? null : (
         <section className="relative overflow-hidden bg-brand-primary" style={{ height: 'clamp(430px, 74vh, 760px)' }}>
           <div className="absolute inset-0 bg-mesh-navy" />
