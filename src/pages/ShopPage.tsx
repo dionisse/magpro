@@ -221,6 +221,11 @@ function BannerCarousel({ banners, onAction, storeName }: {
         <div className="shell w-full">
           <div className="max-w-2xl" key={active}>
             {badge}
+            <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold uppercase tracking-[0.14em] animate-fade-in-up">
+              <Sparkles className="w-3.5 h-3.5 text-brand-accent" />
+              {b.title ? 'En vedette' : (b.subtitle ? 'Nouveauté' : 'Boutique')}
+            </span>
+
             {b.title && (
               <h1 className="mt-5 text-[2.4rem] sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.02] tracking-tight text-balance animate-fade-in-up"
                 style={{ animationDelay: '70ms' }}>
@@ -235,6 +240,30 @@ function BannerCarousel({ banners, onAction, storeName }: {
             )}
             {actions}
             {guarantees}
+
+            <div className="mt-7 flex flex-wrap items-center gap-3 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              {b.cta_text && (
+                <button onClick={() => onAction(b.cta_action)}
+                  className="group inline-flex items-center gap-2.5 bg-brand-accent text-brand-ink font-bold px-6 sm:px-7 py-3.5 rounded-full text-sm
+                             shadow-[0_18px_40px_-16px_rgba(233,164,0,0.9)] hover:bg-white hover:-translate-y-0.5
+                             transition-all duration-300 active:scale-95">
+                  {b.cta_text}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
+              <button onClick={() => onAction(null)}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white
+                           border border-white/25 bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300">
+                Voir le catalogue
+              </button>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-semibold text-white/70 animate-fade-in-up"
+              style={{ animationDelay: '260ms' }}>
+              <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-brand-accent" />Livraison rapide</span>
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-brand-accent" />Paiement sécurisé</span>
+              <span className="inline-flex items-center gap-1.5"><RotateCcw className="w-4 h-4 text-brand-accent" />Retour 7 jours</span>
+            </div>
           </div>
         </div>
       </div>
@@ -242,11 +271,13 @@ function BannerCarousel({ banners, onAction, storeName }: {
       {banners.length > 1 && (
         <>
           <button onClick={() => go(active - 1)}
+          <button onClick={() => { setActive((i) => (i === 0 ? banners.length - 1 : i - 1)); setPaused(true); }}
             aria-label="Bannière précédente"
             className="hidden sm:grid absolute left-3 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white border border-white/20 place-items-center transition-all hover:scale-110">
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button onClick={() => go(active + 1)}
+          <button onClick={() => { setActive((i) => (i + 1) % banners.length); setPaused(true); }}
             aria-label="Bannière suivante"
             className="hidden sm:grid absolute right-3 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md text-white border border-white/20 place-items-center transition-all hover:scale-110">
             <ChevronRight className="w-5 h-5" />
@@ -254,6 +285,17 @@ function BannerCarousel({ banners, onAction, storeName }: {
 
           <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-30">
             {dots}
+          <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-2 rounded-full bg-black/25 backdrop-blur-md border border-white/10">
+            {banners.map((_, i) => (
+              <button key={i} onClick={() => { setActive(i); setPaused(true); }} aria-label={`Aller à la bannière ${i + 1}`}
+                className={`rounded-full transition-all duration-500 ${i === active ? 'bg-brand-accent w-8 h-2' : 'bg-white/40 w-2 h-2 hover:bg-white/70'}`} />
+            ))}
+          </div>
+
+          <div className="absolute bottom-0 inset-x-0 z-30 h-1 bg-white/10 overflow-hidden">
+            {!paused && (
+              <span key={active} className="block h-full bg-brand-accent animate-progress" style={{ animationDuration: '5500ms' }} />
+            )}
           </div>
         </>
       )}
@@ -721,6 +763,7 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
         </div>
       ) : banners.length > 0 ? (
         <BannerCarousel banners={banners} onAction={handleCTA} storeName={settings.store_name} />
+        <BannerCarousel banners={banners} onAction={handleCTA} />
       ) : settings.hero_style === 'none' ? null : (
         <section className="relative overflow-hidden bg-brand-primary" style={{ height: 'clamp(430px, 74vh, 760px)' }}>
           <div className="absolute inset-0 bg-mesh-navy" />
@@ -794,6 +837,21 @@ export function ShopPage({ setView }: { setView: (v: View) => void }) {
 
         {/* ── Catalogue ──────────────────────────────────────────────────── */}
         <section ref={productsSectionRef} className="pb-20 pt-2">
+
+          {/* Sticky toolbar */}
+          <div className="sticky top-[68px] z-30 -mx-4 px-4 sm:mx-0 sm:px-0 pt-3 pb-4 bg-white/90 backdrop-blur-lg">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="hidden lg:block min-w-0">
+                  <p className="eyebrow mb-1">
+                    <span className="w-5 h-px bg-brand-accent" aria-hidden />
+                    {activeSubcategoryName ? activeCategoryName : activeCategoryName ? 'Rayon' : search ? 'Recherche' : 'Catalogue'}
+                  </p>
+                  <h2 className="section-title truncate">
+                    {activeSubcategoryName ?? activeCategoryName ?? (search ? `« ${search} »` : 'Tous les produits')}
+                  </h2>
+                </div>
+
 
           {/* Sticky toolbar */}
           <div className="sticky top-[68px] z-30 -mx-4 px-4 sm:mx-0 sm:px-0 pt-3 pb-4 bg-white/90 backdrop-blur-lg">
