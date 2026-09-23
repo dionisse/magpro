@@ -22,14 +22,63 @@
       body { background: #F5F7FB; }
       #root { min-height: 100vh; }
     </style>
-  </head>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+</head>
   <body>
     <div id="root"></div>
+
+    <!-- Écran de repli : sans variables Supabase ni données de démonstration, l'application
+         ne peut pas démarrer (Supabase lève une erreur avant le rendu React). Plutôt qu'une
+         page blanche, on explique quoi faire — le rendu reste donc identique quel que soit
+         l'environnement, et un écart d'aperçu se voit immédiatement. -->
+    <script>
+      (function () {
+        var url = '%VITE_SUPABASE_URL%';
+        var key = '%VITE_SUPABASE_ANON_KEY%';
+        var configured = url.indexOf('http') === 0 && key.indexOf('http') !== 0 && key.length > 20;
+        if (configured || window.__MOCK__) return;
+        document.getElementById('root').innerHTML =
+          '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;'
+          + 'background:#F5F7FB;padding:24px;font-family:Inter,system-ui,sans-serif;color:#0C1726">'
+          + '<div style="max-width:560px;background:#fff;border:1px solid #E5EAF3;border-radius:20px;'
+          + 'padding:32px;box-shadow:0 18px 40px -24px rgba(11,44,77,.45)">'
+          + '<p style="margin:0 0 8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7B8AA0">Aperçu</p>'
+          + '<h1 style="margin:0 0 12px;font-size:24px;line-height:1.25">Configuration de la boutique requise</h1>'
+          + '<p style="margin:0 0 16px;color:#41506B;line-height:1.6">Cette boutique doit être reliée à sa base de données '
+          + 'Supabase pour afficher le catalogue. Renseignez les variables d\u2019environnement ci-dessous, puis rechargez la page.</p>'
+          + '<ul style="margin:0 0 16px;padding-left:20px;color:#0C1726;line-height:1.9">'
+          + '<li><code style="background:#EDF1F8;border-radius:6px;padding:2px 6px">VITE_SUPABASE_URL</code></li>'
+          + '<li><code style="background:#EDF1F8;border-radius:6px;padding:2px 6px">VITE_SUPABASE_ANON_KEY</code></li></ul>'
+          + '<p style="margin:0;color:#7B8AA0;font-size:14px">En local : créez un fichier <code>.env</code> à la racine du projet. '
+          + 'Sinon, renseignez-les dans les réglages de la plateforme qui héberge l\u2019aperçu.</p>'
+          + '</div></div>';
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      /* Service worker : on ne l'enregistre que si /sw.js existe réellement.
+         Sinon on désinscrit tout worker déjà installé, afin qu'un ancien cache
+         ne serve pas une version obsolète du site. */
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+          fetch('/sw.js', { cache: 'no-store' })
+            .then((res) => {
+              const type = res.headers.get('content-type') || '';
+              // Un serveur de dev renvoie souvent index.html en 200 pour /sw.js :
+              // on vérifie donc aussi le type MIME avant d'enregistrer le worker.
+              if (res.ok && type.indexOf('javascript') !== -1) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+                return;
+              }
+              if (!navigator.serviceWorker.getRegistrations) return;
+              navigator.serviceWorker.getRegistrations()
+                .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+                .catch(() => {});
+            })
+            .catch(() => {});
         });
       }
     </script>

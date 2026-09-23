@@ -191,7 +191,7 @@ export function AdminPOS() {
   if (loading) return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-brand-primary animate-spin" /></div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
+    <div className="shell py-6 lg:py-8">
       <div className="grid lg:grid-cols-5 gap-4" style={{ minHeight: 'calc(100vh - 8rem)' }}>
 
         {/* ── Product grid ── */}

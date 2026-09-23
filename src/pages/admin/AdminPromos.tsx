@@ -296,17 +296,18 @@ export function AdminPromos() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 page-enter">
+    <div className="shell py-6 lg:py-8 page-enter">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <TicketPercent className="w-6 h-6 text-brand-primary" />
-            Codes Promo Partenaires
-          </h1>
-          <p className="text-sm text-brand-muted mt-1">
-            Gérez les codes promo des commerciaux et apporteurs d'affaire, suivez les commissions.
-          </p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><TicketPercent className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Marketing</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Codes Promo Partenaires</h1>
+            <p className="text-sm text-brand-muted mt-1.5">
+              Gérez les codes promo des commerciaux et apporteurs d'affaire, suivez les commissions.
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="btn-ghost">
@@ -383,7 +384,7 @@ export function AdminPromos() {
                   const promoCommission = promoUsages.reduce((s, u) => s + Number(u.commission_amount), 0);
                   const expired = isExpired(pc.ends_at);
                   return (
-                    <tr key={pc.id} className="hover:bg-brand-surface/50 transition">
+                    <tr key={pc.id} className="hover:bg-brand-surface/60 transition-colors transition">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <code className="font-mono font-semibold text-brand-primary bg-brand-primary/5 px-2 py-1 rounded">
@@ -525,7 +526,7 @@ export function AdminPromos() {
               </thead>
               <tbody className="divide-y divide-brand-border">
                 {usages.slice(0, 10).map((u) => (
-                  <tr key={u.id} className="hover:bg-brand-surface/50 transition">
+                  <tr key={u.id} className="hover:bg-brand-surface/60 transition-colors transition">
                     <td className="px-4 py-3 text-xs text-brand-muted">{formatDate(u.created_at)}</td>
                     <td className="px-4 py-3"><code className="font-mono text-brand-primary">{u.code}</code></td>
                     <td className="px-4 py-3 text-brand-dark">{u.partner_name ?? '—'}</td>

@@ -13,8 +13,8 @@ function Modal({ children, title, onClose }: { children: ReactNode; title: strin
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-auto">
-        <div className="sticky top-0 bg-white border-b border-brand-border px-5 py-4 flex items-center justify-between z-10">
-          <h2 className="font-semibold text-lg">{title}</h2>
+        <div className="sticky top-0 glass border-b border-brand-border px-5 sm:px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="font-display font-extrabold text-lg text-brand-ink">{title}</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-brand-surface rounded-lg transition"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-5">{children}</div>
@@ -432,12 +432,13 @@ export function AdminBanners() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 lg:px-6 py-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Megaphone className="w-6 h-6 text-brand-primary" />
+    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <div className="flex items-start gap-3.5 mb-6">
+        <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><Megaphone className="w-5 h-5" /></span>
         <div>
-          <h1 className="text-xl font-bold">Bannières & Promotions</h1>
-          <p className="text-sm text-brand-muted">Gérez les bannières publicitaires et les offres promotionnelles de la boutique.</p>
+          <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Vitrine</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Bannières & Promotions</h1>
+          <p className="text-sm text-brand-muted mt-1.5">Gérez les bannières publicitaires et les offres promotionnelles de la boutique.</p>
         </div>
       </div>
 

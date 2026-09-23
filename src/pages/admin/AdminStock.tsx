@@ -50,7 +50,6 @@ const TYPE_META: Record<MovementType, { label: string; color: string; sign: '+' 
 };
 
 const ENTRY_TYPES: MovementType[] = ['purchase', 'stock_in', 'adjustment'];
-const EXIT_TYPES: MovementType[] = ['damaged', 'adjustment'];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -107,7 +106,6 @@ export function AdminStock() {
     setSavingMov(true);
     setMovError(null);
 
-    const isOut = EXIT_TYPES.includes(movForm.type) && movForm.type !== 'adjustment';
     const isEntry = ENTRY_TYPES.includes(movForm.type);
     const signedQty = (movForm.type === 'damaged') ? -qty
       : (movForm.type === 'adjustment') ? qty   // adjustment is always positive here; negative via negative qty not supported in UI
@@ -189,14 +187,16 @@ export function AdminStock() {
   const outOfStock = trackedProducts.filter((p) => p.stock === 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+    <div className="shell py-6 lg:py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <PackageSearch className="w-6 h-6 text-brand-primary" />Gestion des stocks
-          </h1>
-          <p className="text-sm text-brand-muted mt-1">{products.length} produits actifs</p>
+        <div className="flex items-start gap-3.5">
+          <span className="icon-tile w-11 h-11 rounded-2xl flex-shrink-0"><PackageSearch className="w-5 h-5" /></span>
+          <div>
+            <p className="eyebrow mb-1.5"><span className="w-5 h-px bg-brand-accent" aria-hidden />Inventaire</p>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-brand-ink">Gestion des stocks</h1>
+            <p className="text-sm text-brand-muted mt-1.5">{products.length} produits actifs</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="btn-secondary gap-1.5 text-sm">
@@ -260,14 +260,14 @@ export function AdminStock() {
                 <table className="w-full text-sm">
                   <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                     <tr>
-                      <th className="p-3 text-left">Produit</th>
-                      <th className="p-3 text-left hidden sm:table-cell">SKU</th>
-                      <th className="p-3 text-left hidden lg:table-cell">Marque</th>
-                      <th className="p-3 text-right">Stock actuel</th>
-                      <th className="p-3 text-right hidden md:table-cell">Seuil alerte</th>
-                      <th className="p-3 text-center">Statut</th>
-                      <th className="p-3 text-right hidden lg:table-cell">Prix unitaire</th>
-                      <th className="p-3 text-right hidden lg:table-cell">Valeur stock</th>
+                      <th className="px-4 py-3 text-left">Produit</th>
+                      <th className="px-4 py-3 text-left hidden sm:table-cell">SKU</th>
+                      <th className="px-4 py-3 text-left hidden lg:table-cell">Marque</th>
+                      <th className="px-4 py-3 text-right">Stock actuel</th>
+                      <th className="px-4 py-3 text-right hidden md:table-cell">Seuil alerte</th>
+                      <th className="px-4 py-3 text-center">Statut</th>
+                      <th className="px-4 py-3 text-right hidden lg:table-cell">Prix unitaire</th>
+                      <th className="px-4 py-3 text-right hidden lg:table-cell">Valeur stock</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-brand-border">
@@ -275,6 +275,10 @@ export function AdminStock() {
                       const isOut = p.track_stock && p.stock === 0;
                       const isLow = p.track_stock && p.stock > 0 && p.stock <= p.low_stock_threshold;
                       return (
+                        <tr key={p.id} className={`hover:bg-brand-surface/60 transition-colors ${isOut ? 'bg-brand-danger/[0.03]' : ''}`}>
+                          <td className="px-4 py-3 font-medium">{p.name}</td>
+                          <td className="px-4 py-3 hidden sm:table-cell text-brand-muted font-mono text-xs">{p.sku || '—'}</td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
                         <tr key={p.id} className={`hover:bg-brand-surface/50 ${isOut ? 'bg-brand-danger/[0.03]' : ''}`}>
                           <td className="p-3 font-medium">{p.name}</td>
                           <td className="p-3 hidden sm:table-cell text-brand-muted font-mono text-xs">{p.sku || '—'}</td>
@@ -288,8 +292,8 @@ export function AdminStock() {
                           <td className={`p-3 text-right font-bold text-lg ${!p.track_stock ? 'text-brand-muted' : isOut ? 'text-brand-danger' : isLow ? 'text-brand-warning' : 'text-brand-dark'}`}>
                             {p.track_stock ? p.stock : '—'}
                           </td>
-                          <td className="p-3 text-right hidden md:table-cell text-brand-muted text-xs">{p.track_stock ? p.low_stock_threshold : '—'}</td>
-                          <td className="p-3 text-center">
+                          <td className="px-4 py-3 text-right hidden md:table-cell text-brand-muted text-xs">{p.track_stock ? p.low_stock_threshold : '—'}</td>
+                          <td className="px-4 py-3 text-center">
                             {!p.track_stock ? (
                               <span className="badge bg-brand-border/30 text-brand-muted text-xs">Non suivi</span>
                             ) : isOut ? (
@@ -300,8 +304,8 @@ export function AdminStock() {
                               <span className="badge bg-brand-success/15 text-brand-success text-xs">OK</span>
                             )}
                           </td>
-                          <td className="p-3 text-right hidden lg:table-cell text-brand-muted text-xs">{formatPrice(p.price)}</td>
-                          <td className="p-3 text-right hidden lg:table-cell font-medium">{p.track_stock ? formatPrice(p.price * p.stock) : '—'}</td>
+                          <td className="px-4 py-3 text-right hidden lg:table-cell text-brand-muted text-xs">{formatPrice(p.price)}</td>
+                          <td className="px-4 py-3 text-right hidden lg:table-cell font-medium">{p.track_stock ? formatPrice(p.price * p.stock) : '—'}</td>
                         </tr>
                       );
                     })}
@@ -341,13 +345,13 @@ export function AdminStock() {
                   <table className="w-full text-sm">
                     <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                       <tr>
-                        <th className="p-3 text-left">Date</th>
-                        <th className="p-3 text-left">Produit</th>
-                        <th className="p-3 text-center">Type</th>
-                        <th className="p-3 text-right">Quantité</th>
-                        <th className="p-3 text-left hidden md:table-cell">Référence</th>
-                        <th className="p-3 text-left hidden lg:table-cell">Notes</th>
-                        <th className="p-3 w-10" />
+                        <th className="px-4 py-3 text-left">Date</th>
+                        <th className="px-4 py-3 text-left">Produit</th>
+                        <th className="px-4 py-3 text-center">Type</th>
+                        <th className="px-4 py-3 text-right">Quantité</th>
+                        <th className="px-4 py-3 text-left hidden md:table-cell">Référence</th>
+                        <th className="px-4 py-3 text-left hidden lg:table-cell">Notes</th>
+                        <th className="px-4 py-3 w-10" />
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-brand-border">
@@ -355,18 +359,18 @@ export function AdminStock() {
                         const meta = TYPE_META[m.type] ?? TYPE_META.adjustment;
                         const isNeg = m.quantity < 0;
                         return (
-                          <tr key={m.id} className="hover:bg-brand-surface/50">
-                            <td className="p-3 text-brand-muted text-xs whitespace-nowrap">{formatDate(m.created_at)}</td>
-                            <td className="p-3 font-medium">{m.products?.name ?? '—'}</td>
-                            <td className="p-3 text-center">
+                          <tr key={m.id} className="hover:bg-brand-surface/60 transition-colors">
+                            <td className="px-4 py-3 text-brand-muted text-xs whitespace-nowrap">{formatDate(m.created_at)}</td>
+                            <td className="px-4 py-3 font-medium">{m.products?.name ?? '—'}</td>
+                            <td className="px-4 py-3 text-center">
                               <span className={`badge text-xs ${meta.color}`}>{meta.label}</span>
                             </td>
                             <td className={`p-3 text-right font-bold ${isNeg ? 'text-brand-danger' : 'text-brand-success'}`}>
                               {isNeg ? '' : '+'}{m.quantity}
                             </td>
-                            <td className="p-3 hidden md:table-cell text-brand-muted text-xs">{m.reference || '—'}</td>
-                            <td className="p-3 hidden lg:table-cell text-brand-muted text-xs">{m.notes || '—'}</td>
-                            <td className="p-3">
+                            <td className="px-4 py-3 hidden md:table-cell text-brand-muted text-xs">{m.reference || '—'}</td>
+                            <td className="px-4 py-3 hidden lg:table-cell text-brand-muted text-xs">{m.notes || '—'}</td>
+                            <td className="px-4 py-3">
                               <button onClick={() => deleteMovement(m.id, m.product_id, m.quantity)}
                                 className="text-brand-muted hover:text-brand-danger transition-colors" title="Supprimer et inverser">
                                 <X className="w-3.5 h-3.5" />
@@ -479,30 +483,30 @@ export function AdminStock() {
                   <table className="w-full text-sm">
                     <thead className="bg-brand-surface text-xs font-medium text-brand-muted uppercase">
                       <tr>
-                        <th className="p-3 text-left">Période</th>
-                        <th className="p-3 text-left">Produit</th>
-                        <th className="p-3 text-right">Stock Initial</th>
-                        <th className="p-3 text-right">+ Entrées</th>
-                        <th className="p-3 text-right">− Endommagés</th>
-                        <th className="p-3 text-right">Stock Final</th>
-                        <th className="p-3 text-right font-bold text-brand-primary">= Vendus</th>
-                        <th className="p-3 w-10" />
+                        <th className="px-4 py-3 text-left">Période</th>
+                        <th className="px-4 py-3 text-left">Produit</th>
+                        <th className="px-4 py-3 text-right">Stock Initial</th>
+                        <th className="px-4 py-3 text-right">+ Entrées</th>
+                        <th className="px-4 py-3 text-right">− Endommagés</th>
+                        <th className="px-4 py-3 text-right">Stock Final</th>
+                        <th className="px-4 py-3 text-right font-bold text-brand-primary">= Vendus</th>
+                        <th className="px-4 py-3 w-10" />
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-brand-border">
                       {periods.map((p) => (
-                        <tr key={p.id} className="hover:bg-brand-surface/50">
-                          <td className="p-3">
+                        <tr key={p.id} className="hover:bg-brand-surface/60 transition-colors">
+                          <td className="px-4 py-3">
                             <p className="font-medium">{p.period_label}</p>
                             <p className="text-xs text-brand-muted">{p.start_date} → {p.end_date}</p>
                           </td>
-                          <td className="p-3 text-brand-muted">{p.products?.name ?? '—'}</td>
-                          <td className="p-3 text-right">{p.opening_stock}</td>
-                          <td className="p-3 text-right text-brand-success">+{p.total_in}</td>
-                          <td className="p-3 text-right text-brand-danger">−{p.total_damaged}</td>
-                          <td className="p-3 text-right">{p.closing_stock}</td>
-                          <td className="p-3 text-right font-bold text-brand-primary text-base">{p.sold_qty}</td>
-                          <td className="p-3">
+                          <td className="px-4 py-3 text-brand-muted">{p.products?.name ?? '—'}</td>
+                          <td className="px-4 py-3 text-right">{p.opening_stock}</td>
+                          <td className="px-4 py-3 text-right text-brand-success">+{p.total_in}</td>
+                          <td className="px-4 py-3 text-right text-brand-danger">−{p.total_damaged}</td>
+                          <td className="px-4 py-3 text-right">{p.closing_stock}</td>
+                          <td className="px-4 py-3 text-right font-bold text-brand-primary text-base">{p.sold_qty}</td>
+                          <td className="px-4 py-3">
                             <button onClick={() => deletePeriod(p.id)} className="text-brand-muted hover:text-brand-danger transition-colors">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>

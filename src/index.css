@@ -1,3 +1,49 @@
+/* ─── Polices auto-hébergées ─────────────────────────────────────────────────
+   Inter (texte) et Plus Jakarta Sans (titres) sont servies depuis /fonts au lieu
+   de Google Fonts : le rendu typographique est ainsi identique dans tous les
+   environnements (aperçu Bolt, sandbox, production) et sans requête externe.
+   Licence SIL Open Font License — voir public/fonts/LICENSE-*.txt          */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans Variable';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans Variable';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,7 +54,7 @@
     --shell-x: 1rem;
   }
   html {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
@@ -30,6 +76,28 @@
   ::selection {
     background: #FFC53D;
     color: #071B31;
+  }
+
+  /* Slim, modern scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover { background: #94A3B8; background-clip: content-box; }
+
+  :focus-visible {
+    outline: 2px solid #17507F;
+    outline-offset: 2px;
+  }
+
   }
 
   /* Slim, modern scrollbar */
@@ -112,6 +180,12 @@
            bg-white text-brand-ink/80 transition-all duration-200
            hover:text-brand-primary hover:border-brand-primary/30 hover:shadow-soft active:scale-95;
   }
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-brand-border
+           bg-white text-brand-ink/80 transition-all duration-200
+           hover:text-brand-primary hover:border-brand-primary/30 hover:shadow-soft active:scale-95;
+  }
 
   /* — Forms — */
   .input {
@@ -120,6 +194,10 @@
            transition-all duration-200
            hover:border-brand-primary/30
            focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10;
+  }
+  .label {
+    @apply block text-[13px] font-semibold text-brand-ink/80 mb-1.5;
+  }
   }
   .label {
     @apply block text-[13px] font-semibold text-brand-ink/80 mb-1.5;
@@ -139,6 +217,10 @@
   }
   .panel {
     @apply bg-white border border-brand-border/90 rounded-3xl shadow-soft;
+  }
+  .glass {
+    @apply bg-white/85 backdrop-blur-xl backdrop-saturate-150;
+  }
   }
   .glass {
     @apply bg-white/85 backdrop-blur-xl backdrop-saturate-150;
@@ -163,6 +245,50 @@
   .chip-active {
     @apply chip bg-brand-primary text-white border-brand-primary shadow-[0_8px_20px_-10px_rgba(11,44,77,0.8)];
   }
+
+  /* — Typography helpers — */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-eyebrow font-bold uppercase text-brand-primary/70;
+  }
+  .eyebrow-light {
+    @apply inline-flex items-center gap-2 text-eyebrow font-bold uppercase text-brand-accent;
+  }
+  .section-title {
+    @apply font-display text-2xl sm:text-3xl lg:text-[2rem] font-extrabold text-brand-ink tracking-tight;
+  }
+  .link-quiet {
+    @apply text-sm font-semibold text-brand-muted hover:text-brand-primary transition-colors;
+  }
+  .link-underline {
+    @apply relative font-semibold transition-colors;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -3px; height: 2px; width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after { transform: scaleX(1); }
+
+  /* — Decorative blocks — */
+  .icon-tile {
+    @apply inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-primary/[0.08] text-brand-primary
+           transition-transform duration-300 ease-spring;
+  }
+  .icon-tile-accent { @apply icon-tile bg-brand-accent/20 text-brand-accent-dark; }
+  .icon-tile-success { @apply icon-tile bg-brand-success/[0.12] text-brand-success; }
+  .icon-tile-info { @apply icon-tile bg-brand-info/[0.12] text-brand-info; }
+  .icon-tile-danger { @apply icon-tile bg-brand-danger/10 text-brand-danger; }
+
+  .tile {
+    @apply relative overflow-hidden rounded-2xl bg-brand-surface;
+  }
+  .media-zoom img { @apply transition-transform duration-[900ms] ease-spring; }
+  .media-zoom:hover img { @apply scale-[1.06]; }
 
   /* — Typography helpers — */
   .eyebrow {
@@ -235,6 +361,11 @@
   .toast-info    { @apply toast bg-brand-primary; }
 
   /* — Page transition — */
+  /* `backwards` (et non `both`) : sans cela l'élément conserve la
+     transformation de fin d'animation, ce qui crée un contexte d'empilement et
+     fait passer les fenêtres modales sous l'en-tête collant. */
+  .page-enter {
+    animation: pageEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   .page-enter {
     animation: pageEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
